@@ -1,0 +1,17 @@
+﻿<Window x:Class="TestApi.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TestApi"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Button Content="Test Connection&#xD;&#xA;" HorizontalAlignment="Left" Margin="24,89,0,0" VerticalAlignment="Top" Height="51" Width="115" Click="Button_Click"/>
+        <TextBox HorizontalAlignment="Left" Margin="151,21,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="626" Height="21" Name="txtBaseAddress" />
+        <TextBox HorizontalAlignment="Left" Margin="151,47,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="626" Height="21" x:Name="txtToken" />
+        <Label Content="Base Url&#xD;&#xA;" HorizontalAlignment="Left" Margin="61,16,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.334,-0.114"/>
+        <Label Content="Token&#xD;&#xA;" HorizontalAlignment="Left" Margin="61,47,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.334,-0.114"/>
+        <TextBox HorizontalAlignment="Left" Margin="151,94,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="626" Height="160" x:Name="txtRes" />
+    </Grid>
+</Window>
