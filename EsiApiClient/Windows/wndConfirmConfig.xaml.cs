@@ -27,5 +27,17 @@ namespace EsiApiClient.Windows
             _configModel = configModel;
 
         }
+
+
+        private void BtnConfirm_OnMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            MessageBox.Show("OK");
+
+        }
+
+        private void BtnCancel_OnMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            MessageBox.Show("NOK");
+        }
     }
 }
