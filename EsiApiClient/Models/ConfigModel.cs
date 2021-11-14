@@ -15,6 +15,7 @@ namespace EsiApiClient.Models
         public string Device_Cod { get; set; }
         public string IP { get; set; }
         public string Num_Queue { get; set; }
+        public string WebServiceUrl { get; set; }
         public bool IsConfirmed { get; set; }
     }
 }

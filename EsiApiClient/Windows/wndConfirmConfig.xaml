@@ -5,36 +5,36 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EsiApiClient.Windows"
         mc:Ignorable="d"
-        Title="wndConfirmConfig" Height="768" Width="1368" WindowStyle="None">
-    <Grid>
+        Title="wndConfirmConfig" Height="768" Width="1368" WindowStyle="None" Loaded="WndConfirmConfig_OnLoaded">
+    <Grid x:Name="grdMail">
         <Grid.Background>
-            <ImageBrush ImageSource="../Images/ConfirmConfig.png"/>
+            <ImageBrush ImageSource="../Images/2.png"/>
         </Grid.Background>
-        <TextBox x:Name="txtRestaurant_Cod" HorizontalAlignment="Left" Margin="508,153,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
+        <TextBox x:Name="txtRestaurant_Cod" HorizontalAlignment="Left" Margin="500,149,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
                  Width="212" Height="54" TextAlignment="Center" VerticalContentAlignment="Center"
                  Foreground="White" FontSize="28" BorderBrush="Transparent" Background="#00000000" BorderThickness="0"  >
         </TextBox>
-        <TextBox x:Name="txtDevice_Category" HorizontalAlignment="Left" Margin="508,213,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
+        <TextBox x:Name="txtDevice_Category" HorizontalAlignment="Left" Margin="500,209,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
                  Width="212" Height="54" TextAlignment="Center" VerticalContentAlignment="Center"
                  Foreground="White" FontSize="28" BorderBrush="Transparent" Background="#00000000" BorderThickness="0"  >
         </TextBox>
-        <TextBox x:Name="txtDevice_Type" HorizontalAlignment="Left" Margin="508,274,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
+        <TextBox x:Name="txtDevice_Type" HorizontalAlignment="Left" Margin="500,270,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
                  Width="212" Height="54" TextAlignment="Center" VerticalContentAlignment="Center"
                  Foreground="White" FontSize="28" BorderBrush="Transparent" Background="#00000000" BorderThickness="0"  >
         </TextBox>
-        <TextBox x:Name="txtDevice_Name" HorizontalAlignment="Left" Margin="508,337,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
+        <TextBox x:Name="txtDevice_Name" HorizontalAlignment="Left" Margin="500,333,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
                  Width="212" Height="54" TextAlignment="Center" VerticalContentAlignment="Center"
                  Foreground="White" FontSize="28" BorderBrush="Transparent" Background="#00000000" BorderThickness="0"  >
         </TextBox>
-        <TextBox x:Name="txtDevice_Cod" HorizontalAlignment="Left" Margin="508,398,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
+        <TextBox x:Name="txtDevice_Cod" HorizontalAlignment="Left" Margin="500,394,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
                  Width="212" Height="54" TextAlignment="Center" VerticalContentAlignment="Center"
                  Foreground="White" FontSize="28" BorderBrush="Transparent" Background="#00000000" BorderThickness="0"  >
         </TextBox>
-        <TextBox x:Name="txtIP" HorizontalAlignment="Left" Margin="508,464,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
+        <TextBox x:Name="txtIP" HorizontalAlignment="Left" Margin="500,460,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
                  Width="212" Height="54" TextAlignment="Center" VerticalContentAlignment="Center"
                  Foreground="White" FontSize="28" BorderBrush="Transparent" Background="#00000000" BorderThickness="0"  >
         </TextBox>
-        <TextBox x:Name="txtNum_Queue" HorizontalAlignment="Left" Margin="508,530,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
+        <TextBox x:Name="txtNum_Queue" HorizontalAlignment="Left" Margin="500,526,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
                  Width="212" Height="54" TextAlignment="Center" VerticalContentAlignment="Center"
                  Foreground="White" FontSize="28" BorderBrush="Transparent" Background="#00000000" BorderThickness="0"  >
         </TextBox>
