@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Fonts\Vazir.ttf" />
     <None Remove="Images\1.PNG" />
     <None Remove="Images\10.PNG" />
     <None Remove="Images\11.PNG" />
@@ -54,6 +55,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Fonts\Vazir.ttf" />
     <Resource Include="Images\1.PNG" />
     <Resource Include="Images\10.PNG" />
     <Resource Include="Images\11.PNG" />

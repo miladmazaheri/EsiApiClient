@@ -4,6 +4,6 @@
              xmlns:local="clr-namespace:EsiApiClient"
              StartupUri="Windows/MainWindow.xaml">
     <Application.Resources>
-         
+        <FontFamily x:Key="Vazir">pack://application:,,,/Fonts/#Vazir</FontFamily>
     </Application.Resources>
 </Application>

@@ -5,8 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EsiApiClient.Windows"
         mc:Ignorable="d"
-        Title="wndCompleteConfig" Height="450" Width="800">
-    <Grid>
-        
+        Title="wndCompleteConfig" Height="768" Width="1366 " WindowStyle="None" Loaded="WndCompleteConfig_OnLoaded">
+    <Grid x:Name="grdMain">
+        <Grid.Background>
+            <ImageBrush ImageSource="../Images/4.png"/>
+        </Grid.Background>
+        <Label x:Name="lblError" Content="خطایی در ارتباط با سرور رخ داده است" HorizontalAlignment="Left" Margin="518,412,0,0" VerticalAlignment="Top" Width="347" Height="62"
+               Foreground="Red" FontFamily="{StaticResource Vazir}" FontSize="22"/>
     </Grid>
 </Window>

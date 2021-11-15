@@ -16,6 +16,20 @@ namespace EsiApiClient.Models
         public string IP { get; set; }
         public string Num_Queue { get; set; }
         public string WebServiceUrl { get; set; }
+        public bool CheckOnline { get; set; }
         public bool IsConfirmed { get; set; }
+
+        public bool IsValid()
+        {
+            return
+                !string.IsNullOrWhiteSpace(Restaurant_Cod) &&
+                !string.IsNullOrWhiteSpace(Device_Category) &&
+                !string.IsNullOrWhiteSpace(Device_Type) &&
+                !string.IsNullOrWhiteSpace(Device_Name) &&
+                !string.IsNullOrWhiteSpace(Device_Cod) &&
+                !string.IsNullOrWhiteSpace(IP) &&
+                !string.IsNullOrWhiteSpace(Num_Queue) &&
+                !string.IsNullOrWhiteSpace(WebServiceUrl);
+        }
     }
 }
