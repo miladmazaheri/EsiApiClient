@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Management;
 using System.Text.Json;
+using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using EsiApiClient.Models;
@@ -21,12 +22,12 @@ namespace EsiApiClient.Windows
             InitializeComponent();
         }
 
-        private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
+        private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
-            CheckConfigStatusAndInitUtilities();
+            await CheckConfigStatusAndInitUtilities();
         }
 
-        private void CheckConfigStatusAndInitUtilities()
+        private async Task CheckConfigStatusAndInitUtilities()
         {
             if (!File.Exists(_configPath))
             {
@@ -55,6 +56,7 @@ namespace EsiApiClient.Windows
                 }
                 else
                 {
+                    await GetConfigFromServerAsync();
                     InitReConfigListener();
                     InitUpdateFromApiTimer();
                     InitFingerPrintListener();
@@ -62,6 +64,12 @@ namespace EsiApiClient.Windows
                 }
             }
         }
+
+        private async Task GetConfigFromServerAsync()
+        {
+            
+        }
+
         private void ShowNeedConfig()
         {
             _ = new wndNeedConfig().ShowDialog();
