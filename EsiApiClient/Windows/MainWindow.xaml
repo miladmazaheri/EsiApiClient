@@ -7,6 +7,8 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="768" Width="1366" Loaded="MainWindow_OnLoaded" WindowStyle="None"  >
     <Grid x:Name="dgMain">
-
+        <Grid.Background>
+            <ImageBrush ImageSource="../Images/0.png"/>
+        </Grid.Background>
     </Grid>
 </Window>

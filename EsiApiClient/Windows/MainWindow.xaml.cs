@@ -2,11 +2,20 @@
 using System.Globalization;
 using System.IO;
 using System.Management;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Threading;
+using DNTPersianUtils.Core;
+using EsiApiClient.Api;
+using EsiApiClient.Api.Dto;
 using EsiApiClient.Models;
+using EsiApiClient.Tools;
 using Timer = System.Timers.Timer;
 
 namespace EsiApiClient.Windows
@@ -17,25 +26,34 @@ namespace EsiApiClient.Windows
     public partial class MainWindow : Window
     {
         private readonly string _configPath = Directory.GetCurrentDirectory() + @"\config.json";
+        private readonly Timer _recheckTimer;
+
         public MainWindow()
         {
             InitializeComponent();
+            _recheckTimer = new Timer(30000);
+            _recheckTimer.Elapsed += async (sender, e) => await GetConfigFromServerAsync();
+        }
+
+        private void RecheckTimerCallBack(object state)
+        {
+            throw new NotImplementedException();
         }
 
         private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
-            await CheckConfigStatusAndInitUtilities();
+            await CheckConfigStatusAndInitUtilitiesAsync();
         }
 
-        private async Task CheckConfigStatusAndInitUtilities()
+        private async Task CheckConfigStatusAndInitUtilitiesAsync()
         {
             if (!File.Exists(_configPath))
             {
-                ShowNeedConfig();
+                await ShowNeedConfigAsync();
             }
             else
             {
-                var configContent = File.ReadAllBytes(_configPath);
+                var configContent = await File.ReadAllBytesAsync(_configPath);
                 ConfigModel configModel;
                 try
                 {
@@ -48,11 +66,11 @@ namespace EsiApiClient.Windows
 
                 if (configModel == null)
                 {
-                    ShowNeedConfig();
+                    await ShowNeedConfigAsync();
                 }
                 else if (!configModel.IsConfirmed)
                 {
-                    ShowConfirmConfig(configModel);
+                    await ShowConfirmConfigAsync(configModel);
                 }
                 else
                 {
@@ -67,20 +85,70 @@ namespace EsiApiClient.Windows
 
         private async Task GetConfigFromServerAsync()
         {
-            
+            _recheckTimer.Stop();
+            SetBackGroundImage("9");
+            try
+            {
+                var mainInfo = await ApiClient.MainInfo_Send_Lookup_Data_Fun();
+                SetBackGroundImage("10");
+                SystemTimeHelper.SetSystemTime(mainInfo.ServerDateTime);
+                //TODO Save In Database
+                Thread.Sleep(2000);
+            }
+            catch (Exception)
+            {
+                //TODO Log
+                SetBackGroundImage("11");
+                _recheckTimer.Start();
+                return;
+            }
+
+            SetBackGroundImage("12");
+            //TODO Update Personnel Info
+            Thread.Sleep(2000);
+            SetBackGroundImage("13");
+
+            SetBackGroundImage("15");
+            try
+            {
+                //TODO decide about cod meal
+                var reservationDate = await ApiClient.MainInfo_Send_Offline_Data_Fun(new MainInfo_Send_Offline_Data_Fun_Input_Data(App.AppConfig.Device_Cod,DateTime.Now.ToServerDateFormat(),"22"));
+                SetBackGroundImage("16");
+                //TODO Save In Database
+                Thread.Sleep(2000);
+            }
+            catch (Exception)
+            {
+                //TODO Log
+                SetBackGroundImage("17");
+                _recheckTimer.Start();
+                return;
+            }
+
+            SetBackGroundImage("21");
         }
 
-        private void ShowNeedConfig()
+        private async Task ShowNeedConfigAsync()
         {
             _ = new wndNeedConfig().ShowDialog();
-            CheckConfigStatusAndInitUtilities();
+            await CheckConfigStatusAndInitUtilitiesAsync();
         }
-        private void ShowConfirmConfig(ConfigModel configModel)
+        private async Task ShowConfirmConfigAsync(ConfigModel configModel)
         {
             _ = new wndConfirmConfig(configModel).ShowDialog();
-            CheckConfigStatusAndInitUtilities();
+            await CheckConfigStatusAndInitUtilitiesAsync();
         }
 
+
+        private void SetBackGroundImage(string imageName)
+        {
+            Dispatcher.BeginInvoke(() =>
+            {
+                dgMain.Background =
+                    new ImageBrush(new BitmapImage(
+                        new Uri(@$"pack://application:,,,/EsiApiClient;component/Images/{imageName}.png")));
+            });
+        }
 
         #region ReConfig Listener
         private void InitReConfigListener()
@@ -92,7 +160,7 @@ namespace EsiApiClient.Windows
             watcher.Start();
         }
 
-        private void Watcher_EventArrived(object sender, EventArrivedEventArgs e)
+        private async void Watcher_EventArrived(object sender, EventArrivedEventArgs e)
         {
             var driveNameProp = e.NewEvent.Properties["DriveName"];
             if (!string.IsNullOrWhiteSpace(driveNameProp?.Value.ToString()))
@@ -102,13 +170,13 @@ namespace EsiApiClient.Windows
                 {
                     try
                     {
-                        var configContent = File.ReadAllText(configFilePath);
+                        var configContent = await File.ReadAllTextAsync(configFilePath);
                         if (!string.IsNullOrWhiteSpace(configContent))
                         {
                             var configModel = JsonSerializer.Deserialize<ConfigModel>(configContent);
                             if (configModel != null)
                             {
-                                ShowConfirmConfig(configModel);
+                                await ShowConfirmConfigAsync(configModel);
                             }
                         }
                     }

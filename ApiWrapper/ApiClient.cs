@@ -14,7 +14,7 @@ namespace EsiApiClient.Api
     public static class ApiClient
     {
         private static string baseUrl;
-        private static HttpClient httpClient = new HttpClient();
+        private static HttpClient httpClient = new();
         /// <summary>
         /// تنظیم آدرس اصلی سرور
         /// </summary>
@@ -40,13 +40,18 @@ namespace EsiApiClient.Api
         /// <summary>
         /// جهت تعیین وعده غذایی توسط کاربر جهت دریافت لیست افراد دریافت کننده
         /// </summary>
-        public static async Task<MainInfo_Send_Lookup_Data_Fun_Output> MainInfo_Send_Lookup_Data_Fun()
+        public static async Task<MainInfo_Send_Lookup_Data_Fun> MainInfo_Send_Lookup_Data_Fun()
         {
             try
             {
-                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/MainInfo_Send_Lookup_Data_Fun", null);
+                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/MainInfo_Send_Lookup_Data_Fun", new StringContent("{\"JSON_CHARACTER\":\"[]\"}"));
                 var resAsString = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<MainInfo_Send_Lookup_Data_Fun_Output>(resAsString);
+                var res1 = JsonSerializer.Deserialize<MainInfo_Send_Lookup_Data_Fun_Output>(resAsString);
+                if (res1 != null && string.IsNullOrWhiteSpace(res1.MainInfo_Send_Lookup_Data_Fun)) return null;
+                var res2 = JsonSerializer.Deserialize<MainInfo_Send_Lookup_Data_Fun>(res1.MainInfo_Send_Lookup_Data_Fun);
+                //TODO: Fill Server Date Time Prop From Response Header`
+                //res2.ServerDateTime = 
+                return res2;
             }
             catch (Exception)
             {
@@ -57,13 +62,15 @@ namespace EsiApiClient.Api
         /// <summary>
         /// ارسال اطلاعات رزرواسیون سرویس گیرنده ها در حالت آفلاین
         /// </summary>
-        public static async Task<MainInfo_Send_Offline_Data_Fun_Output> MainInfo_Send_Offline_Data_Fun(MainInfo_Send_Offline_Data_Fun_Input input)
+        public static async Task<List<MainInfo_Send_Offline_Data_Fun_Output_Data>> MainInfo_Send_Offline_Data_Fun(MainInfo_Send_Offline_Data_Fun_Input_Data input)
         {
             try
             {
-                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/MainInfo_Send_Offline_Data_Fun", new StringContent(JsonSerializer.Serialize(input, new JsonSerializerOptions(JsonSerializerDefaults.Web))));
+                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/MainInfo_Send_Offline_Data_Fun", new StringContent(input.ToJsonString()));
                 var resAsString = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<MainInfo_Send_Offline_Data_Fun_Output>(resAsString);
+                var res1 = JsonSerializer.Deserialize<MainInfo_Send_Offline_Data_Fun_Output>(resAsString);
+                if (res1 != null && string.IsNullOrWhiteSpace(res1.MainInfoSendOfflineDataFun)) return null;
+                return JsonSerializer.Deserialize<List<MainInfo_Send_Offline_Data_Fun_Output_Data>>(res1.MainInfoSendOfflineDataFun);
             }
             catch (Exception)
             {

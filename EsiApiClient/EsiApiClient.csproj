@@ -9,6 +9,7 @@
 
 	<ItemGroup>
 		<None Remove="Fonts\Vazir.ttf" />
+		<None Remove="Images\0.png" />
 		<None Remove="Images\1.PNG" />
 		<None Remove="Images\10.PNG" />
 		<None Remove="Images\11.PNG" />
@@ -47,6 +48,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="DNTPersianUtils.Core" Version="5.3.1" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 		<PackageReference Include="System.Management" Version="5.0.0" />
 	</ItemGroup>
@@ -57,6 +59,7 @@
 
 	<ItemGroup>
 		<Resource Include="Fonts\Vazir.ttf" />
+		<Resource Include="Images\0.png" />
 		<Resource Include="Images\1.PNG" />
 		<Resource Include="Images\10.PNG" />
 		<Resource Include="Images\11.PNG" />

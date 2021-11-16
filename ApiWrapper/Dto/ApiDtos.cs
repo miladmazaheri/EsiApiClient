@@ -1,4 +1,5 @@
-﻿using System.CodeDom;
+﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 
 namespace EsiApiClient.Api.Dto
@@ -40,15 +41,61 @@ namespace EsiApiClient.Api.Dto
     #region MainInfo_Send_Lookup_Data_Fun
     public class MainInfo_Send_Lookup_Data_Fun_Output
     {
-        public MainInfo_Send_Lookup_Data_Fun MainInfo_Send_Lookup_Data_Fun { get; set; }
+        public string MainInfo_Send_Lookup_Data_Fun { get; set; }
     }
 
     public class MainInfo_Send_Lookup_Data_Fun
     {
-        public List<Meals> Meals { get; set; }
+        public List<Meal> Meals { get; set; }
+        public List<Restaurant> Restaurant { get; set; }
+        public List<Direction> Direction { get; set; }
+        public List<DeviceCategory> Device_Category { get; set; }
+        public List<DeviceType> Device_Type { get; set; }
+        public List<QueueNumber> Queue_Number { get; set; }
+
+        public DateTime ServerDateTime { get; set; }
     }
 
-    public class Meals
+    public class Meal
+    {
+        public string Cod_Data { get; set; }
+        public string Des_Data { get; set; }
+    }
+
+    public class Device
+    {
+        public string Device_Category { get; set; }
+        public int Device_Id { get; set; }
+        public string Des_Device { get; set; }
+        public string Cod_Device { get; set; }
+    }
+
+    public class Restaurant
+    {
+        public string Cod_Data { get; set; }
+        public string Des_Data { get; set; }
+        public List<Device> Devices { get; set; }
+    }
+
+    public class Direction
+    {
+        public string Cod_Data { get; set; }
+        public string Des_Data { get; set; }
+    }
+
+    public class DeviceCategory
+    {
+        public string Cod_Data { get; set; }
+        public string Des_Data { get; set; }
+    }
+
+    public class DeviceType
+    {
+        public string Cod_Data { get; set; }
+        public string Des_Data { get; set; }
+    }
+
+    public class QueueNumber
     {
         public string Cod_Data { get; set; }
         public string Des_Data { get; set; }
@@ -74,6 +121,11 @@ namespace EsiApiClient.Api.Dto
             Date = date;
             Cod_Meal = codMeal;
         }
+
+        public string ToJsonString()
+        {
+            return "{\"JSON_CHARACTER\": \"[{\"" + Device_Cod + "\":\"{0}\", \"DATE\":\"" + Date + "\", \"COD_MEAL\":\"" + Cod_Meal + "\"}]\" }";
+        }
     }
 
     public class MainInfo_Send_Offline_Data_Fun_Input : BaseInput<MainInfo_Send_Offline_Data_Fun_Input_Data>
@@ -83,7 +135,7 @@ namespace EsiApiClient.Api.Dto
 
     public class MainInfo_Send_Offline_Data_Fun_Output
     {
-        public List<MainInfo_Send_Offline_Data_Fun_Output_Data> MainInfoSendOfflineDataFun { get; set; }
+        public string MainInfoSendOfflineDataFun { get; set; }
     }
     public class MainInfo_Send_Offline_Data_Fun_Output_Data
     {
@@ -110,37 +162,6 @@ namespace EsiApiClient.Api.Dto
 
         public List<Course> Main_Course { get; set; }
         public List<Course> Appetizer_Dessert { get; set; }
-
-        public MainInfo_Send_Offline_Data_Fun_Output_Data()
-        {
-
-        }
-
-        public MainInfo_Send_Offline_Data_Fun_Output_Data(string receiverMealPlanDayId, string reciverCouponId, string mealPlanDayId, string numIde, string firstNameIde, string lastNameIde, string codSerial, string codContractOrder, string desContractOrder, string employeeShiftName, string datDayMepdy, string desNamMeal, string numTimStrMealRsmls, string numTimEndMealRsmls, string desNamResturantRstm, string numTotCouponRccpn, string desFoodOrderMepdy, string lkpCodOrderMepdyMeans, string codResturant, string codCoupon, List<Course> mainCourse, List<Course> appetizerDessert)
-        {
-            Receiver_Meal_Plan_Day_Id = receiverMealPlanDayId;
-            Reciver_Coupon_Id = reciverCouponId;
-            Meal_Plan_Day_Id = mealPlanDayId;
-            Num_Ide = numIde;
-            First_Name_Ide = firstNameIde;
-            Last_Name_Ide = lastNameIde;
-            Cod_Serial = codSerial;
-            Cod_Contract_Order = codContractOrder;
-            Des_Contract_Order = desContractOrder;
-            Employee_Shift_Name = employeeShiftName;
-            Dat_Day_Mepdy = datDayMepdy;
-            Des_Nam_Meal = desNamMeal;
-            Num_Tim_Str_Meal_Rsmls = numTimStrMealRsmls;
-            Num_Tim_End_Meal_Rsmls = numTimEndMealRsmls;
-            Des_Nam_Resturant_Rstm = desNamResturantRstm;
-            Num_Tot_Coupon_Rccpn = numTotCouponRccpn;
-            Des_Food_Order_Mepdy = desFoodOrderMepdy;
-            Lkp_Cod_Order_Mepdy_Means = lkpCodOrderMepdyMeans;
-            Cod_Resturant = codResturant;
-            Cod_Coupon = codCoupon;
-            Main_Course = mainCourse;
-            Appetizer_Dessert = appetizerDessert;
-        }
 
     }
 
@@ -242,7 +263,7 @@ namespace EsiApiClient.Api.Dto
 
         public RESTRN_QUEUE_HAVE_RESERVE_FUN_Output()
         {
-            
+
         }
 
         public RESTRN_QUEUE_HAVE_RESERVE_FUN_Output(bool isSuccessFull, RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_OnFail failOutput, RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_OnSuccess successOutput)
@@ -282,7 +303,7 @@ namespace EsiApiClient.Api.Dto
 
         public MAININFO_REGISTER_DEVICE_FUN_Input()
         {
-            
+
         }
         public MAININFO_REGISTER_DEVICE_FUN_Input(params MAININFO_REGISTER_DEVICE_FUN_Input_Data[] inputs)
         {
