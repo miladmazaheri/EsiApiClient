@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -48,6 +50,11 @@ namespace EsiApiClient.Windows
                 }));
             var isSuccess = res?.MAININFO_REGISTER_DEVICE_FUN.Any(x => x.Message_Code == "WS300") ?? false;
             SetBackGroundImage(isSuccess);
+            if (isSuccess)
+            {
+                _configModel.IsConfirmed = true;
+                await File.WriteAllTextAsync(App.ConfigFilePath, JsonSerializer.Serialize(_configModel));
+            }
             _ = new Timer(Callback, isSuccess, 3000, int.MaxValue);
         }
 

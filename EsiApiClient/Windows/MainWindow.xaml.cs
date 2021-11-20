@@ -25,7 +25,6 @@ namespace EsiApiClient.Windows
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly string _configPath = Directory.GetCurrentDirectory() + @"\config.json";
         private readonly Timer _recheckTimer;
 
         public MainWindow()
@@ -35,11 +34,6 @@ namespace EsiApiClient.Windows
             _recheckTimer.Elapsed += async (sender, e) => await GetConfigFromServerAsync();
         }
 
-        private void RecheckTimerCallBack(object state)
-        {
-            throw new NotImplementedException();
-        }
-
         private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
             await CheckConfigStatusAndInitUtilitiesAsync();
@@ -47,13 +41,13 @@ namespace EsiApiClient.Windows
 
         private async Task CheckConfigStatusAndInitUtilitiesAsync()
         {
-            if (!File.Exists(_configPath))
+            if (!File.Exists(App.ConfigFilePath))
             {
                 await ShowNeedConfigAsync();
             }
             else
             {
-                var configContent = await File.ReadAllBytesAsync(_configPath);
+                var configContent = await File.ReadAllBytesAsync(App.ConfigFilePath);
                 ConfigModel configModel;
                 try
                 {
