@@ -2,8 +2,16 @@
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using System.Windows.Threading;
+using ApiWrapper;
 using IPAClient.Models;
+using IPAClient.Windows;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
+using NLog.Extensions.Logging;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace IPAClient
 {
@@ -13,12 +21,63 @@ namespace IPAClient
     public partial class App : Application
     {
         public static ConfigModel AppConfig { get; set; }
-        public static string ConfigFilePath = Directory.GetCurrentDirectory() + @"\config.json";
+        public static string ConfigFilePath => Directory.GetCurrentDirectory() + @"\config.json";
+        private static ILogger Logger;
+        public App()
+        {
+            #region For Initilize Logger
+            var host = new HostBuilder()
+                .ConfigureServices((hostContext, services) =>
+                {
+                    //Lets Create single tone instance of Master windows
+                    services.AddSingleton<MainWindow>();
 
+                })
+                .ConfigureLogging(logBuilder =>
+                {
+                    logBuilder.SetMinimumLevel(LogLevel.Error);
+                    logBuilder.AddNLog("nlog.config");
+
+                }).Build();
+
+            using var serviceScope = host.Services.CreateScope();
+            {
+                var services = serviceScope.ServiceProvider;
+                try
+                {
+                    Logger = services.GetRequiredService<ILogger<MainWindow>>();
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
+            }
+            #endregion
+        }
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+            ManageUnhandledExceptions();
             SetStartup();
+            ConfigureApiClient();
+        }
+
+        private void ConfigureApiClient()
+        {
+            ApiClient.SetLogger(Logger);
+            ApiClient.SetAuthToken("Basic TkFNRk9PRHVzZXIxOjUxZjIzMDQxYWNkOGRmNzlkMWIxOGY2ZjE2ZWE4YzM2");
+        }
+        private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            AddLog(e.Exception);
+            e.Handled = true;
+        }
+        private void ManageUnhandledExceptions()
+        {
+            AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+            {
+                AddLog((Exception)args.ExceptionObject);
+            };
         }
         private void SetStartup()
         {
@@ -38,10 +97,17 @@ namespace IPAClient
                     rkm.SetValue(appName, exePath);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //TODO Log
+                AddLog(ex);
             }
+
+
+        }
+
+        public static void AddLog(Exception ex)
+        {
+            Logger.LogError(ex, "");
         }
     }
 }

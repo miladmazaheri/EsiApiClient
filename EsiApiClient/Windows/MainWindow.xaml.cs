@@ -70,6 +70,7 @@ namespace IPAClient.Windows
                 else
                 {
                     App.AppConfig = configModel;
+                    ApiClient.SetBaseUrl(string.IsNullOrWhiteSpace(configModel.WebServiceUrl)? "http://eis.msc.ir/" : configModel.WebServiceUrl);
                     await GetConfigFromServerAsync();
                     InitReConfigListener();
                     InitUpdateFromApiTimer();
@@ -92,9 +93,9 @@ namespace IPAClient.Windows
                 //TODO Save In Database
                 Thread.Sleep(2000);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //TODO Log
+                App.AddLog(ex);
                 SetBackGroundImage("11");
                 _recheckTimer.Start();
                 return;
@@ -115,9 +116,9 @@ namespace IPAClient.Windows
                 //TODO Save In Database
                 Thread.Sleep(2000);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //TODO Log
+                App.AddLog(ex);
                 SetBackGroundImage("17");
                 _recheckTimer.Start();
                 return;
@@ -139,7 +140,6 @@ namespace IPAClient.Windows
             _ = new wndConfirmConfig(configModel).ShowDialog();
             await CheckConfigStatusAndInitUtilitiesAsync();
         }
-
 
         private void SetBackGroundImage(string imageName)
         {

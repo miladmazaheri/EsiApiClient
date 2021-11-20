@@ -54,7 +54,11 @@
 
 	<ItemGroup>
 		<PackageReference Include="DNTPersianUtils.Core" Version="5.3.1" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<PackageReference Include="NLog.Web.AspNetCore" Version="4.14.0" />
 		<PackageReference Include="System.Management" Version="5.0.0" />
 	</ItemGroup>
 
@@ -121,6 +125,9 @@
 	<ItemGroup>
 		<None Update="config.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="nLog.config">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
 

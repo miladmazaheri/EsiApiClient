@@ -1,17 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using ApiWrapper.Dto;
+using Microsoft.Extensions.Logging;
 
 namespace ApiWrapper
 {
     public static class ApiClient
     {
         private static string baseUrl;
-        private static HttpClient httpClient = new HttpClient();
+        private static readonly HttpClient httpClient = new HttpClient();
+        private static ILogger _logger;
+
+
+        public static void SetLogger(ILogger logger)
+        {
+            _logger = logger;
+        }
         /// <summary>
         /// تنظیم آدرس اصلی سرور
         /// </summary>
@@ -34,6 +43,7 @@ namespace ApiWrapper
             }
             httpClient.DefaultRequestHeaders.Add(key, token);
         }
+
         /// <summary>
         /// جهت تعیین وعده غذایی توسط کاربر جهت دریافت لیست افراد دریافت کننده
         /// </summary>
@@ -67,9 +77,9 @@ namespace ApiWrapper
                 }
                 return res2;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //TODO : Log
+                AddLog(ex);
                 return null;
             }
         }
@@ -86,9 +96,9 @@ namespace ApiWrapper
                 if (res1 != null && string.IsNullOrWhiteSpace(res1.MainInfoSendOfflineDataFun)) return null;
                 return JsonSerializer.Deserialize<List<MainInfo_Send_Offline_Data_Fun_Output_Data>>(res1.MainInfoSendOfflineDataFun);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //TODO : Log
+                AddLog(ex);
                 return null;
             }
         }
@@ -103,9 +113,9 @@ namespace ApiWrapper
                 var resAsString = await response.Content.ReadAsStringAsync();
                 return JsonSerializer.Deserialize<MainInfo_Synchronize_Data_Fun_Output>(resAsString);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //TODO : Log
+                AddLog(ex);
                 return null;
             }
         }
@@ -120,9 +130,9 @@ namespace ApiWrapper
                 var resAsString = await response.Content.ReadAsStringAsync();
                 return JsonSerializer.Deserialize<MAININFO_REGISTER_DEVICE_FUN_Output>(resAsString);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //TODO : Log
+                AddLog(ex);
                 return null;
             }
         }
@@ -137,9 +147,9 @@ namespace ApiWrapper
                 var resAsString = await response.Content.ReadAsStringAsync();
                 return JsonSerializer.Deserialize<MainInfo_User_Authenticate_Fun_Output>(resAsString);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //TODO : Log
+                AddLog(ex);
                 return null;
             }
         }
@@ -163,11 +173,18 @@ namespace ApiWrapper
                     return new RESTRN_QUEUE_HAVE_RESERVE_FUN_Output(true, res, null);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //TODO : Log
+                AddLog(ex);
                 return null;
             }
         }
+
+
+        private static void AddLog(Exception ex)
+        {
+            _logger?.LogError(ex, $"ApiError-{(new StackFrame(1, true).GetMethod()?.Name ?? "")}");
+        }
+
     }
 }
