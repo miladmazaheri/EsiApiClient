@@ -49,8 +49,25 @@ namespace EsiApiClient.Api
                 var res1 = JsonSerializer.Deserialize<MainInfo_Send_Lookup_Data_Fun_Output>(resAsString);
                 if (res1 != null && string.IsNullOrWhiteSpace(res1.MainInfo_Send_Lookup_Data_Fun)) return null;
                 var res2 = JsonSerializer.Deserialize<MainInfo_Send_Lookup_Data_Fun>(res1.MainInfo_Send_Lookup_Data_Fun);
-                //TODO: Fill Server Date Time Prop From Response Header`
-                //res2.ServerDateTime = 
+                if (res2 == null) return null;
+
+                //Read Server Date Time From Response Header
+                if (response.Headers.TryGetValues("Date", out var dateValues))
+                {
+                    var dateStr = dateValues.First();
+                    if (DateTime.TryParse(dateStr, out var date))
+                    {
+                        res2.ServerDateTime = date;
+                    }
+                    else
+                    {
+                        res2.ServerDateTime = DateTime.Now;
+                    }
+                }
+                else
+                {
+                    res2.ServerDateTime = DateTime.Now;
+                }
                 return res2;
             }
             catch (Exception)
