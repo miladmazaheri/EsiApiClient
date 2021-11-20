@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using DNTPersianUtils.Core;
 
-namespace EsiApiClient.Tools
+namespace IPAClient.Tools
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct SYSTEMTIME

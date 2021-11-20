@@ -1,9 +1,8 @@
-﻿<Window x:Class="EsiApiClient.Windows.wndConfirmConfig"
+﻿<Window x:Class="IPAClient.Windows.wndConfirmConfig"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:EsiApiClient.Windows"
         mc:Ignorable="d"
         Title="wndConfirmConfig"  Style="{StaticResource AppWindow}"  Loaded="WndConfirmConfig_OnLoaded">
     <Grid x:Name="grdMail">

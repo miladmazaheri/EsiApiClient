@@ -1,25 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Windows.Threading;
 using EsiApiClient.Api;
 using EsiApiClient.Api.Dto;
-using EsiApiClient.Models;
+using IPAClient.Models;
 
-namespace EsiApiClient.Windows
+namespace IPAClient.Windows
 {
     /// <summary>
     /// Interaction logic for wndCompleteConfig.xaml

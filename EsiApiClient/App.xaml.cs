@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
-using EsiApiClient.Models;
+using IPAClient.Models;
 using Microsoft.Win32;
 
-namespace EsiApiClient
+namespace IPAClient
 {
     /// <summary>
     /// Interaction logic for App.xaml
@@ -26,18 +22,25 @@ namespace EsiApiClient
         }
         private void SetStartup()
         {
-            var appName = "IPA_Client";
-            var exePath = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
-
-            if (exePath != null)
+            try
             {
-                ////Current User
-                //RegistryKey rku = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-                //rku.SetValue(appName, exePath);
+                var appName = "IPA_Client";
+                var exePath = Process.GetCurrentProcess().MainModule?.FileName;
 
-                ////Local Machine
-                RegistryKey rkm = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-                rkm.SetValue(appName, exePath);
+                if (exePath != null)
+                {
+                    ////Current User
+                    //RegistryKey rku = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+                    //rku.SetValue(appName, exePath);
+
+                    ////Local Machine
+                    RegistryKey rkm = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+                    rkm.SetValue(appName, exePath);
+                }
+            }
+            catch (Exception)
+            {
+                //TODO Log
             }
         }
     }

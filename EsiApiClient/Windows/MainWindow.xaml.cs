@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.IO;
 using System.Management;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,14 +10,13 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using DNTPersianUtils.Core;
 using EsiApiClient.Api;
 using EsiApiClient.Api.Dto;
-using EsiApiClient.Models;
-using EsiApiClient.Tools;
+using IPAClient.Models;
+using IPAClient.Tools;
 using Timer = System.Timers.Timer;
 
-namespace EsiApiClient.Windows
+namespace IPAClient.Windows
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

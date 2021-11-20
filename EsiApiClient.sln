@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31624.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EsiApiClient", "EsiApiClient\EsiApiClient.csproj", "{F59D0EE4-0CA7-4196-B891-8F262D205F42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IPAClient", "EsiApiClient\IPAClient.csproj", "{F59D0EE4-0CA7-4196-B891-8F262D205F42}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiWrapper", "ApiWrapper\ApiWrapper.csproj", "{8906E6CB-0045-46CE-A3BD-847722A4737F}"
 EndProject
