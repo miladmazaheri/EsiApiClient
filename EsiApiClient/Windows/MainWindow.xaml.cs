@@ -25,6 +25,9 @@ namespace EsiApiClient.Windows
     /// </summary>
     public partial class MainWindow : Window
     {
+        /// <summary>
+        /// از این تایمر برای تلاش مجدد برای دریافت اطلاعات اولیه از سرور در صورت بروز خطا استفاده می شود
+        /// </summary>
         private readonly Timer _recheckTimer;
 
         public MainWindow()
@@ -81,6 +84,7 @@ namespace EsiApiClient.Windows
         private async Task GetConfigFromServerAsync()
         {
             _recheckTimer.Stop();
+            //دریافت اطلاعات اولیه و تاریخ و ساعت سرور 
             SetBackGroundImage("9");
             try
             {
@@ -97,12 +101,13 @@ namespace EsiApiClient.Windows
                 _recheckTimer.Start();
                 return;
             }
-
+            //دریافت اطلاعات هویتی پرسنل
             SetBackGroundImage("12");
             //TODO Update Personnel Info
             Thread.Sleep(2000);
             SetBackGroundImage("13");
 
+            //دریافت رزرواسیون آفلاین
             SetBackGroundImage("15");
             try
             {
@@ -120,6 +125,8 @@ namespace EsiApiClient.Windows
                 return;
             }
 
+
+            //تصویر پس زمینه آماده به کار
             SetBackGroundImage("21");
         }
 
@@ -128,6 +135,7 @@ namespace EsiApiClient.Windows
             _ = new wndNeedConfig().ShowDialog();
             await CheckConfigStatusAndInitUtilitiesAsync();
         }
+
         private async Task ShowConfirmConfigAsync(ConfigModel configModel)
         {
             _ = new wndConfirmConfig(configModel).ShowDialog();
