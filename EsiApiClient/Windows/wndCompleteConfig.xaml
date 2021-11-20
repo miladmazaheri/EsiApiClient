@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EsiApiClient.Windows"
         mc:Ignorable="d"
-        Title="wndCompleteConfig" Height="768" Width="1366 " WindowStyle="None" Loaded="WndCompleteConfig_OnLoaded">
+        Title="wndCompleteConfig" Style="{StaticResource AppWindow}" Loaded="WndCompleteConfig_OnLoaded">
     <Grid x:Name="grdMain">
         <Grid.Background>
             <ImageBrush ImageSource="../Images/4.png"/>

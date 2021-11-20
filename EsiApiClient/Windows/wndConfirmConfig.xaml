@@ -5,42 +5,33 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EsiApiClient.Windows"
         mc:Ignorable="d"
-        Title="wndConfirmConfig" Height="768" Width="1368" WindowStyle="None" Loaded="WndConfirmConfig_OnLoaded">
+        Title="wndConfirmConfig"  Style="{StaticResource AppWindow}"  Loaded="WndConfirmConfig_OnLoaded">
     <Grid x:Name="grdMail">
         <Grid.Background>
             <ImageBrush ImageSource="../Images/2.png"/>
         </Grid.Background>
-        <TextBox x:Name="txtRestaurant_Cod" HorizontalAlignment="Left" Margin="497,167,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
-                 Width="212" Height="37" TextAlignment="Center" VerticalContentAlignment="Center"
-                 Foreground="White" FontSize="28" BorderBrush="Transparent" Background="#00000000" BorderThickness="0"  >
+        <TextBox x:Name="txtRestaurant_Cod" Style="{StaticResource AppTxt}" HorizontalAlignment="Left" Margin="505,171,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="212" Height="37"  >
         </TextBox>
-        <TextBox x:Name="txtDevice_Category" HorizontalAlignment="Left" Margin="498,213,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
-                 Width="212" Height="37" TextAlignment="Center" VerticalContentAlignment="Center"
-                 Foreground="White" FontSize="28" BorderBrush="Transparent" Background="#00000000" BorderThickness="0"  >
+        <TextBox x:Name="txtDevice_Category" HorizontalAlignment="Left" Margin="506,217,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
+                 Width="212" Height="37"  Style="{StaticResource AppTxt}"  >
         </TextBox>
-        <TextBox x:Name="txtDevice_Type" HorizontalAlignment="Left" Margin="497,260,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
-                 Width="212" Height="37" TextAlignment="Center" VerticalContentAlignment="Center"
-                 Foreground="White" FontSize="28" BorderBrush="Transparent" Background="#00000000" BorderThickness="0"  >
+        <TextBox x:Name="txtDevice_Type" HorizontalAlignment="Left" Margin="505,264,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
+                 Width="212" Height="37"  Style="{StaticResource AppTxt}"  >
         </TextBox>
-        <TextBox x:Name="txtDevice_Name" HorizontalAlignment="Left" Margin="497,308,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
-                 Width="212" Height="37" TextAlignment="Center" VerticalContentAlignment="Center"
-                 Foreground="White" FontSize="28" BorderBrush="Transparent" Background="#00000000" BorderThickness="0"  >
+        <TextBox x:Name="txtDevice_Name" HorizontalAlignment="Left" Margin="505,312,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
+                 Width="212" Height="37"  Style="{StaticResource AppTxt}"  >
         </TextBox>
-        <TextBox x:Name="txtDevice_Cod" HorizontalAlignment="Left" Margin="498,355,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
-                 Width="212" Height="38" TextAlignment="Center" VerticalContentAlignment="Center"
-                 Foreground="White" FontSize="28" BorderBrush="Transparent" Background="#00000000" BorderThickness="0"  >
+        <TextBox x:Name="txtDevice_Cod" HorizontalAlignment="Left" Margin="506,359,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
+                 Width="212" Height="38"  Style="{StaticResource AppTxt}"  >
         </TextBox>
-        <TextBox x:Name="txtIP" HorizontalAlignment="Left" Margin="498,405,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
-                 Width="212" Height="37" TextAlignment="Center" VerticalContentAlignment="Center"
-                 Foreground="White" FontSize="28" BorderBrush="Transparent" Background="#00000000" BorderThickness="0"  >
+        <TextBox x:Name="txtIP" HorizontalAlignment="Left" Margin="506,409,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
+                 Width="212" Height="37"  Style="{StaticResource AppTxt}"  >
         </TextBox>
-        <TextBox x:Name="txtNum_Queue" HorizontalAlignment="Left" Margin="498,455,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
-                 Width="212" Height="37" TextAlignment="Center" VerticalContentAlignment="Center"
-                 Foreground="White" FontSize="28" BorderBrush="Transparent" Background="#00000000" BorderThickness="0"  >
+        <TextBox x:Name="txtNum_Queue" HorizontalAlignment="Left" Margin="506,459,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
+                 Width="212" Height="37"  Style="{StaticResource AppTxt}"  >
         </TextBox>
-        <TextBox x:Name="txtWebServiceUrl" HorizontalAlignment="Left" Margin="498,503,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
-                 Width="212" Height="37" TextAlignment="Center" VerticalContentAlignment="Center"
-                 Foreground="White" FontSize="28" BorderBrush="Transparent" Background="#00000000" BorderThickness="0"  />
+        <TextBox x:Name="txtWebServiceUrl" HorizontalAlignment="Left" Margin="506,507,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
+                 Width="212" Height="37"  Style="{StaticResource AppTxt}"  />
 
         <Label x:Name="btnConfirm" Content="" HorizontalAlignment="Left" Margin="636,607,0,0" VerticalAlignment="Top" Width="223" Height="49" MouseDown="BtnConfirm_OnMouseDown"/>
         <Label x:Name="btnCancel" Content="" HorizontalAlignment="Left" Margin="506,608,0,0" VerticalAlignment="Top" Width="118" Height="49" MouseDown="BtnCancel_OnMouseDown"/>
