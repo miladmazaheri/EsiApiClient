@@ -1,0 +1,10 @@
+{
+  "Restaurant_Cod": "test",
+  "Device_Category": "test",
+  "Device_Type": "test",
+  "Device_Name": "test",
+  "Device_Cod": "test",
+  "IP": "test",
+  "Num_Queue": "test",
+  "IsConfirmed": false
+}

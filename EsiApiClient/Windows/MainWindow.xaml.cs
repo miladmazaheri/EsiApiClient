@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using System.IO.Ports;
 using System.Management;
 using System.Text.Json;
 using System.Threading;
@@ -27,7 +28,7 @@ namespace IPAClient.Windows
         /// از این تایمر برای تلاش مجدد برای دریافت اطلاعات اولیه از سرور در صورت بروز خطا استفاده می شود
         /// </summary>
         private readonly Timer _recheckTimer;
-
+        private SerialPort _serialPort;
         public MainWindow()
         {
             InitializeComponent();
@@ -70,7 +71,7 @@ namespace IPAClient.Windows
                 else
                 {
                     App.AppConfig = configModel;
-                    ApiClient.SetBaseUrl(string.IsNullOrWhiteSpace(configModel.WebServiceUrl)? "http://eis.msc.ir/" : configModel.WebServiceUrl);
+                    ApiClient.SetBaseUrl(string.IsNullOrWhiteSpace(configModel.WebServiceUrl) ? "http://eis.msc.ir/" : configModel.WebServiceUrl);
                     await GetConfigFromServerAsync();
                     InitReConfigListener();
                     InitUpdateFromApiTimer();
@@ -220,7 +221,24 @@ namespace IPAClient.Windows
         }
         #endregion
 
+        #region Serial Port
 
+
+        private void SendSerialData(string dataStr)
+        {
+            if (string.IsNullOrWhiteSpace(dataStr)) return;
+            try
+            {
+                _serialPort ??= new SerialPort("COM6", 1200, Parity.None, 8, StopBits.One);
+                var messageBytes = System.Text.Encoding.UTF8.GetBytes(dataStr);
+                _serialPort.Write(messageBytes, 0, messageBytes.Length);
+            }
+            catch (Exception e)
+            {
+                App.AddLog(e);
+            }
+        }
+        #endregion
 
     }
 }
