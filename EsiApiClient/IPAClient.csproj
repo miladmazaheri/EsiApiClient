@@ -6,12 +6,8 @@
 		<UseWPF>true</UseWPF>
 		<ApplicationIcon>Images\ipa.ico</ApplicationIcon>
 		<ApplicationManifest>Properties\app.manifest</ApplicationManifest>
-		<AssemblyName>IPA_Client</AssemblyName>
+		<AssemblyName>IPAClient</AssemblyName>
 		<RootNamespace>IPAClient</RootNamespace>
-		<RuntimeIdentifier>win-arm64</RuntimeIdentifier>
-		<SelfContained>false</SelfContained>
-		<PublishSingleFile>True</PublishSingleFile>
-		<PublishReadyToRun>false</PublishReadyToRun>
 	</PropertyGroup>
 
 	<ItemGroup>

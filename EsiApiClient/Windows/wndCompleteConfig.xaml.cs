@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using EsiApiClient.Api;
-using EsiApiClient.Api.Dto;
+using ApiWrapper;
+using ApiWrapper.Dto;
 using IPAClient.Models;
 
 namespace IPAClient.Windows
@@ -64,7 +64,7 @@ namespace IPAClient.Windows
             {
                 Dispatcher.Invoke(() =>
                 {
-                    grdMain.Background = new ImageBrush(new BitmapImage(new Uri(@"pack://application:,,,/EsiApiClient;component/Images/5.png")));
+                    grdMain.Background = new ImageBrush(new BitmapImage(new Uri(@"pack://application:,,,/IPAClient;component/Images/5.png")));
                     App.AppConfig = _configModel;
                 });
             }

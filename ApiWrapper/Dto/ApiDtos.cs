@@ -1,8 +1,7 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Generic;
 
-namespace EsiApiClient.Api.Dto
+namespace ApiWrapper.Dto
 {
     #region Base
     public abstract class BaseInput<T> where T : class

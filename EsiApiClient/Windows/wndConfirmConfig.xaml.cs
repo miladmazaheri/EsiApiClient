@@ -67,7 +67,7 @@ namespace IPAClient.Windows
 
         private void SetBackGroundImage(bool checkOnline)
         {
-            grdMail.Background = new ImageBrush(new BitmapImage(new Uri(checkOnline ? @"pack://application:,,,/EsiApiClient;component/Images/3.png" : @"pack://application:,,,/EsiApiClient;component/Images/2.png")));
+            grdMail.Background = new ImageBrush(new BitmapImage(new Uri(checkOnline ? @"pack://application:,,,/IPAClient;component/Images/3.png" : @"pack://application:,,,/IPAClient;component/Images/2.png")));
         }
 
         private void BtnCheckOnline_OnMouseDown(object sender, MouseButtonEventArgs e)

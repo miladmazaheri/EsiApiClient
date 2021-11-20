@@ -2,19 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Security.Principal;
-using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using EsiApiClient.Api.Dto;
+using ApiWrapper.Dto;
 
-namespace EsiApiClient.Api
+namespace ApiWrapper
 {
     public static class ApiClient
     {
         private static string baseUrl;
-        private static HttpClient httpClient = new();
+        private static HttpClient httpClient = new HttpClient();
         /// <summary>
         /// تنظیم آدرس اصلی سرور
         /// </summary>
@@ -102,7 +99,7 @@ namespace EsiApiClient.Api
         {
             try
             {
-                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/MainInfo_Synchronize_Data_Fun", new StringContent(JsonSerializer.Serialize(input, new JsonSerializerOptions(JsonSerializerDefaults.Web))));
+                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/MainInfo_Synchronize_Data_Fun", new StringContent(JsonSerializer.Serialize(input)));
                 var resAsString = await response.Content.ReadAsStringAsync();
                 return JsonSerializer.Deserialize<MainInfo_Synchronize_Data_Fun_Output>(resAsString);
             }
@@ -119,7 +116,7 @@ namespace EsiApiClient.Api
         {
             try
             {
-                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/Maininfo_Register_Device_Fun", new StringContent(JsonSerializer.Serialize(input, new JsonSerializerOptions(JsonSerializerDefaults.Web))));
+                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/Maininfo_Register_Device_Fun", new StringContent(JsonSerializer.Serialize(input)));
                 var resAsString = await response.Content.ReadAsStringAsync();
                 return JsonSerializer.Deserialize<MAININFO_REGISTER_DEVICE_FUN_Output>(resAsString);
             }
@@ -136,7 +133,7 @@ namespace EsiApiClient.Api
         {
             try
             {
-                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/MainInfo_User_Authenticate_Fun", new StringContent(JsonSerializer.Serialize(input, new JsonSerializerOptions(JsonSerializerDefaults.Web))));
+                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/MainInfo_User_Authenticate_Fun", new StringContent(JsonSerializer.Serialize(input)));
                 var resAsString = await response.Content.ReadAsStringAsync();
                 return JsonSerializer.Deserialize<MainInfo_User_Authenticate_Fun_Output>(resAsString);
             }
@@ -153,7 +150,7 @@ namespace EsiApiClient.Api
         {
             try
             {
-                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/Restrn_Queue_Have_Reserve_Fun", new StringContent(JsonSerializer.Serialize(input, new JsonSerializerOptions(JsonSerializerDefaults.Web))));
+                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/Restrn_Queue_Have_Reserve_Fun", new StringContent(JsonSerializer.Serialize(input)));
                 var resAsString = await response.Content.ReadAsStringAsync();
                 try
                 {

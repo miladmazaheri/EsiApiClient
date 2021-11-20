@@ -10,8 +10,8 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using EsiApiClient.Api;
-using EsiApiClient.Api.Dto;
+using ApiWrapper;
+using ApiWrapper.Dto;
 using IPAClient.Models;
 using IPAClient.Tools;
 using Timer = System.Timers.Timer;
@@ -147,7 +147,7 @@ namespace IPAClient.Windows
             {
                 dgMain.Background =
                     new ImageBrush(new BitmapImage(
-                        new Uri(@$"pack://application:,,,/EsiApiClient;component/Images/{imageName}.png")));
+                        new Uri(@$"pack://application:,,,/IPAClient;component/Images/{imageName}.png")));
             });
         }
 

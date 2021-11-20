@@ -1,7 +1,7 @@
 ﻿<Application x:Class="IPAClient.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:EsiApiClient"
+             xmlns:local="clr-namespace:IPAClient"
              StartupUri="Windows/MainWindow.xaml">
     <Application.Resources>
         <FontFamily x:Key="Vazir">pack://application:,,,/Fonts/#Vazir</FontFamily>
