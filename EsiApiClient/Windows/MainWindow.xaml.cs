@@ -74,6 +74,7 @@ namespace EsiApiClient.Windows
                 }
                 else
                 {
+                    App.AppConfig = configModel;
                     await GetConfigFromServerAsync();
                     InitReConfigListener();
                     InitUpdateFromApiTimer();
@@ -112,7 +113,7 @@ namespace EsiApiClient.Windows
             try
             {
                 //TODO decide about cod meal
-                var reservationDate = await ApiClient.MainInfo_Send_Offline_Data_Fun(new MainInfo_Send_Offline_Data_Fun_Input_Data(App.AppConfig.Device_Cod,DateTime.Now.ToServerDateFormat(),"22"));
+                var reservationDate = await ApiClient.MainInfo_Send_Offline_Data_Fun(new MainInfo_Send_Offline_Data_Fun_Input_Data(App.AppConfig.Device_Cod, DateTime.Now.ToServerDateFormat(), "22"));
                 SetBackGroundImage("16");
                 //TODO Save In Database
                 Thread.Sleep(2000);
