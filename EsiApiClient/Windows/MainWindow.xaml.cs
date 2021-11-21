@@ -29,6 +29,7 @@ namespace IPAClient.Windows
         /// </summary>
         private readonly Timer _recheckTimer;
         private SerialPort _serialPort;
+        private FingerPrintHelper _fingerPrintHelper;
         public MainWindow()
         {
             InitializeComponent();
@@ -210,8 +211,15 @@ namespace IPAClient.Windows
         #region Finger Print Listener
         private void InitFingerPrintListener()
         {
-
+            _fingerPrintHelper?.Dispose();
+            _fingerPrintHelper = new FingerPrintHelper(dataReceivedAction: FingerPrintDataReceived);
         }
+
+        private void FingerPrintDataReceived(uint obj)
+        {
+            //TODO 
+        }
+
         #endregion
 
         #region RfId Listener
