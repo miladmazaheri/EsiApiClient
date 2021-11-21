@@ -10,6 +10,7 @@
         public string IP { get; set; }
         public string Num_Queue { get; set; }
         public string WebServiceUrl { get; set; }
+        public string WebServiceAuthToken { get; set; }
         public bool CheckOnline { get; set; }
         public bool IsConfirmed { get; set; }
 
@@ -23,6 +24,7 @@
                 !string.IsNullOrWhiteSpace(Device_Cod) &&
                 !string.IsNullOrWhiteSpace(IP) &&
                 !string.IsNullOrWhiteSpace(Num_Queue) &&
+                !string.IsNullOrWhiteSpace(WebServiceAuthToken) &&
                 !string.IsNullOrWhiteSpace(WebServiceUrl);
         }
     }

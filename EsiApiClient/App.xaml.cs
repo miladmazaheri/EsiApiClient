@@ -22,6 +22,7 @@ namespace IPAClient
     {
         public static ConfigModel AppConfig { get; set; }
         public static string ConfigFilePath => Directory.GetCurrentDirectory() + @"\config.json";
+        public static string FingerPrintConfigFilePath => Directory.GetCurrentDirectory() + @"\fingerPrintConfig.json";
         private static ILogger Logger;
         public App()
         {
@@ -65,7 +66,6 @@ namespace IPAClient
         private void ConfigureApiClient()
         {
             ApiClient.SetLogger(Logger);
-            ApiClient.SetAuthToken("Basic TkFNRk9PRHVzZXIxOjUxZjIzMDQxYWNkOGRmNzlkMWIxOGY2ZjE2ZWE4YzM2");
         }
         private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {

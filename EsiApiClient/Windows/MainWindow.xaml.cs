@@ -72,11 +72,12 @@ namespace IPAClient.Windows
                 else
                 {
                     App.AppConfig = configModel;
+                    ApiClient.SetAuthToken(string.IsNullOrWhiteSpace(configModel.WebServiceAuthToken) ? "Basic TkFNRk9PRHVzZXIxOjUxZjIzMDQxYWNkOGRmNzlkMWIxOGY2ZjE2ZWE4YzM2" : configModel.WebServiceAuthToken);
                     ApiClient.SetBaseUrl(string.IsNullOrWhiteSpace(configModel.WebServiceUrl) ? "http://eis.msc.ir/" : configModel.WebServiceUrl);
                     await GetConfigFromServerAsync();
                     InitReConfigListener();
                     InitUpdateFromApiTimer();
-                    InitFingerPrintListener();
+                    await InitFingerPrintListener();
                     InitRfIdListener();
                 }
             }
@@ -209,14 +210,38 @@ namespace IPAClient.Windows
         #endregion
 
         #region Finger Print Listener
-        private void InitFingerPrintListener()
+        private async Task InitFingerPrintListener()
         {
             _fingerPrintHelper?.Dispose();
-            _fingerPrintHelper = new FingerPrintHelper(dataReceivedAction: FingerPrintDataReceived);
+
+            if (!File.Exists(App.FingerPrintConfigFilePath))
+            {
+                _fingerPrintHelper = new FingerPrintHelper(dataReceivedAction: FingerPrintDataReceived);
+            }
+            else
+            {
+                var fingerConfigContent = await File.ReadAllBytesAsync(App.FingerPrintConfigFilePath);
+                FingerPrintConfigModel fingerConfigModel = null;
+                try
+                {
+                    fingerConfigModel = JsonSerializer.Deserialize<FingerPrintConfigModel>(fingerConfigContent);
+                }
+                catch (Exception e)
+                {
+                    App.AddLog(e);
+                    _fingerPrintHelper = new FingerPrintHelper(dataReceivedAction: FingerPrintDataReceived);
+                }
+
+                _fingerPrintHelper = fingerConfigModel == null ?
+                    new FingerPrintHelper(dataReceivedAction: FingerPrintDataReceived) :
+                    new FingerPrintHelper(fingerConfigModel.DataBits, fingerConfigModel.Parity, fingerConfigModel.StopBits, fingerConfigModel.BaudRate, fingerConfigModel.PortName, FingerPrintDataReceived);
+            }
+
         }
 
         private void FingerPrintDataReceived(uint obj)
         {
+            MessageBox.Show($"Finger Print Received User Id :{obj}");
             //TODO 
         }
 

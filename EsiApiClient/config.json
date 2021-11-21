@@ -6,5 +6,8 @@
   "Device_Cod": "test",
   "IP": "test",
   "Num_Queue": "test",
+  "WebServiceUrl": "http://eis.msc.ir/",
+  "WebServiceAuthToken": "Basic TkFNRk9PRHVzZXIxOjUxZjIzMDQxYWNkOGRmNzlkMWIxOGY2ZjE2ZWE4YzM2",
+  "CheckOnline": false,
   "IsConfirmed": false
 }
