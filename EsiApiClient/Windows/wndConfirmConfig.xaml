@@ -4,37 +4,37 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="wndConfirmConfig"  Style="{StaticResource AppWindow}"  Loaded="WndConfirmConfig_OnLoaded">
-    <Grid x:Name="grdMail">
+        Title="wndConfirmConfig"  Style="{StaticResource AppWindow}"  Width="1366" Height="768" Loaded="WndConfirmConfig_OnLoaded">
+    <Grid x:Name="grdMail" Margin="0,-1,0,1">
         <Grid.Background>
             <ImageBrush ImageSource="../Images/2.png"/>
         </Grid.Background>
-        <TextBox x:Name="txtRestaurant_Cod" Style="{StaticResource AppTxt}" HorizontalAlignment="Left" Margin="505,171,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="212" Height="37"  >
+        <TextBox x:Name="txtRestaurant_Cod" Style="{StaticResource AppTxt}" HorizontalAlignment="Left" Margin="507,169,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="212" Height="37"  >
         </TextBox>
-        <TextBox x:Name="txtDevice_Category" HorizontalAlignment="Left" Margin="506,217,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
+        <TextBox x:Name="txtDevice_Category" HorizontalAlignment="Left" Margin="507,215,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
                  Width="212" Height="37"  Style="{StaticResource AppTxt}"  >
         </TextBox>
-        <TextBox x:Name="txtDevice_Type" HorizontalAlignment="Left" Margin="505,264,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
+        <TextBox x:Name="txtDevice_Type" HorizontalAlignment="Left" Margin="506,260,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
                  Width="212" Height="37"  Style="{StaticResource AppTxt}"  >
         </TextBox>
-        <TextBox x:Name="txtDevice_Name" HorizontalAlignment="Left" Margin="505,312,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
+        <TextBox x:Name="txtDevice_Name" HorizontalAlignment="Left" Margin="506,307,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
                  Width="212" Height="37"  Style="{StaticResource AppTxt}"  >
         </TextBox>
-        <TextBox x:Name="txtDevice_Cod" HorizontalAlignment="Left" Margin="506,359,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
+        <TextBox x:Name="txtDevice_Cod" HorizontalAlignment="Left" Margin="506,353,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
                  Width="212" Height="38"  Style="{StaticResource AppTxt}"  >
         </TextBox>
-        <TextBox x:Name="txtIP" HorizontalAlignment="Left" Margin="506,409,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
+        <TextBox x:Name="txtIP" HorizontalAlignment="Left" Margin="506,402,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
                  Width="212" Height="37"  Style="{StaticResource AppTxt}"  >
         </TextBox>
-        <TextBox x:Name="txtNum_Queue" HorizontalAlignment="Left" Margin="506,459,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
+        <TextBox x:Name="txtNum_Queue" HorizontalAlignment="Left" Margin="506,451,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
                  Width="212" Height="37"  Style="{StaticResource AppTxt}"  >
         </TextBox>
-        <TextBox x:Name="txtWebServiceUrl" HorizontalAlignment="Left" Margin="506,507,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
+        <TextBox x:Name="txtWebServiceUrl" HorizontalAlignment="Left" Margin="506,499,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top"
                  Width="212" Height="37"  Style="{StaticResource AppTxt}"  />
 
-        <Label x:Name="btnConfirm" Content="" HorizontalAlignment="Left" Margin="636,607,0,0" VerticalAlignment="Top" Width="223" Height="49" MouseDown="BtnConfirm_OnMouseDown"/>
-        <Label x:Name="btnCancel" Content="" HorizontalAlignment="Left" Margin="506,608,0,0" VerticalAlignment="Top" Width="118" Height="49" MouseDown="BtnCancel_OnMouseDown"/>
-        <Label x:Name="btnCheckOnline" Content="" HorizontalAlignment="Left" Margin="560,563,0,0" VerticalAlignment="Top" Width="53" Height="31" MouseDown="BtnCheckOnline_OnMouseDown"/>
+        <Label x:Name="btnConfirm" Content="" HorizontalAlignment="Left" Margin="636,595,0,0" VerticalAlignment="Top" Width="223" Height="49" MouseDown="BtnConfirm_OnMouseDown"/>
+        <Label x:Name="btnCancel" Content="" HorizontalAlignment="Left" Margin="506,595,0,0" VerticalAlignment="Top" Width="118" Height="49" MouseDown="BtnCancel_OnMouseDown"/>
+        <Label x:Name="btnCheckOnline" Content="" HorizontalAlignment="Left" Margin="560,551,0,0" VerticalAlignment="Top" Width="53" Height="31" MouseDown="BtnCheckOnline_OnMouseDown"/>
         <Label x:Name="lblError" Content="تنظیمات نامعتبر است" HorizontalAlignment="Left" Margin="611,646,0,0" VerticalAlignment="Top" Width="307" Height="32"
             Foreground="Red" FontFamily="{StaticResource Vazir}" FontSize="15"/>
 
