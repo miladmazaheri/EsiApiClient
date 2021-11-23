@@ -11,7 +11,7 @@
             <ImageBrush ImageSource="../Images/21.png"/>
         </Grid.Background>
         <Label   x:Name="lblDate" Content="1400/09/01 دوشنبه 14:06"  Width="281" Foreground="Yellow" FontFamily="{StaticResource Vazir}" FontSize="18" Margin="936,136,148,582"  HorizontalContentAlignment="Center"/>
-        <Label   x:Name="lblName" Content="میلاد مظاهری" righ Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="28" FontWeight="ExtraBold" Margin="736,239,148,439"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        <Label   x:Name="lblName" Content="میلاد مظاهری" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="28" FontWeight="ExtraBold" Margin="736,239,148,439"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
         <Label   x:Name="lblNumber" Content="123456789" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="22" FontWeight="ExtraBold" Margin="922,341,272,377"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
         <Label   x:Name="lblVade" Content="ناهار" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="18" FontWeight="ExtraBold" Margin="711,342,586,376"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
         <Label   x:Name="lblShift" Content="صبح" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="18" FontWeight="ExtraBold" Margin="1060,405,237,313"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>

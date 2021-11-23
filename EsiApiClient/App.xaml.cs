@@ -21,6 +21,7 @@ namespace IPAClient
     /// </summary>
     public partial class App : Application
     {
+        public static string CurrentMealCode { get; set; }
         public static ConfigModel AppConfig { get; set; }
         public static MainInfo_Send_Lookup_Data_Fun MainInfo { get; set; }
         public static string ConfigFilePath => Directory.GetCurrentDirectory() + @"\config.json";

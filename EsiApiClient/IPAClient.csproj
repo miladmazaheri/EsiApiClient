@@ -65,6 +65,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\ApiWrapper\ApiWrapper.csproj" />
+		<ProjectReference Include="..\DataLayer\DataLayer.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -18,6 +18,9 @@ using DNTPersianUtils.Core;
 using IPAClient.Models;
 using IPAClient.Tools;
 using Timer = System.Timers.Timer;
+using DataLayer.Services;
+using DataLayer.Entities;
+using System.Linq;
 
 namespace IPAClient.Windows
 {
@@ -32,9 +35,11 @@ namespace IPAClient.Windows
         private readonly Timer _recheckTimer;
         private SerialPort _serialPort;
         private FingerPrintHelper _fingerPrintHelper;
+        private readonly ReservationService _reservationService;
         public MainWindow()
         {
             InitializeComponent();
+            _reservationService = new ReservationService();
             SetlabelsVisible(false);
             _recheckTimer = new Timer(30000);
             _recheckTimer.Elapsed += async (sender, e) => await GetConfigFromServerAsync();
@@ -92,11 +97,11 @@ namespace IPAClient.Windows
                     SetlabelsVisible(true);
                     await InitFingerPrintListener();
                     InitRfIdListener();
-                    
+
                 }
             }
         }
-      
+
         private async Task GetConfigFromServerAsync()
         {
             _recheckTimer.Stop();
@@ -155,10 +160,9 @@ namespace IPAClient.Windows
                 try
                 {
                     //TODO decide about cod meal
-                    var reservationDate = await ApiClient.MainInfo_Send_Offline_Data_Fun(new MainInfo_Send_Offline_Data_Fun_Input_Data(App.AppConfig.Device_Cod, DateTime.Now.ToServerDateFormat(), "22"));
+                    var reservationDate = await ApiClient.MainInfo_Send_Offline_Data_Fun(new MainInfo_Send_Offline_Data_Fun_Input_Data(App.AppConfig.Device_Cod, DateTime.Now.ToServerDateFormat(), App.CurrentMealCode));
                     SetBackGroundImage("16");
-                    //TODO Save In Database
-                    Thread.Sleep(2000);
+                    await _reservationService.InsertAsync(reservationDate.Select(MapToReservation).ToList());
                 }
                 catch (Exception ex)
                 {
@@ -201,7 +205,7 @@ namespace IPAClient.Windows
         }
         private void ClearLables()
         {
-             lblName.Content = lblNumber.Content = lblVade.Content = lblShift.Content = lblShiftCompany.Content = string.Empty;
+            lblName.Content = lblNumber.Content = lblVade.Content = lblShift.Content = lblShiftCompany.Content = string.Empty;
         }
 
         private void HideBorder(Border brd)
@@ -217,7 +221,7 @@ namespace IPAClient.Windows
         private void UpdateDateLabel()
         {
             var now = DateTime.Now;
-            lblDate.Content = now.ToString("HH:mm")+ " " + now.ToPersianDateTextify();
+            lblDate.Content = now.ToString("HH:mm") + " " + now.ToPersianDateTextify();
         }
 
         #region ReConfig Listener
@@ -314,8 +318,7 @@ namespace IPAClient.Windows
 
         private void FingerPrintDataReceived(uint obj)
         {
-            MessageBox.Show($"Finger Print Received User Id :{obj}");
-            //TODO 
+            ShowBorder(brdRfId, true);
         }
 
         #endregion
@@ -345,6 +348,42 @@ namespace IPAClient.Windows
             }
         }
         #endregion
+        //map MainInfo_Send_Offline_Data_Fun_Output_Data to reservation
+        private Reservation MapToReservation(MainInfo_Send_Offline_Data_Fun_Output_Data input)
+        {
+            return new Reservation
+            {
+                Id = Guid.NewGuid(),
+                Date = DateTime.Now.ToString(),
+                Cod_Meal = null,
+                Date_Use = null,
+                Status = null,
+                Time_Use = null,
 
+                Main_Course = input.Main_Course.Select(x => new Food { Des_Food = x.Des_Food, Num_Amount = x.Num_Amount, Typ_Serv_Unit = x.Typ_Serv_Unit }).ToList(),
+                Appetizer_Dessert = input.Appetizer_Dessert.Select(x => new Food { Des_Food = x.Des_Food, Num_Amount = x.Num_Amount, Typ_Serv_Unit = x.Typ_Serv_Unit }).ToList(),
+                Cod_Contract_Order = input.Cod_Contract_Order,
+                Cod_Coupon = input.Cod_Coupon,
+                Cod_Resturant = input.Cod_Resturant,
+                Cod_Serial = input.Cod_Serial,
+                Dat_Day_Mepdy = input.Dat_Day_Mepdy,
+                Des_Contract_Order = input.Des_Contract_Order,
+                Des_Food_Order_Mepdy = input.Des_Food_Order_Mepdy,
+                Des_Nam_Meal = input.Des_Nam_Meal,
+                Des_Nam_Resturant_Rstm = input.Des_Nam_Resturant_Rstm,
+                Employee_Shift_Name = input.Employee_Shift_Name,
+                First_Name_Ide = input.First_Name_Ide,
+                Last_Name_Ide = input.Last_Name_Ide,
+                Lkp_Cod_Order_Mepdy_Means = input.Lkp_Cod_Order_Mepdy_Means,
+                Meal_Plan_Day_Id = input.Meal_Plan_Day_Id,
+                Num_Ide = input.Num_Ide,
+                Num_Tim_End_Meal_Rsmls = input.Num_Tim_End_Meal_Rsmls,
+                Num_Tim_Str_Meal_Rsmls = input.Num_Tim_Str_Meal_Rsmls,
+                Num_Tot_Coupon_Rccpn = input.Num_Tot_Coupon_Rccpn,
+                Receiver_Meal_Plan_Day_Id = input.Receiver_Meal_Plan_Day_Id,
+                Reciver_Coupon_Id = input.Reciver_Coupon_Id,
+
+            };
+        }
     }
 }
