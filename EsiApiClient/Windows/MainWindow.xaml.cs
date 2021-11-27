@@ -40,7 +40,7 @@ namespace IPAClient.Windows
         {
             InitializeComponent();
             _reservationService = new ReservationService();
-            SetlabelsVisible(false);
+            SetLabelsVisible(false);
             _recheckTimer = new Timer(30000);
             _recheckTimer.Elapsed += async (sender, e) => await GetConfigFromServerAsync();
         }
@@ -93,8 +93,8 @@ namespace IPAClient.Windows
                     {
                         SetBackGroundImage("21");
                     }
-                    ClearLables();
-                    SetlabelsVisible(true);
+                    ClearLabels();
+                    SetLabelsVisible(true);
                     await InitFingerPrintListener();
                     InitRfIdListener();
 
@@ -159,10 +159,25 @@ namespace IPAClient.Windows
                 SetBackGroundImage("15");
                 try
                 {
-                    //TODO decide about cod meal
-                    var reservationDate = await ApiClient.MainInfo_Send_Offline_Data_Fun(new MainInfo_Send_Offline_Data_Fun_Input_Data(App.AppConfig.Device_Cod, DateTime.Now.ToServerDateFormat(), App.CurrentMealCode));
-                    SetBackGroundImage("16");
-                    await _reservationService.InsertAsync(reservationDate.Select(MapToReservation).ToList());
+                    if (App.MainInfo?.Meals != null && App.MainInfo.Meals.Any())
+                    {
+                        foreach (var meal in App.MainInfo.Meals)
+                        {
+                            var reservationDate =
+                                await ApiClient.MainInfo_Send_Offline_Data_Fun(new MainInfo_Send_Offline_Data_Fun_Input_Data(App.AppConfig.Device_Cod, DateTime.Now.ToServerDateFormat(), meal.Cod_Data));
+                            await _reservationService.InsertAsync(reservationDate.Select(MapToReservation).ToList());
+
+                            var minMealTime = reservationDate.Min(x => x.Num_Tim_Str_Meal_Rsmls).ToTimeSpan();
+                            var maxMealTime = reservationDate.Max(x => x.Num_Tim_End_Meal_Rsmls).ToTimeSpan();
+
+                            meal.StartTime = minMealTime;
+                            meal.EndTime = maxMealTime;
+                        }
+
+                        App.CurrentMealCode = App.MainInfo.Meals.FirstOrDefault(x => x.IsCurrentMeal)?.Cod_Data;
+
+                        SetBackGroundImage("16");
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -199,11 +214,12 @@ namespace IPAClient.Windows
             });
         }
 
-        private void SetlabelsVisible(bool isVisible)
+        private void SetLabelsVisible(bool isVisible)
         {
             lblDate.Visibility = lblName.Visibility = lblNumber.Visibility = lblVade.Visibility = lblShift.Visibility = lblShiftCompany.Visibility = isVisible ? Visibility.Visible : Visibility.Collapsed;
         }
-        private void ClearLables()
+
+        private void ClearLabels()
         {
             lblName.Content = lblNumber.Content = lblVade.Content = lblShift.Content = lblShiftCompany.Content = string.Empty;
         }
@@ -212,6 +228,7 @@ namespace IPAClient.Windows
         {
             brd.Visibility = Visibility.Collapsed;
         }
+
         private void ShowBorder(Border brd, bool isSuccess)
         {
             Dispatcher.Invoke(() =>

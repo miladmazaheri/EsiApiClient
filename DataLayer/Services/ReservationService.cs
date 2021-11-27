@@ -28,7 +28,7 @@ namespace DataLayer.Services
             var reservationExist = await _context.Reservations.FirstOrDefaultAsync(x => x.Reciver_Coupon_Id == reservation.Reciver_Coupon_Id && x.Num_Ide == reservation.Num_Ide);
             if (reservationExist == null)
             {
-                _context.Reservations.Add(reservation);
+                await _context.Reservations.AddAsync(reservation);
             }
         }
 

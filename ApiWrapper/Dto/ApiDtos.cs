@@ -59,6 +59,11 @@ namespace ApiWrapper.Dto
     {
         public string Cod_Data { get; set; }
         public string Des_Data { get; set; }
+
+        public TimeSpan? StartTime  { get; set; }
+        public TimeSpan? EndTime  { get; set; }
+
+        public bool IsCurrentMeal => StartTime.HasValue && EndTime.HasValue && DateTime.Now.TimeOfDay >= StartTime && DateTime.Now.TimeOfDay <= EndTime;
     }
 
     public class Device

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using DNTPersianUtils.Core;
 
@@ -47,7 +48,14 @@ namespace IPAClient.Tools
             return $"{pDt.Year:0000}{pDt.Month:00}{pDt.Day:00}";
         }
 
-
+        public static TimeSpan? ToTimeSpan(this string val)
+        {
+            if (string.IsNullOrWhiteSpace(val) || val.Length != 4 || val.Any(x => !char.IsDigit(x)))
+            {
+                return null;
+            }
+            return new TimeSpan(hours: int.Parse(val.Substring(0, 2)), minutes: int.Parse(val.Substring(2, 2)), 0);
+        }
 
     }
 }
