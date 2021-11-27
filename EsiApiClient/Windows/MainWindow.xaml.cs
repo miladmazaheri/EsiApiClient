@@ -21,6 +21,7 @@ using Timer = System.Timers.Timer;
 using DataLayer.Services;
 using DataLayer.Entities;
 using System.Linq;
+using System.Windows.Input;
 
 namespace IPAClient.Windows
 {
@@ -235,6 +236,14 @@ namespace IPAClient.Windows
             {
                 brd.BorderBrush = new SolidColorBrush(isSuccess ? Color.FromRgb(0, 255, 0) : Color.FromRgb(255, 0, 0));
                 brd.Visibility = Visibility.Visible;
+                if (isSuccess)
+                {
+                    System.Media.SystemSounds.Hand.Play();
+                }
+                else
+                {
+                    System.Media.SystemSounds.Asterisk.Play();
+                }
             });
         }
 
@@ -373,13 +382,12 @@ namespace IPAClient.Windows
 
         }
 
-        private void FingerPrintDataReceived(uint obj)
+        private async void FingerPrintDataReceived(uint obj)
         {
-            MessageBox.Show(obj.ToString());
-
             if (obj != uint.MaxValue)
             {
                 ShowBorder(brdRfId, true);
+                await CheckReservation(obj.ToString());
             }
             else
             {
@@ -395,9 +403,6 @@ namespace IPAClient.Windows
 
         }
         #endregion
-
-        #region Serial Port
-
 
         private async Task SendMonitorData(string dataStr)
         {
@@ -438,7 +443,6 @@ namespace IPAClient.Windows
                 App.AddLog(e);
             }
         }
-        #endregion
 
         private async Task CheckReservation(string personnelNumber)
         {
@@ -452,5 +456,14 @@ namespace IPAClient.Windows
             //}
         }
 
+        private async void BtnKeyPad_OnMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            var wndKeyPad = new wndKeyPad();
+            wndKeyPad.ShowDialog();
+            if (!string.IsNullOrWhiteSpace(wndKeyPad.PersonnelNumber))
+            {
+                await CheckReservation(wndKeyPad.PersonnelNumber);
+            }
+        }
     }
 }

@@ -18,6 +18,7 @@
         <Label   x:Name="lblShiftCompany" Content="ایپا" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="18" FontWeight="ExtraBold" Margin="711,405,509,313"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
         <Border  x:Name="brdRfId" BorderBrush="LawnGreen" Margin="1077,463,126,136" BorderThickness="3" CornerRadius="8" Visibility="Visible"/>
         <Border  x:Name="brdFingerPrint" BorderBrush="Red" Margin="894,463,308,136" BorderThickness="3" CornerRadius="8" Visibility="Visible"/>
+        <Label x:Name="btnKeyPad" Content="" HorizontalAlignment="Left" Margin="711,463,0,0" VerticalAlignment="Top" Width="165" Height="153" MouseDown="BtnKeyPad_OnMouseDown"/>
 
     </Grid>
 </Window>
