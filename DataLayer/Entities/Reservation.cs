@@ -11,6 +11,7 @@ namespace DataLayer.Entities
         public Guid Id { get; set; }
         public string Date { get; set; }
         public string Cod_Meal { get; set; }
+
         public string Receiver_Meal_Plan_Day_Id { get; set; }
         public string Reciver_Coupon_Id { get; set; }
         public string Meal_Plan_Day_Id { get; set; }

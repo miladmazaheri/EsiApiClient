@@ -4,6 +4,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Threading;
 using ApiWrapper;
+using ApiWrapper.Dto;
 using IPAClient.Models;
 using IPAClient.Windows;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,9 +21,12 @@ namespace IPAClient
     /// </summary>
     public partial class App : Application
     {
+        public static string CurrentMealCode { get; set; }
         public static ConfigModel AppConfig { get; set; }
+        public static MainInfo_Send_Lookup_Data_Fun MainInfo { get; set; }
         public static string ConfigFilePath => Directory.GetCurrentDirectory() + @"\config.json";
         public static string FingerPrintConfigFilePath => Directory.GetCurrentDirectory() + @"\fingerPrintConfig.json";
+        public static string MainInfoFilePath => Directory.GetCurrentDirectory() + @"\mainInfo.json";
         private static ILogger Logger;
         public App()
         {

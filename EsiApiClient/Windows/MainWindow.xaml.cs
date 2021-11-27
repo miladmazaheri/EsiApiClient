@@ -8,14 +8,19 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using ApiWrapper;
 using ApiWrapper.Dto;
+using DNTPersianUtils.Core;
 using IPAClient.Models;
 using IPAClient.Tools;
 using Timer = System.Timers.Timer;
+using DataLayer.Services;
+using DataLayer.Entities;
+using System.Linq;
 
 namespace IPAClient.Windows
 {
@@ -30,9 +35,12 @@ namespace IPAClient.Windows
         private readonly Timer _recheckTimer;
         private SerialPort _serialPort;
         private FingerPrintHelper _fingerPrintHelper;
+        private readonly ReservationService _reservationService;
         public MainWindow()
         {
             InitializeComponent();
+            _reservationService = new ReservationService();
+            SetlabelsVisible(false);
             _recheckTimer = new Timer(30000);
             _recheckTimer.Elapsed += async (sender, e) => await GetConfigFromServerAsync();
         }
@@ -44,6 +52,7 @@ namespace IPAClient.Windows
 
         private async Task CheckConfigStatusAndInitUtilitiesAsync()
         {
+            UpdateDateLabel();
             if (!File.Exists(App.ConfigFilePath))
             {
                 await ShowNeedConfigAsync();
@@ -74,11 +83,21 @@ namespace IPAClient.Windows
                     App.AppConfig = configModel;
                     ApiClient.SetAuthToken(string.IsNullOrWhiteSpace(configModel.WebServiceAuthToken) ? "Basic TkFNRk9PRHVzZXIxOjUxZjIzMDQxYWNkOGRmNzlkMWIxOGY2ZjE2ZWE4YzM2" : configModel.WebServiceAuthToken);
                     ApiClient.SetBaseUrl(string.IsNullOrWhiteSpace(configModel.WebServiceUrl) ? "http://eis.msc.ir/" : configModel.WebServiceUrl);
-                    await GetConfigFromServerAsync();
-                    InitReConfigListener();
-                    InitUpdateFromApiTimer();
+                    if (!App.AppConfig.IsDemo)
+                    {
+                        await GetConfigFromServerAsync();
+                        InitReConfigListener();
+                        InitUpdateFromApiTimer();
+                    }
+                    else
+                    {
+                        SetBackGroundImage("21");
+                    }
+                    ClearLables();
+                    SetlabelsVisible(true);
                     await InitFingerPrintListener();
                     InitRfIdListener();
+
                 }
             }
         }
@@ -86,47 +105,73 @@ namespace IPAClient.Windows
         private async Task GetConfigFromServerAsync()
         {
             _recheckTimer.Stop();
-            //دریافت اطلاعات اولیه و تاریخ و ساعت سرور 
-            SetBackGroundImage("9");
-            try
+            if (!App.AppConfig.IsDemo)
             {
-                var mainInfo = await ApiClient.MainInfo_Send_Lookup_Data_Fun();
-                SetBackGroundImage("10");
-                SystemTimeHelper.SetSystemTime(mainInfo.ServerDateTime);
-                //TODO Save In Database
+                //دریافت اطلاعات اولیه و تاریخ و ساعت سرور 
+                SetBackGroundImage("9");
+                try
+                {
+                    var mainInfo = await ApiClient.MainInfo_Send_Lookup_Data_Fun();
+                    if (mainInfo == null)
+                    {
+                        if (File.Exists(App.MainInfoFilePath))
+                        {
+                            var mainInfoContent = await File.ReadAllBytesAsync(App.MainInfoFilePath);
+                            try
+                            {
+                                mainInfo = JsonSerializer.Deserialize<MainInfo_Send_Lookup_Data_Fun>(mainInfoContent);
+                            }
+                            catch (Exception e)
+                            {
+                                App.AddLog(e);
+                                throw;
+                            }
+                            App.MainInfo = mainInfo;
+                        }
+                        else
+                        {
+                            throw new Exception("Main Info File Not Found");
+                        }
+                    }
+                    else
+                    {
+                        SetBackGroundImage("10");
+                        await File.WriteAllTextAsync(App.ConfigFilePath, JsonSerializer.Serialize(mainInfo));
+                        App.MainInfo = mainInfo;
+                        SystemTimeHelper.SetSystemTime(mainInfo.ServerDateTime);
+                        UpdateDateLabel();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    App.AddLog(ex);
+                    SetBackGroundImage("11");
+                    _recheckTimer.Start();
+                    return;
+                }
+                //دریافت اطلاعات هویتی پرسنل
+                SetBackGroundImage("12");
+                //TODO Update Personnel Info
                 Thread.Sleep(2000);
-            }
-            catch (Exception ex)
-            {
-                App.AddLog(ex);
-                SetBackGroundImage("11");
-                _recheckTimer.Start();
-                return;
-            }
-            //دریافت اطلاعات هویتی پرسنل
-            SetBackGroundImage("12");
-            //TODO Update Personnel Info
-            Thread.Sleep(2000);
-            SetBackGroundImage("13");
+                SetBackGroundImage("13");
 
-            //دریافت رزرواسیون آفلاین
-            SetBackGroundImage("15");
-            try
-            {
-                //TODO decide about cod meal
-                var reservationDate = await ApiClient.MainInfo_Send_Offline_Data_Fun(new MainInfo_Send_Offline_Data_Fun_Input_Data(App.AppConfig.Device_Cod, DateTime.Now.ToServerDateFormat(), "22"));
-                SetBackGroundImage("16");
-                //TODO Save In Database
-                Thread.Sleep(2000);
+                //دریافت رزرواسیون آفلاین
+                SetBackGroundImage("15");
+                try
+                {
+                    //TODO decide about cod meal
+                    var reservationDate = await ApiClient.MainInfo_Send_Offline_Data_Fun(new MainInfo_Send_Offline_Data_Fun_Input_Data(App.AppConfig.Device_Cod, DateTime.Now.ToServerDateFormat(), App.CurrentMealCode));
+                    SetBackGroundImage("16");
+                    await _reservationService.InsertAsync(reservationDate.Select(MapToReservation).ToList());
+                }
+                catch (Exception ex)
+                {
+                    App.AddLog(ex);
+                    SetBackGroundImage("17");
+                    _recheckTimer.Start();
+                    return;
+                }
             }
-            catch (Exception ex)
-            {
-                App.AddLog(ex);
-                SetBackGroundImage("17");
-                _recheckTimer.Start();
-                return;
-            }
-
 
             //تصویر پس زمینه آماده به کار
             SetBackGroundImage("21");
@@ -152,6 +197,68 @@ namespace IPAClient.Windows
                     new ImageBrush(new BitmapImage(
                         new Uri(@$"pack://application:,,,/IPAClient;component/Images/{imageName}.png")));
             });
+        }
+
+        private void SetlabelsVisible(bool isVisible)
+        {
+            lblDate.Visibility = lblName.Visibility = lblNumber.Visibility = lblVade.Visibility = lblShift.Visibility = lblShiftCompany.Visibility = isVisible ? Visibility.Visible : Visibility.Collapsed;
+        }
+        private void ClearLables()
+        {
+            lblName.Content = lblNumber.Content = lblVade.Content = lblShift.Content = lblShiftCompany.Content = string.Empty;
+        }
+
+        private void HideBorder(Border brd)
+        {
+            brd.Visibility = Visibility.Collapsed;
+        }
+        private void ShowBorder(Border brd, bool isSuccess)
+        {
+            brd.BorderBrush = new SolidColorBrush(isSuccess ? Color.FromRgb(0, 255, 0) : Color.FromRgb(255, 0, 0));
+            brd.Visibility = Visibility.Visible;
+        }
+
+        private void UpdateDateLabel()
+        {
+            var now = DateTime.Now;
+            lblDate.Content = now.ToString("HH:mm") + " " + now.ToPersianDateTextify();
+        }
+
+        private Reservation MapToReservation(MainInfo_Send_Offline_Data_Fun_Output_Data input)
+        {
+            return new Reservation
+            {
+                Id = Guid.NewGuid(),
+                Date = DateTime.Now.ToString(),
+                Cod_Meal = null,
+                Date_Use = null,
+                Status = null,
+                Time_Use = null,
+
+                Main_Course = input.Main_Course.Select(x => new Food { Des_Food = x.Des_Food, Num_Amount = x.Num_Amount, Typ_Serv_Unit = x.Typ_Serv_Unit }).ToList(),
+                Appetizer_Dessert = input.Appetizer_Dessert.Select(x => new Food { Des_Food = x.Des_Food, Num_Amount = x.Num_Amount, Typ_Serv_Unit = x.Typ_Serv_Unit }).ToList(),
+                Cod_Contract_Order = input.Cod_Contract_Order,
+                Cod_Coupon = input.Cod_Coupon,
+                Cod_Resturant = input.Cod_Resturant,
+                Cod_Serial = input.Cod_Serial,
+                Dat_Day_Mepdy = input.Dat_Day_Mepdy,
+                Des_Contract_Order = input.Des_Contract_Order,
+                Des_Food_Order_Mepdy = input.Des_Food_Order_Mepdy,
+                Des_Nam_Meal = input.Des_Nam_Meal,
+                Des_Nam_Resturant_Rstm = input.Des_Nam_Resturant_Rstm,
+                Employee_Shift_Name = input.Employee_Shift_Name,
+                First_Name_Ide = input.First_Name_Ide,
+                Last_Name_Ide = input.Last_Name_Ide,
+                Lkp_Cod_Order_Mepdy_Means = input.Lkp_Cod_Order_Mepdy_Means,
+                Meal_Plan_Day_Id = input.Meal_Plan_Day_Id,
+                Num_Ide = input.Num_Ide,
+                Num_Tim_End_Meal_Rsmls = input.Num_Tim_End_Meal_Rsmls,
+                Num_Tim_Str_Meal_Rsmls = input.Num_Tim_Str_Meal_Rsmls,
+                Num_Tot_Coupon_Rccpn = input.Num_Tot_Coupon_Rccpn,
+                Receiver_Meal_Plan_Day_Id = input.Receiver_Meal_Plan_Day_Id,
+                Reciver_Coupon_Id = input.Reciver_Coupon_Id,
+
+            };
         }
 
         #region ReConfig Listener
@@ -212,37 +319,43 @@ namespace IPAClient.Windows
         #region Finger Print Listener
         private async Task InitFingerPrintListener()
         {
-            _fingerPrintHelper?.Dispose();
+            try
+            {
+                _fingerPrintHelper?.Dispose();
 
-            if (!File.Exists(App.FingerPrintConfigFilePath))
-            {
-                _fingerPrintHelper = new FingerPrintHelper(dataReceivedAction: FingerPrintDataReceived);
-            }
-            else
-            {
-                var fingerConfigContent = await File.ReadAllBytesAsync(App.FingerPrintConfigFilePath);
-                FingerPrintConfigModel fingerConfigModel = null;
-                try
+                if (!File.Exists(App.FingerPrintConfigFilePath))
                 {
-                    fingerConfigModel = JsonSerializer.Deserialize<FingerPrintConfigModel>(fingerConfigContent);
-                }
-                catch (Exception e)
-                {
-                    App.AddLog(e);
                     _fingerPrintHelper = new FingerPrintHelper(dataReceivedAction: FingerPrintDataReceived);
                 }
+                else
+                {
+                    var fingerConfigContent = await File.ReadAllBytesAsync(App.FingerPrintConfigFilePath);
+                    FingerPrintConfigModel fingerConfigModel = null;
+                    try
+                    {
+                        fingerConfigModel = JsonSerializer.Deserialize<FingerPrintConfigModel>(fingerConfigContent);
+                    }
+                    catch (Exception e)
+                    {
+                        App.AddLog(e);
+                        _fingerPrintHelper = new FingerPrintHelper(dataReceivedAction: FingerPrintDataReceived);
+                    }
 
-                _fingerPrintHelper = fingerConfigModel == null ?
-                    new FingerPrintHelper(dataReceivedAction: FingerPrintDataReceived) :
-                    new FingerPrintHelper(fingerConfigModel.DataBits, fingerConfigModel.Parity, fingerConfigModel.StopBits, fingerConfigModel.BaudRate, fingerConfigModel.PortName, FingerPrintDataReceived);
+                    _fingerPrintHelper = fingerConfigModel == null ?
+                        new FingerPrintHelper(dataReceivedAction: FingerPrintDataReceived) :
+                        new FingerPrintHelper(fingerConfigModel.DataBits, fingerConfigModel.Parity, fingerConfigModel.StopBits, fingerConfigModel.BaudRate, fingerConfigModel.PortName, FingerPrintDataReceived);
+                }
+            }
+            catch (Exception e)
+            {
+                App.AddLog(e);
             }
 
         }
 
         private void FingerPrintDataReceived(uint obj)
         {
-            MessageBox.Show($"Finger Print Received User Id :{obj}");
-            //TODO 
+            ShowBorder(brdRfId, true);
         }
 
         #endregion
@@ -272,6 +385,18 @@ namespace IPAClient.Windows
             }
         }
         #endregion
-
+        
+        private async Task CheckReservation(string personnelNumber)
+        {
+            if (App.AppConfig.CheckOnline)
+            {
+                var res = await ApiClient.Restrn_Queue_Have_Reserve_Fun(new RESTRN_QUEUE_HAVE_RESERVE_FUN_Input());
+                if(res != null)
+                {
+                    res.
+                }
+            }
+        }
+        
     }
 }

@@ -13,6 +13,7 @@
         public string WebServiceAuthToken { get; set; }
         public bool CheckOnline { get; set; }
         public bool IsConfirmed { get; set; }
+        public bool IsDemo { get; set; }
 
         public bool IsValid()
         {
