@@ -38,8 +38,12 @@ namespace IPAClient.Tools
             serialPort1.Read(rx_byte, 0, in_data_cnt);
 
             for (var i = 0; i < in_data_cnt; i++)
-                if (my_parser(rx_byte[i]) != 0)
-                    _dataReceivedAction?.Invoke(USR_ID);
+            {
+                var res = my_parser(rx_byte[i]);
+                if (res != 0)
+                    _dataReceivedAction?.Invoke(res);
+            }
+                
         }
 
         private uint my_parser(byte in_ch)
@@ -59,6 +63,7 @@ namespace IPAClient.Tools
                     USR_ID <<= 8;
                     USR_ID += rx_bytes[2];
 
+                    if (USR_ID == 0) return uint.MaxValue;
                     return USR_ID;
                 }
             }

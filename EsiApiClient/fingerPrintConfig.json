@@ -1,7 +1,7 @@
 {
   "DataBits": 8,
-  "Parity": "None",
-  "StopBits": "One",
+  "Parity": 0,
+  "StopBits": 1,
   "BaudRate": 115200,
   "PortName": "COM3"
 }

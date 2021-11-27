@@ -59,7 +59,7 @@ namespace IPAClient.Windows
             }
             else
             {
-                var configContent = await File.ReadAllBytesAsync(App.ConfigFilePath);
+                var configContent = await File.ReadAllTextAsync(App.ConfigFilePath);
                 ConfigModel configModel;
                 try
                 {
@@ -116,7 +116,7 @@ namespace IPAClient.Windows
                     {
                         if (File.Exists(App.MainInfoFilePath))
                         {
-                            var mainInfoContent = await File.ReadAllBytesAsync(App.MainInfoFilePath);
+                            var mainInfoContent = await File.ReadAllTextAsync(App.MainInfoFilePath);
                             try
                             {
                                 mainInfo = JsonSerializer.Deserialize<MainInfo_Send_Lookup_Data_Fun>(mainInfoContent);
@@ -214,8 +214,11 @@ namespace IPAClient.Windows
         }
         private void ShowBorder(Border brd, bool isSuccess)
         {
-            brd.BorderBrush = new SolidColorBrush(isSuccess ? Color.FromRgb(0, 255, 0) : Color.FromRgb(255, 0, 0));
-            brd.Visibility = Visibility.Visible;
+            Dispatcher.Invoke(() =>
+            {
+                brd.BorderBrush = new SolidColorBrush(isSuccess ? Color.FromRgb(0, 255, 0) : Color.FromRgb(255, 0, 0));
+                brd.Visibility = Visibility.Visible;
+            });
         }
 
         private void UpdateDateLabel()
@@ -329,7 +332,7 @@ namespace IPAClient.Windows
                 }
                 else
                 {
-                    var fingerConfigContent = await File.ReadAllBytesAsync(App.FingerPrintConfigFilePath);
+                    var fingerConfigContent = await File.ReadAllTextAsync(App.FingerPrintConfigFilePath);
                     FingerPrintConfigModel fingerConfigModel = null;
                     try
                     {
@@ -355,7 +358,16 @@ namespace IPAClient.Windows
 
         private void FingerPrintDataReceived(uint obj)
         {
-            ShowBorder(brdRfId, true);
+            MessageBox.Show(obj.ToString());
+
+            if(obj != uint.MaxValue)
+            {
+                ShowBorder(brdRfId, true);
+            }
+            else
+            {
+                ShowBorder(brdRfId, false);
+            }
         }
 
         #endregion
@@ -388,14 +400,14 @@ namespace IPAClient.Windows
         
         private async Task CheckReservation(string personnelNumber)
         {
-            if (App.AppConfig.CheckOnline)
-            {
-                var res = await ApiClient.Restrn_Queue_Have_Reserve_Fun(new RESTRN_QUEUE_HAVE_RESERVE_FUN_Input());
-                if(res != null)
-                {
-                    res.
-                }
-            }
+            //if (App.AppConfig.CheckOnline)
+            //{
+            //    var res = await ApiClient.Restrn_Queue_Have_Reserve_Fun(new RESTRN_QUEUE_HAVE_RESERVE_FUN_Input());
+            //    if(res != null)
+            //    {
+            //        res.
+            //    }
+            //}
         }
         
     }
