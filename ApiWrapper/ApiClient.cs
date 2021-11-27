@@ -169,6 +169,7 @@ namespace ApiWrapper
                 }
                 catch (Exception e)
                 {
+                    AddLog(e);
                     var res = JsonSerializer.Deserialize<RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_OnFail>(resAsString);
                     return new RESTRN_QUEUE_HAVE_RESERVE_FUN_Output(true, res, null);
                 }
