@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace IPAClient.Models
 {
-    public class FingerPrintConfigModel
+    public class SerialPortConfigModel
     {
         public int DataBits { get; set; }
         public Parity Parity { get; set; }
@@ -15,12 +15,12 @@ namespace IPAClient.Models
         public int BaudRate { get; set; }
         public string PortName { get; set; }
 
-        public FingerPrintConfigModel()
+        public SerialPortConfigModel()
         {
             
         }
 
-        public FingerPrintConfigModel(int dataBits, Parity parity, StopBits stopBits, int baudRate, string portName)
+        public SerialPortConfigModel(int dataBits, Parity parity, StopBits stopBits, int baudRate, string portName)
         {
             DataBits = dataBits;
             Parity = parity;

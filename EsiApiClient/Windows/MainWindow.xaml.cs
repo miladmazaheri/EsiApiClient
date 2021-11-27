@@ -33,8 +33,8 @@ namespace IPAClient.Windows
         /// از این تایمر برای تلاش مجدد برای دریافت اطلاعات اولیه از سرور در صورت بروز خطا استفاده می شود
         /// </summary>
         private readonly Timer _recheckTimer;
-        private SerialPort _serialPort;
         private FingerPrintHelper _fingerPrintHelper;
+        private MonitorHelper _monitorHelper;
         private readonly ReservationService _reservationService;
         public MainWindow()
         {
@@ -333,10 +333,10 @@ namespace IPAClient.Windows
                 else
                 {
                     var fingerConfigContent = await File.ReadAllTextAsync(App.FingerPrintConfigFilePath);
-                    FingerPrintConfigModel fingerConfigModel = null;
+                    SerialPortConfigModel fingerConfigModel = null;
                     try
                     {
-                        fingerConfigModel = JsonSerializer.Deserialize<FingerPrintConfigModel>(fingerConfigContent);
+                        fingerConfigModel = JsonSerializer.Deserialize<SerialPortConfigModel>(fingerConfigContent);
                     }
                     catch (Exception e)
                     {
@@ -360,7 +360,7 @@ namespace IPAClient.Windows
         {
             MessageBox.Show(obj.ToString());
 
-            if(obj != uint.MaxValue)
+            if (obj != uint.MaxValue)
             {
                 ShowBorder(brdRfId, true);
             }
@@ -382,14 +382,39 @@ namespace IPAClient.Windows
         #region Serial Port
 
 
-        private void SendSerialData(string dataStr)
+        private async Task SendMonitorData(string dataStr)
         {
             if (string.IsNullOrWhiteSpace(dataStr)) return;
             try
             {
-                _serialPort ??= new SerialPort("COM6", 1200, Parity.None, 8, StopBits.One);
-                var messageBytes = System.Text.Encoding.UTF8.GetBytes(dataStr);
-                _serialPort.Write(messageBytes, 0, messageBytes.Length);
+                if (_monitorHelper == null)
+                {
+                    if (!File.Exists(App.MonitorConfigFilePath))
+                    {
+                        _monitorHelper = new MonitorHelper();
+                    }
+                    else
+                    {
+                        var monitorConfigContent = await File.ReadAllTextAsync(App.MonitorConfigFilePath);
+                        SerialPortConfigModel monitorConfigModel = null;
+                        try
+                        {
+                            monitorConfigModel = JsonSerializer.Deserialize<SerialPortConfigModel>(monitorConfigContent);
+                        }
+                        catch (Exception e)
+                        {
+                            App.AddLog(e);
+                            _monitorHelper = new MonitorHelper();
+                        }
+
+                        _monitorHelper = monitorConfigModel == null ?
+                            new MonitorHelper() :
+                            new MonitorHelper(monitorConfigModel.DataBits, monitorConfigModel.Parity, monitorConfigModel.StopBits,
+                                monitorConfigModel.BaudRate, monitorConfigModel.PortName);
+                    }
+                }
+
+                _monitorHelper.SendDate(dataStr);
             }
             catch (Exception e)
             {
@@ -397,7 +422,7 @@ namespace IPAClient.Windows
             }
         }
         #endregion
-        
+
         private async Task CheckReservation(string personnelNumber)
         {
             //if (App.AppConfig.CheckOnline)
@@ -409,6 +434,6 @@ namespace IPAClient.Windows
             //    }
             //}
         }
-        
+
     }
 }
