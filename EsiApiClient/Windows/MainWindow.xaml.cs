@@ -52,7 +52,6 @@ namespace IPAClient.Windows
             //در زمان هایی که برنامه مشغول کار دیگری نیست اجرا میشود
             ComponentDispatcher.ThreadIdle += new EventHandler(CheckTimeForAutoUpdate);
             monitorDto = new MonitorDto();
-            monitorDto.QueueChange += async (sender, json) => { await SendMonitorData(json); };
             //InitilizeRecheckTimer();
         }
 
@@ -508,7 +507,7 @@ namespace IPAClient.Windows
                 var remainFood = await _reservationService.GetMealFoodRemain(DateTime.Now.ToServerDateFormat(), App.CurrentMealCode);
                 monitorDto.InsertOrUpdateRemainFood(remainFood.Select(x => new RemainFoodModel(x.Title, x.Remain, x.Total)).ToArray());
                 monitorDto.AddToQueue(offlineReserve);
-                //TODO Add To Q And Display
+                await SendMonitorData(monitorDto.ToJson());
             }
             else
             {

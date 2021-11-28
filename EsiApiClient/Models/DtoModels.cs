@@ -61,8 +61,6 @@ namespace IPAClient.Models
 
     public class MonitorDto
     {
-        public delegate void QueueEventHandler(MonitorDto dto, string json);
-        public event QueueEventHandler QueueChange;
 
         public string CurrentDateTime => SystemTimeHelper.CurrentPersinaFullDateTime();
         public TimeSpan CurrentMealRemainTime { get; set; }
@@ -82,7 +80,6 @@ namespace IPAClient.Models
                 PersonnelFoods.Remove(PersonnelFoods[0]);
             }
             PersonnelFoods.Add(new PersonnelFoodDto(reservation));
-            QueueChange?.Invoke(this, ToJson());
         }
         public string ToJson()
         {
