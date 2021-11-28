@@ -57,5 +57,20 @@ namespace IPAClient.Tools
             return new TimeSpan(hours: int.Parse(val.Substring(0, 2)), minutes: int.Parse(val.Substring(2, 2)), 0);
         }
 
+        public static bool IsNextDay(this DateTime dt)
+        {
+            return dt.Date.AddDays(1) == DateTime.Now.Date;
+        }
+        public static bool IsMinutePassed(this DateTime dt,int minute)
+        {
+            return dt.AddMinutes(minute) < DateTime.Now;
+        }
+
+
+        public static string CurrentPersinaFullDateTime()
+        {
+            var now = DateTime.Now;
+            return now.ToString("HH:mm") + " " + now.ToPersianDateTextify()
+        }
     }
 }

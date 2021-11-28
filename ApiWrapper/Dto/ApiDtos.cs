@@ -128,7 +128,7 @@ namespace ApiWrapper.Dto
 
         public string ToJsonString()
         {
-            return "{\"JSON_CHARACTER\": \"[{\"" + Device_Cod + "\":\"{0}\", \"DATE\":\"" + Date + "\", \"COD_MEAL\":\"" + Cod_Meal + "\"}]\" }";
+            return "{\"JSON_CHARACTER\": \"[{\"DEVICE_COD\":\"" + Device_Cod + "\", \"DATE\":\"" + Date + "\", \"COD_MEAL\":\"" + Cod_Meal + "\"}]\" }";
         }
     }
 
@@ -242,6 +242,10 @@ namespace ApiWrapper.Dto
         {
             Device_Cod = deviceCod;
             Num_Prsn = numPrsn;
+        }
+        public string ToJsonString()
+        {
+            return "{\"JSON_CHARACTER\": \"[{\"DEVICE_COD\":\"" + Device_Cod + "\", \"Num_Prsn\":\"" + Num_Prsn + "\"}]\" }";
         }
     }
 

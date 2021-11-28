@@ -17,11 +17,11 @@ using ApiWrapper.Dto;
 using DNTPersianUtils.Core;
 using IPAClient.Models;
 using IPAClient.Tools;
-using Timer = System.Timers.Timer;
 using DataLayer.Services;
 using DataLayer.Entities;
 using System.Linq;
 using System.Windows.Input;
+using System.Windows.Interop;
 
 namespace IPAClient.Windows
 {
@@ -33,24 +33,45 @@ namespace IPAClient.Windows
         /// <summary>
         /// از این تایمر برای تلاش مجدد برای دریافت اطلاعات اولیه از سرور در صورت بروز خطا استفاده می شود
         /// </summary>
-        private readonly Timer _recheckTimer;
+        //private DispatcherTimer _recheckTimer;
         private FingerPrintHelper _fingerPrintHelper;
         private MonitorHelper _monitorHelper;
         private readonly ReservationService _reservationService;
+        private MonitorDto monitorDto;
         public MainWindow()
         {
             InitializeComponent();
             _reservationService = new ReservationService();
             SetLabelsVisible(false);
-            _recheckTimer = new Timer(30000);
-            _recheckTimer.Elapsed += async (sender, e) => await GetConfigFromServerAsync();
+
         }
 
         private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
             await CheckConfigStatusAndInitUtilitiesAsync();
+            //در زمان هایی که برنامه مشغول کار دیگری نیست اجرا میشود
+            ComponentDispatcher.ThreadIdle += new EventHandler(CheckTimeForAutoUpdate);
+            monitorDto = new MonitorDto();
+            monitorDto.QueueChange += async (sender, json) => { await SendMonitorData(json); };
+            //InitilizeRecheckTimer();
         }
 
+        private async void CheckTimeForAutoUpdate(object sender, EventArgs e)
+        {
+            // در هر روز همه ی اطلاعات بروز میشود
+            if (App.LastFullUpdateTime == null || App.LastFullUpdateTime.Value.IsNextDay())
+            {
+                await GetConfigFromServerAsync();
+            }
+            //هر 30 دقیقه اطلاعات رزرو وعده فعلی بروز میشود
+            else if (App.LastMealUpdateTime == null || App.LastMealUpdateTime.Value.IsMinutePassed(30))
+            {
+                await UpdateCurrentMealReservationFromServer();
+            }
+
+            App.CurrentMealCode = App.MainInfo.Meals.FirstOrDefault(x => x.IsCurrentMeal)?.Cod_Data;
+        }
+        
         private async Task CheckConfigStatusAndInitUtilitiesAsync()
         {
             UpdateDateLabel();
@@ -88,7 +109,6 @@ namespace IPAClient.Windows
                     {
                         await GetConfigFromServerAsync();
                         InitReConfigListener();
-                        InitUpdateFromApiTimer();
                     }
                     else
                     {
@@ -105,7 +125,7 @@ namespace IPAClient.Windows
 
         private async Task GetConfigFromServerAsync()
         {
-            _recheckTimer.Stop();
+            //_recheckTimer.Stop();
             if (!App.AppConfig.IsDemo)
             {
                 //دریافت اطلاعات اولیه و تاریخ و ساعت سرور 
@@ -147,7 +167,7 @@ namespace IPAClient.Windows
                 {
                     App.AddLog(ex);
                     SetBackGroundImage("11");
-                    _recheckTimer.Start();
+                    //_recheckTimer.Start();
                     return;
                 }
                 //دریافت اطلاعات هویتی پرسنل
@@ -160,39 +180,89 @@ namespace IPAClient.Windows
                 SetBackGroundImage("15");
                 try
                 {
-                    if (App.MainInfo?.Meals != null && App.MainInfo.Meals.Any())
-                    {
-                        foreach (var meal in App.MainInfo.Meals)
-                        {
-                            var reservationDate =
-                                await ApiClient.MainInfo_Send_Offline_Data_Fun(new MainInfo_Send_Offline_Data_Fun_Input_Data(App.AppConfig.Device_Cod, DateTime.Now.ToServerDateFormat(), meal.Cod_Data));
-                            await _reservationService.InsertAsync(reservationDate.Select(MapToReservation).ToList());
-
-                            var minMealTime = reservationDate.Min(x => x.Num_Tim_Str_Meal_Rsmls).ToTimeSpan();
-                            var maxMealTime = reservationDate.Max(x => x.Num_Tim_End_Meal_Rsmls).ToTimeSpan();
-
-                            meal.StartTime = minMealTime;
-                            meal.EndTime = maxMealTime;
-                        }
-
-                        App.CurrentMealCode = App.MainInfo.Meals.FirstOrDefault(x => x.IsCurrentMeal)?.Cod_Data;
-
-                        SetBackGroundImage("16");
-                    }
+                    await GetAllMealsReservationsFromServer();
+                    SetBackGroundImage("16");
                 }
                 catch (Exception ex)
                 {
                     App.AddLog(ex);
                     SetBackGroundImage("17");
-                    _recheckTimer.Start();
+                    //_recheckTimer.Start();
                     return;
                 }
             }
-
+            App.LastFullUpdateTime = DateTime.Now;
+            App.LastMealUpdateTime = DateTime.Now;
             //تصویر پس زمینه آماده به کار
             SetBackGroundImage("21");
         }
 
+        private async Task GetAllMealsReservationsFromServer()
+        {
+            if (App.MainInfo?.Meals != null && App.MainInfo.Meals.Any())
+            {
+                foreach (var meal in App.MainInfo.Meals)
+                {
+                    var reservationDate =
+                        await ApiClient.MainInfo_Send_Offline_Data_Fun(new MainInfo_Send_Offline_Data_Fun_Input_Data(App.AppConfig.Device_Cod, DateTime.Now.ToServerDateFormat(), meal.Cod_Data));
+
+                    await _reservationService.InsertAsync(reservationDate.Select(x=> MapToReservation(x,meal.Cod_Data)).ToList());
+
+                    var minMealTime = reservationDate.Min(x => x.Num_Tim_Str_Meal_Rsmls).ToTimeSpan();
+                    var maxMealTime = reservationDate.Max(x => x.Num_Tim_End_Meal_Rsmls).ToTimeSpan();
+
+                    meal.StartTime = minMealTime;
+                    meal.EndTime = maxMealTime;
+                }
+                App.CurrentMealCode = App.MainInfo.Meals.FirstOrDefault(x => x.IsCurrentMeal)?.Cod_Data;
+            }
+        }
+
+        private async Task UpdateCurrentMealReservationFromServer()
+        {
+            var reservationDate = await ApiClient.MainInfo_Send_Offline_Data_Fun(new MainInfo_Send_Offline_Data_Fun_Input_Data(App.AppConfig.Device_Cod, DateTime.Now.ToServerDateFormat(),App.CurrentMealCode));
+            await _reservationService.InsertAsync(reservationDate.Select(x=>MapToReservation(x, App.CurrentMealCode)).ToList());
+            App.LastMealUpdateTime = DateTime.Now;
+        }
+
+        private Reservation MapToReservation(MainInfo_Send_Offline_Data_Fun_Output_Data input,string mealCode)
+        {
+            return new Reservation
+            {
+                Id = Guid.NewGuid(),
+                Date = DateTime.Now.ToString(),
+                Cod_Meal = mealCode,
+                Date_Use = null,
+                Status = null,
+                Time_Use = null,
+
+                Main_Course = input.Main_Course.Select(x => new Food { Des_Food = x.Des_Food, Num_Amount = x.Num_Amount, Typ_Serv_Unit = x.Typ_Serv_Unit }).ToList(),
+                Appetizer_Dessert = input.Appetizer_Dessert.Select(x => new Food { Des_Food = x.Des_Food, Num_Amount = x.Num_Amount, Typ_Serv_Unit = x.Typ_Serv_Unit }).ToList(),
+                Cod_Contract_Order = input.Cod_Contract_Order,
+                Cod_Coupon = input.Cod_Coupon,
+                Cod_Resturant = input.Cod_Resturant,
+                Cod_Serial = input.Cod_Serial,
+                Dat_Day_Mepdy = input.Dat_Day_Mepdy,
+                Des_Contract_Order = input.Des_Contract_Order,
+                Des_Food_Order_Mepdy = input.Des_Food_Order_Mepdy,
+                Des_Nam_Meal = input.Des_Nam_Meal,
+                Des_Nam_Resturant_Rstm = input.Des_Nam_Resturant_Rstm,
+                Employee_Shift_Name = input.Employee_Shift_Name,
+                First_Name_Ide = input.First_Name_Ide,
+                Last_Name_Ide = input.Last_Name_Ide,
+                Lkp_Cod_Order_Mepdy_Means = input.Lkp_Cod_Order_Mepdy_Means,
+                Meal_Plan_Day_Id = input.Meal_Plan_Day_Id,
+                Num_Ide = input.Num_Ide,
+                Num_Tim_End_Meal_Rsmls = input.Num_Tim_End_Meal_Rsmls,
+                Num_Tim_Str_Meal_Rsmls = input.Num_Tim_Str_Meal_Rsmls,
+                Num_Tot_Coupon_Rccpn = input.Num_Tot_Coupon_Rccpn,
+                Receiver_Meal_Plan_Day_Id = input.Receiver_Meal_Plan_Day_Id,
+                Reciver_Coupon_Id = input.Reciver_Coupon_Id,
+
+            };
+        }
+
+        #region ٌWindow Functions
         private async Task ShowNeedConfigAsync()
         {
             _ = new wndNeedConfig().ShowDialog();
@@ -249,46 +319,19 @@ namespace IPAClient.Windows
 
         private void UpdateDateLabel()
         {
-            var now = DateTime.Now;
-            lblDate.Content = now.ToString("HH:mm") + " " + now.ToPersianDateTextify();
+            lblDate.Content = SystemTimeHelper.CurrentPersinaFullDateTime();
         }
 
-        private Reservation MapToReservation(MainInfo_Send_Offline_Data_Fun_Output_Data input)
+        private async void BtnKeyPad_OnMouseDown(object sender, MouseButtonEventArgs e)
         {
-            return new Reservation
+            var wndKeyPad = new wndKeyPad();
+            wndKeyPad.ShowDialog();
+            if (!string.IsNullOrWhiteSpace(wndKeyPad.PersonnelNumber))
             {
-                Id = Guid.NewGuid(),
-                Date = DateTime.Now.ToString(),
-                Cod_Meal = null,
-                Date_Use = null,
-                Status = null,
-                Time_Use = null,
-
-                Main_Course = input.Main_Course.Select(x => new Food { Des_Food = x.Des_Food, Num_Amount = x.Num_Amount, Typ_Serv_Unit = x.Typ_Serv_Unit }).ToList(),
-                Appetizer_Dessert = input.Appetizer_Dessert.Select(x => new Food { Des_Food = x.Des_Food, Num_Amount = x.Num_Amount, Typ_Serv_Unit = x.Typ_Serv_Unit }).ToList(),
-                Cod_Contract_Order = input.Cod_Contract_Order,
-                Cod_Coupon = input.Cod_Coupon,
-                Cod_Resturant = input.Cod_Resturant,
-                Cod_Serial = input.Cod_Serial,
-                Dat_Day_Mepdy = input.Dat_Day_Mepdy,
-                Des_Contract_Order = input.Des_Contract_Order,
-                Des_Food_Order_Mepdy = input.Des_Food_Order_Mepdy,
-                Des_Nam_Meal = input.Des_Nam_Meal,
-                Des_Nam_Resturant_Rstm = input.Des_Nam_Resturant_Rstm,
-                Employee_Shift_Name = input.Employee_Shift_Name,
-                First_Name_Ide = input.First_Name_Ide,
-                Last_Name_Ide = input.Last_Name_Ide,
-                Lkp_Cod_Order_Mepdy_Means = input.Lkp_Cod_Order_Mepdy_Means,
-                Meal_Plan_Day_Id = input.Meal_Plan_Day_Id,
-                Num_Ide = input.Num_Ide,
-                Num_Tim_End_Meal_Rsmls = input.Num_Tim_End_Meal_Rsmls,
-                Num_Tim_Str_Meal_Rsmls = input.Num_Tim_Str_Meal_Rsmls,
-                Num_Tot_Coupon_Rccpn = input.Num_Tot_Coupon_Rccpn,
-                Receiver_Meal_Plan_Day_Id = input.Receiver_Meal_Plan_Day_Id,
-                Reciver_Coupon_Id = input.Reciver_Coupon_Id,
-
-            };
+                await CheckReservation(wndKeyPad.PersonnelNumber);
+            }
         }
+        #endregion
 
         #region ReConfig Listener
         private void InitReConfigListener()
@@ -327,21 +370,6 @@ namespace IPAClient.Windows
                 }
             }
 
-        }
-        #endregion
-
-        #region Update Form Api Timer
-        private void InitUpdateFromApiTimer()
-        {
-            var mainTimer = new Timer(5 * 60 * 1000);//5 Minutes
-            mainTimer.Elapsed += MainTimer_Elapsed;
-            mainTimer.Start();
-        }
-
-        private void MainTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            //TODO: Update Reservations With Api
-            _ = MessageBox.Show(e.SignalTime.ToString(CultureInfo.InvariantCulture));
         }
         #endregion
 
@@ -446,24 +474,35 @@ namespace IPAClient.Windows
 
         private async Task CheckReservation(string personnelNumber)
         {
-            //if (App.AppConfig.CheckOnline)
-            //{
-            //    var res = await ApiClient.Restrn_Queue_Have_Reserve_Fun(new RESTRN_QUEUE_HAVE_RESERVE_FUN_Input());
-            //    if(res != null)
-            //    {
-            //        res.
-            //    }
-            //}
-        }
-
-        private async void BtnKeyPad_OnMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            var wndKeyPad = new wndKeyPad();
-            wndKeyPad.ShowDialog();
-            if (!string.IsNullOrWhiteSpace(wndKeyPad.PersonnelNumber))
+            if (App.AppConfig.CheckOnline)
             {
-                await CheckReservation(wndKeyPad.PersonnelNumber);
+                var res = await ApiClient.Restrn_Queue_Have_Reserve_Fun(new RESTRN_QUEUE_HAVE_RESERVE_FUN_Input_Data() { Device_Cod = App.AppConfig.Device_Cod,Num_Prsn = personnelNumber});
+                if (res != null)
+                {
+                    if (res.IsSuccessFull)
+                    {
+                        //TODO Different Type Of Data
+                        return;
+                    }
+                    else
+                    {
+                        //TODO How To Show Message?
+                        return;
+                    }
+                }
+            }
+            var offlineReserve = await _reservationService.FindReservationAsync(personnelNumber,App.CurrentMealCode,DateTime.Now.Date.ToServerDateFormat());
+
+            if(offlineReserve != null)
+            {
+                //TODO Add To Q And Display
+            }
+            else
+            {
+                //TODO How To Show Message?
             }
         }
+
+        
     }
 }

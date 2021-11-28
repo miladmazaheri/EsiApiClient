@@ -32,5 +32,16 @@ namespace DataLayer.Services
             }
         }
 
+        public async Task<Reservation> FindReservationAsync(string personnelNumber, string currentMealCode, string date)
+        {
+            var reservationExist = await _context.Reservations.FirstOrDefaultAsync(x => 
+            x.Num_Ide == personnelNumber 
+            && x.Cod_Meal == currentMealCode 
+            && x.Dat_Day_Mepdy == date 
+            && string.IsNullOrWhiteSpace(x.Status) 
+            );
+
+            return reservationExist;
+        }
     }
 }

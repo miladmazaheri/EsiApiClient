@@ -156,7 +156,7 @@ namespace ApiWrapper
         /// <summary>
         /// بررسی رزرو افراد در حالت آنلاین
         /// </summary>
-        public static async Task<RESTRN_QUEUE_HAVE_RESERVE_FUN_Output> Restrn_Queue_Have_Reserve_Fun(RESTRN_QUEUE_HAVE_RESERVE_FUN_Input input)
+        public static async Task<RESTRN_QUEUE_HAVE_RESERVE_FUN_Output> Restrn_Queue_Have_Reserve_Fun(RESTRN_QUEUE_HAVE_RESERVE_FUN_Input_Data input)
         {
             try
             {

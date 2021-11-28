@@ -28,6 +28,9 @@ namespace IPAClient
         public static string FingerPrintConfigFilePath => Directory.GetCurrentDirectory() + @"\fingerPrintConfig.json";
         public static string MonitorConfigFilePath => Directory.GetCurrentDirectory() + @"\monitorConfig.json";
         public static string MainInfoFilePath => Directory.GetCurrentDirectory() + @"\mainInfo.json";
+        public static DateTime? LastFullUpdateTime { get; set; }
+        public static DateTime? LastMealUpdateTime { get; set; }
+
         private static ILogger Logger;
         public App()
         {
