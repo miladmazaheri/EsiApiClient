@@ -71,7 +71,7 @@ namespace IPAClient.Windows
 
             App.CurrentMealCode = App.MainInfo.Meals.FirstOrDefault(x => x.IsCurrentMeal)?.Cod_Data;
         }
-        
+
         private async Task CheckConfigStatusAndInitUtilitiesAsync()
         {
             UpdateDateLabel();
@@ -206,7 +206,7 @@ namespace IPAClient.Windows
                     var reservationDate =
                         await ApiClient.MainInfo_Send_Offline_Data_Fun(new MainInfo_Send_Offline_Data_Fun_Input_Data(App.AppConfig.Device_Cod, DateTime.Now.ToServerDateFormat(), meal.Cod_Data));
 
-                    await _reservationService.InsertAsync(reservationDate.Select(x=> MapToReservation(x,meal.Cod_Data)).ToList());
+                    await _reservationService.InsertAsync(reservationDate.Select(x => MapToReservation(x, meal.Cod_Data)).ToList());
 
                     var minMealTime = reservationDate.Min(x => x.Num_Tim_Str_Meal_Rsmls).ToTimeSpan();
                     var maxMealTime = reservationDate.Max(x => x.Num_Tim_End_Meal_Rsmls).ToTimeSpan();
@@ -220,12 +220,12 @@ namespace IPAClient.Windows
 
         private async Task UpdateCurrentMealReservationFromServer()
         {
-            var reservationDate = await ApiClient.MainInfo_Send_Offline_Data_Fun(new MainInfo_Send_Offline_Data_Fun_Input_Data(App.AppConfig.Device_Cod, DateTime.Now.ToServerDateFormat(),App.CurrentMealCode));
-            await _reservationService.InsertAsync(reservationDate.Select(x=>MapToReservation(x, App.CurrentMealCode)).ToList());
+            var reservationDate = await ApiClient.MainInfo_Send_Offline_Data_Fun(new MainInfo_Send_Offline_Data_Fun_Input_Data(App.AppConfig.Device_Cod, DateTime.Now.ToServerDateFormat(), App.CurrentMealCode));
+            await _reservationService.InsertAsync(reservationDate.Select(x => MapToReservation(x, App.CurrentMealCode)).ToList());
             App.LastMealUpdateTime = DateTime.Now;
         }
 
-        private Reservation MapToReservation(MainInfo_Send_Offline_Data_Fun_Output_Data input,string mealCode)
+        private Reservation MapToReservation(MainInfo_Send_Offline_Data_Fun_Output_Data input, string mealCode)
         {
             return new Reservation
             {
@@ -293,6 +293,15 @@ namespace IPAClient.Windows
         private void ClearLabels()
         {
             lblName.Content = lblNumber.Content = lblVade.Content = lblShift.Content = lblShiftCompany.Content = string.Empty;
+        }
+
+        private void UpdateLabels(Reservation reservation)
+        {
+            lblName.Content = reservation.First_Name_Ide + " " + reservation.Last_Name_Ide;
+            lblNumber.Content = reservation.Num_Ide;
+            lblVade.Content = reservation.Des_Nam_Meal;
+            lblShift.Content = reservation.Employee_Shift_Name;
+            lblShiftCompany.Content = reservation.Des_Contract_Order;
         }
 
         private void HideBorder(Border brd)
@@ -476,12 +485,12 @@ namespace IPAClient.Windows
         {
             if (App.AppConfig.CheckOnline)
             {
-                var res = await ApiClient.Restrn_Queue_Have_Reserve_Fun(new RESTRN_QUEUE_HAVE_RESERVE_FUN_Input_Data() { Device_Cod = App.AppConfig.Device_Cod,Num_Prsn = personnelNumber});
+                var res = await ApiClient.Restrn_Queue_Have_Reserve_Fun(new RESTRN_QUEUE_HAVE_RESERVE_FUN_Input_Data() { Device_Cod = App.AppConfig.Device_Cod, Num_Prsn = personnelNumber });
                 if (res != null)
                 {
                     if (res.IsSuccessFull)
                     {
-                        //TODO Different Type Of Data
+
                         return;
                     }
                     else
@@ -491,10 +500,14 @@ namespace IPAClient.Windows
                     }
                 }
             }
-            var offlineReserve = await _reservationService.FindReservationAsync(personnelNumber,App.CurrentMealCode,DateTime.Now.Date.ToServerDateFormat());
+            var offlineReserve = await _reservationService.FindReservationAsync(personnelNumber, App.CurrentMealCode, DateTime.Now.Date.ToServerDateFormat());
 
-            if(offlineReserve != null)
+            if (offlineReserve != null)
             {
+                UpdateLabels(offlineReserve);
+                var remainFood = await _reservationService.GetMealFoodRemain(DateTime.Now.ToServerDateFormat(), App.CurrentMealCode);
+                monitorDto.InsertOrUpdateRemainFood(remainFood.Select(x => new RemainFoodModel(x.Title, x.Remain, x.Total)).ToArray());
+                monitorDto.AddToQueue(offlineReserve);
                 //TODO Add To Q And Display
             }
             else
@@ -503,6 +516,6 @@ namespace IPAClient.Windows
             }
         }
 
-        
+
     }
 }

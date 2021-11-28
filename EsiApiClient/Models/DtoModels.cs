@@ -14,15 +14,17 @@ namespace IPAClient.Models
     {
         public string Title { get; set; }
         public int Remain { get; set; }
+        public int Total { get; set; }
 
         public RemainFoodModel()
         {
 
         }
-        public RemainFoodModel(string title, int remain)
+        public RemainFoodModel(string title, int remain, int total)
         {
             Title = title;
             Remain = remain;
+            Total = total;
         }
 
 
