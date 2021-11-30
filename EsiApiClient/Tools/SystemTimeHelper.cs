@@ -70,7 +70,7 @@ namespace IPAClient.Tools
         public static string CurrentPersinaFullDateTime()
         {
             var now = DateTime.Now;
-            return now.ToString("HH:mm") + " " + now.ToPersianDateTextify()
+            return now.ToString("HH:mm") + " " + now.ToPersianDateTextify();
         }
     }
 }

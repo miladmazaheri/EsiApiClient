@@ -7,16 +7,13 @@
         mc:Ignorable="d"
         Title="Arm64 Test" Height="450" Width="800">
     <Grid>
-        <Label Content="This Is a Test For Running WPF On Arm64 Device&#xD;&#xA;" HorizontalAlignment="Center" VerticalAlignment="Top" Width="272" RenderTransformOrigin="0.5,0.5" Margin="0,218,0,0">
-            <Label.RenderTransform>
-                <TransformGroup>
-                    <ScaleTransform/>
-                    <SkewTransform/>
-                    <RotateTransform Angle="31.777"/>
-                    <TranslateTransform/>
-                </TransformGroup>
-            </Label.RenderTransform>
-        </Label>
-
+        <TextBox x:Name="TxtBytes" HorizontalAlignment="Left" Margin="24,69,0,0" Text="Bytes" TextWrapping="Wrap" VerticalAlignment="Top" Width="372" Height="55"/>
+        <TextBox x:Name="TxtDataHex" HorizontalAlignment="Left" Margin="410,73,0,0" Text="Hex" TextWrapping="Wrap" VerticalAlignment="Top" Width="358" Height="51"/>
+        <TextBox x:Name="TxtDataAnsi" HorizontalAlignment="Left" Margin="24,129,0,0" Text="Ansi" TextWrapping="Wrap" VerticalAlignment="Top" Width="744" Height="112"/>
+        <TextBox x:Name="TxtDataUtf8" HorizontalAlignment="Left" Margin="24,246,0,0" Text="UTF8" TextWrapping="Wrap" VerticalAlignment="Top" Width="121" Height="173"/>
+        <TextBox x:Name="TxtDataAscci" HorizontalAlignment="Left" Margin="157,246,0,0" Text="Ascii" TextWrapping="Wrap" VerticalAlignment="Top" Width="121" Height="173"/>
+        <Button x:Name="button" Content="Connect To Port COM4" HorizontalAlignment="Left" Margin="259,10,0,0" VerticalAlignment="Top" Width="273" Height="40" Click="button_Click"/>
+        <TextBox x:Name="TxtReadLine" HorizontalAlignment="Left" Margin="294,246,0,0" Text="Read Line" TextWrapping="Wrap" VerticalAlignment="Top" Width="381" Height="173"/>
+        <Button x:Name="button_Copy" Content="Clear" HorizontalAlignment="Left" Margin="680,359,0,0" VerticalAlignment="Top" Width="88" Height="50" Click="button_Copy_Click"/>
     </Grid>
 </Window>

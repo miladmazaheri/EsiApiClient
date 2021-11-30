@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Threading;
 using ApiWrapper;
 using ApiWrapper.Dto;
+using DataLayer.Entities;
 using IPAClient.Models;
 using IPAClient.Windows;
 using Microsoft.Extensions.DependencyInjection;
@@ -66,6 +69,20 @@ namespace IPAClient
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+            var model = new MonitorDto()
+            {
+                CurrentMealRemainTime = new TimeSpan(2, 40, 35),
+            };
+            model.AddToQueue(new Reservation() { Main_Course = new List<Food>() { new Food() }, Appetizer_Dessert = new List<Food>() { new Food() } });
+            model.AddToQueue(new Reservation());
+            model.AddToQueue(new Reservation());
+            model.AddToQueue(new Reservation());
+            model.AddToQueue(new Reservation());
+            model.InsertOrUpdateRemainFood(new RemainFoodModel(), new RemainFoodModel(), new RemainFoodModel());
+
+            var str = JsonSerializer.Serialize(model);
+
             ManageUnhandledExceptions();
             SetStartup();
             ConfigureApiClient();
