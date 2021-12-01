@@ -35,6 +35,7 @@ namespace IPAClient.Windows
         /// </summary>
         //private DispatcherTimer _recheckTimer;
         private FingerPrintHelper _fingerPrintHelper;
+        private RfidHelper _rfidHelper;
         private MonitorHelper _monitorHelper;
         private readonly ReservationService _reservationService;
         private MonitorDto monitorDto;
@@ -67,8 +68,10 @@ namespace IPAClient.Windows
             {
                 await UpdateCurrentMealReservationFromServer();
             }
-
-            App.CurrentMealCode = App.MainInfo.Meals.FirstOrDefault(x => x.IsCurrentMeal)?.Cod_Data;
+            //ClearLabels();
+            //HideBorder(brdFingerPrint);
+            //HideBorder(brdRfId);
+            App.CurrentMealCode = App.MainInfo?.Meals?.FirstOrDefault(x => x.IsCurrentMeal)?.Cod_Data;
         }
 
         private async Task CheckConfigStatusAndInitUtilitiesAsync()
@@ -114,8 +117,12 @@ namespace IPAClient.Windows
                         SetBackGroundImage("21");
                     }
                     ClearLabels();
+                    HideBorder(brdFingerPrint);
+                    HideBorder(brdRfId);
                     SetLabelsVisible(true);
                     await InitFingerPrintListener();
+                    await InitRfIdListener();
+
                     InitRfIdListener();
 
                 }
@@ -310,19 +317,19 @@ namespace IPAClient.Windows
 
         private void ShowBorder(Border brd, bool isSuccess)
         {
-            Dispatcher.Invoke(() =>
+            HideBorder(brdFingerPrint);
+            HideBorder(brdRfId);
+            brd.BorderBrush = new SolidColorBrush(isSuccess ? Color.FromRgb(0, 255, 0) : Color.FromRgb(255, 0, 0));
+            brd.Visibility = Visibility.Visible;
+            if (isSuccess)
             {
-                brd.BorderBrush = new SolidColorBrush(isSuccess ? Color.FromRgb(0, 255, 0) : Color.FromRgb(255, 0, 0));
-                brd.Visibility = Visibility.Visible;
-                if (isSuccess)
-                {
-                    System.Media.SystemSounds.Hand.Play();
-                }
-                else
-                {
-                    System.Media.SystemSounds.Asterisk.Play();
-                }
-            });
+                System.Media.SystemSounds.Hand.Play();
+            }
+            else
+            {
+                System.Media.SystemSounds.Asterisk.Play();
+            }
+
         }
 
         private void UpdateDateLabel()
@@ -420,24 +427,92 @@ namespace IPAClient.Windows
 
         private async void FingerPrintDataReceived(uint obj)
         {
-            if (obj != uint.MaxValue)
+            await Dispatcher.Invoke(async () =>
             {
-                ShowBorder(brdRfId, true);
-                await CheckReservation(obj.ToString());
-            }
-            else
-            {
-                ShowBorder(brdRfId, false);
-            }
+                if (obj != uint.MaxValue)
+                {
+                    //حذف رقم اول کد خوانده شده
+                    var objStr = obj.ToString();
+                    var num = objStr.Substring(1, objStr.Length - 1);
+                    lblNumber.Content = num;
+                    ShowBorder(brdFingerPrint, true);
+                    await CheckReservation(num);
+                }
+                else
+                {
+                    ShowBorder(brdFingerPrint, false);
+                }
+            });
         }
 
         #endregion
 
         #region RfId Listener
-        private void InitRfIdListener()
+        private async Task InitRfIdListener()
         {
+            try
+            {
+                _rfidHelper?.Dispose();
+
+                if (!File.Exists(App.RfIdConfigFilePath))
+                {
+                    _rfidHelper = new RfidHelper(dataReceivedAction: RfidDataReceivedAction);
+                }
+                else
+                {
+                    var rfidConfigContent = await File.ReadAllTextAsync(App.RfIdConfigFilePath);
+                    SerialPortConfigModel rfidConfigModel = null;
+                    try
+                    {
+                        rfidConfigModel = JsonSerializer.Deserialize<SerialPortConfigModel>(rfidConfigContent);
+                    }
+                    catch (Exception e)
+                    {
+                        App.AddLog(e);
+                        _rfidHelper = new RfidHelper(dataReceivedAction: RfidDataReceivedAction);
+                    }
+
+                    _rfidHelper = rfidConfigModel == null ?
+                        new RfidHelper(dataReceivedAction: RfidDataReceivedAction) :
+                        new RfidHelper(rfidConfigModel.DataBits, rfidConfigModel.Parity, rfidConfigModel.StopBits, rfidConfigModel.BaudRate, rfidConfigModel.PortName, RfidDataReceivedAction);
+                }
+            }
+            catch (Exception e)
+            {
+                App.AddLog(e);
+            }
 
         }
+
+        private async Task<bool> RfidDataReceivedAction(uint personnelNumber, bool isActive, bool isExp)
+        {
+            await Dispatcher.Invoke(async () =>
+            {
+                if (personnelNumber != 0)
+                {
+                    lblNumber.Content = personnelNumber.ToString();
+                    if (!isActive)
+                    {
+                        lblName.Content = "کارت غیر فعال است";
+                        ShowBorder(brdRfId, false);
+                        return;
+                    }
+
+                    if (isExp)
+                    {
+                        lblName.Content = "کارت منقضی شده است";
+                        ShowBorder(brdRfId, false);
+                        return;
+                    }
+
+                    ShowBorder(brdRfId, true);
+                    await CheckReservation(personnelNumber.ToString());
+                }
+            });
+
+            return true;
+        }
+
         #endregion
 
         private async Task SendMonitorData(string dataStr)
@@ -489,30 +564,35 @@ namespace IPAClient.Windows
                 {
                     if (res.IsSuccessFull)
                     {
-
                         return;
                     }
                     else
                     {
                         //TODO How To Show Message?
+                        lblName.Content = "رزرو یافت نشد";
                         return;
                     }
                 }
             }
-            var offlineReserve = await _reservationService.FindReservationAsync(personnelNumber, App.CurrentMealCode, DateTime.Now.Date.ToServerDateFormat());
-
-            if (offlineReserve != null)
-            {
-                UpdateLabels(offlineReserve);
-                var remainFood = await _reservationService.GetMealFoodRemain(DateTime.Now.ToServerDateFormat(), App.CurrentMealCode);
-                monitorDto.InsertOrUpdateRemainFood(remainFood.Select(x => new RemainFoodModel(x.Title, x.Remain, x.Total)).ToArray());
-                monitorDto.AddToQueue(offlineReserve);
-                await SendMonitorData(monitorDto.ToJson());
-            }
             else
             {
-                //TODO How To Show Message?
+                var offlineReserve = await _reservationService.FindReservationAsync(personnelNumber, App.CurrentMealCode, DateTime.Now.Date.ToServerDateFormat());
+
+                if (offlineReserve != null)
+                {
+                    UpdateLabels(offlineReserve);
+                    var remainFood = await _reservationService.GetMealFoodRemain(DateTime.Now.ToServerDateFormat(), App.CurrentMealCode);
+                    monitorDto.InsertOrUpdateRemainFood(remainFood.Select(x => new RemainFoodModel(x.Title, x.Remain, x.Total)).ToArray());
+                    monitorDto.AddToQueue(offlineReserve);
+                    await SendMonitorData(monitorDto.ToJson());
+                }
+                else
+                {
+                    lblName.Content = "رزرو یافت نشد";
+                    //TODO How To Show Message?
+                }
             }
+
         }
 
 

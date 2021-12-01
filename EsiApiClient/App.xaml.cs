@@ -29,6 +29,7 @@ namespace IPAClient
         public static MainInfo_Send_Lookup_Data_Fun MainInfo { get; set; }
         public static string ConfigFilePath => Directory.GetCurrentDirectory() + @"\config.json";
         public static string FingerPrintConfigFilePath => Directory.GetCurrentDirectory() + @"\fingerPrintConfig.json";
+        public static string RfIdConfigFilePath => Directory.GetCurrentDirectory() + @"\rfidConfig.json";
         public static string MonitorConfigFilePath => Directory.GetCurrentDirectory() + @"\monitorConfig.json";
         public static string MainInfoFilePath => Directory.GetCurrentDirectory() + @"\mainInfo.json";
         public static DateTime? LastFullUpdateTime { get; set; }

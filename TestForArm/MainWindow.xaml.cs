@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using DNTPersianUtils.Core;
 
 namespace TestForArm
 {
@@ -36,9 +37,41 @@ namespace TestForArm
                 do
                 {
                     txt += serialPort1.ReadLine();
-                } while (serialPort1.BytesToRead !=0);
+                } while (serialPort1.BytesToRead != 0);
 
                 Dispatcher.Invoke((Action)(() => TxtReadLine.Text = txt));
+
+                var parts = txt.Split("\r").Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
+
+                uint number = 0;
+                var isExp = false;
+                var isActive = false;
+                foreach (var part in parts)
+                {
+                    if (part.StartsWith("USERCODE"))
+                    {
+                        number = uint.Parse(part.Split(":")[1]);
+                    }
+                    else if (part.StartsWith("EXPDATE"))
+                    {
+                        var strDate = part.Split(":")[1];
+                        var dateParts = strDate.Split("/").Select(int.Parse).ToList();
+                        var year = dateParts[0] < 90 ? 1400 + dateParts[0] : 1300 + dateParts[0];
+                        var persianDate = new PersianDay(year, dateParts[1], dateParts[2]);
+                        isExp = persianDate.PersianDayToGregorian().Date <= DateTime.Now.Date;
+                    }
+                    else if (!part.StartsWith("CARDID"))
+                    {
+                        isActive = part == "ACTIVE";
+                    }
+                }
+
+                MessageBox.Show($"{number} {isActive} {isExp}");
+
+                //USERCODE: 5017818
+                //EXPDATE: 00 / 12 / 29
+                //ACTIVE
+                //CARDID:8E,B4,83,79
 
                 //var txt = serialPort1.ReadLine();
                 //var a = serialPort1.BytesToRead;
@@ -121,7 +154,7 @@ namespace TestForArm
                 };
                 serialPort1.DataReceived += SerialPort1OnDataReceived;
                 serialPort1.Open();
-                button.Content = "Connected To COM4";
+                button.Content = "Connected To COM3";
             }
             catch (Exception ex)
             {
