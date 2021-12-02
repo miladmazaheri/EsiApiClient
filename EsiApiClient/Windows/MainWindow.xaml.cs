@@ -343,7 +343,7 @@ namespace IPAClient.Windows
         private void UpdateDateLabel()
         {
             lblDate.Content = SystemTimeHelper.CurrentPersinaFullDate();
-            lblTime.Content = DateTime.Now.ToString("HH:mm",new CultureInfo("fa-IR"));
+            lblTime.Content = DateTime.Now.ToString("HH:mm", new CultureInfo("fa-IR"));
         }
 
         private async void BtnKeyPad_OnMouseDown(object sender, MouseButtonEventArgs e)
@@ -611,8 +611,12 @@ namespace IPAClient.Windows
 
         private void ShowError(string error)
         {
-            lblError.Content = error;
-            recError.Visibility = Visibility.Visible;
+            Dispatcher.Invoke(() =>
+          {
+              lblError.Content = error;
+              recError.Visibility = Visibility.Visible;
+          }, DispatcherPriority.Normal);
+
         }
     }
 }
