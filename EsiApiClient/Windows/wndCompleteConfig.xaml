@@ -4,12 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="wndCompleteConfig" Style="{StaticResource AppWindow}" Loaded="WndCompleteConfig_OnLoaded">
+        Title="wndCompleteConfig" Style="{StaticResource AppWindow}" Width="1280" Height="720" Loaded="WndCompleteConfig_OnLoaded">
     <Grid x:Name="grdMain">
         <Grid.Background>
             <ImageBrush ImageSource="../Images/4.png"/>
         </Grid.Background>
-        <Label x:Name="lblError" Content="خطایی در ارتباط با سرور رخ داده است" HorizontalAlignment="Left" Margin="518,412,0,0" VerticalAlignment="Top" Width="347" Height="62"
+        <Label x:Name="lblError" Content="خطایی در ارتباط با سرور رخ داده است" HorizontalAlignment="Left" Margin="455,537,0,0" VerticalAlignment="Top" Width="398" Height="62"
                Foreground="Red" FontFamily="{StaticResource Vazir}" FontSize="22"/>
     </Grid>
 </Window>

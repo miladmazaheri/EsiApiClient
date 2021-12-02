@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="wndNeedConfig" Style="{StaticResource AppWindow}" Width="1366" Height="768 " Loaded="WndNeedConfig_OnLoaded">
+        Title="wndNeedConfig" Style="{StaticResource AppWindow}" Width="1280" Height="720  " Loaded="WndNeedConfig_OnLoaded">
     <Grid x:Name="dgMain">
         <Grid.Background>
             <ImageBrush ImageSource="../Images/1.png"/>
