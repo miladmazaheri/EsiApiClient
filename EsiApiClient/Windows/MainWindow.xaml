@@ -5,20 +5,23 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:IPAClient"
         mc:Ignorable="d"
-        Title="MainWindow" Style="{StaticResource AppWindow}" Width="1366" Height="768" Loaded="MainWindow_OnLoaded" >
+        Title="MainWindow" Style="{StaticResource AppWindow}" Width="1280" Height="720" Loaded="MainWindow_OnLoaded" >
     <Grid x:Name="dgMain">
         <Grid.Background>
             <ImageBrush ImageSource="../Images/21.png"/>
         </Grid.Background>
-        <Label   x:Name="lblDate" Content="1400/09/01 دوشنبه 14:06"  Width="281" Foreground="Yellow" FontFamily="{StaticResource Vazir}" FontSize="18" Margin="936,136,148,582"  HorizontalContentAlignment="Center"/>
-        <Label   x:Name="lblName" Content="میلاد مظاهری سلام خوبی  چطوری" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="35" FontWeight="ExtraBold" Margin="711,239,125,439"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-        <Label   x:Name="lblNumber" Content="123456789" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="22" FontWeight="ExtraBold" Margin="922,341,272,377"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-        <Label   x:Name="lblVade" Content="ناهار" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="18" FontWeight="ExtraBold" Margin="711,342,586,376"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-        <Label   x:Name="lblShift" Content="صبح" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="18" FontWeight="ExtraBold" Margin="1060,405,237,313"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-        <Label   x:Name="lblShiftCompany" Content="ایپا" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="18" FontWeight="ExtraBold" Margin="711,405,509,313"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-        <Border  x:Name="brdRfId" BorderBrush="LawnGreen" Margin="1077,463,126,136" BorderThickness="3" CornerRadius="8" Visibility="Visible"/>
-        <Border  x:Name="brdFingerPrint" BorderBrush="Red" Margin="894,463,308,136" BorderThickness="3" CornerRadius="8" Visibility="Visible"/>
-        <Label x:Name="btnKeyPad" Content="" HorizontalAlignment="Left" Margin="711,463,0,0" VerticalAlignment="Top" Width="165" Height="153" MouseDown="BtnKeyPad_OnMouseDown"/>
+        <Label   x:Name="lblDate" Content="1400/09/01 دوشنبه" Foreground="Yellow" FontFamily="{StaticResource Vazir}" FontSize="18" Margin="870,125,226,542"  HorizontalContentAlignment="Center"/>
+        <Label   x:Name="lblTime" Content="14:06" Foreground="Yellow" FontFamily="{StaticResource Vazir}" FontSize="18" Margin="1058,126,135,541"  HorizontalContentAlignment="Center"/>
 
+        <Label   x:Name="lblName" Content="میلاد مظاهری سلام خوبی  " Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="35" FontWeight="ExtraBold" Margin="668,214,116,416"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        <Label   x:Name="lblNumber" Content="125458" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="22" FontWeight="ExtraBold" Margin="874,317,272,347"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        <Label   x:Name="lblVade" Content="ناهار" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="18" FontWeight="ExtraBold" Margin="668,317,544,346"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        <Label   x:Name="lblShift" Content="صبح" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="18" FontWeight="ExtraBold" Margin="992,377,222,288"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        <Label   x:Name="lblShiftCompany" Content="ایپا" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="18" FontWeight="ExtraBold" Margin="668,376,478,287"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        <Border  x:Name="brdRfId" BorderBrush="LawnGreen" Margin="1007,440,116,129" BorderThickness="3" CornerRadius="8" Visibility="Collapsed"/>
+        <Border  x:Name="brdFingerPrint" BorderBrush="Red" Margin="838,440,287,129" BorderThickness="3" CornerRadius="8" Visibility="Collapsed"/>
+        <Label x:Name="btnKeyPad" Content="" HorizontalAlignment="Left" Margin="668,434,0,0" VerticalAlignment="Top" Width="151" Height="141" MouseDown="BtnKeyPad_OnMouseDown"/>
+        <Label   x:Name="lblError" Content="میلاد مظاهری سلام خوبی  چطوری" Foreground="red" FontFamily="{StaticResource Vazir}" FontSize="28" FontWeight="ExtraBold" Margin="112,482,731,147"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        <Rectangle x:Name="recError" HorizontalAlignment="Left" Height="189" Margin="228,0,0,0" Stroke="Black" VerticalAlignment="Center" Width="210" Fill="#ff0000"  Opacity="0.2" RadiusX="109.5" RadiusY="109.5" Visibility="Collapsed"/>
     </Grid>
 </Window>

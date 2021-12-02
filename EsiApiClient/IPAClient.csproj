@@ -11,7 +11,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<None Remove="Fonts\Vazir-Black-FD-WOL.ttf" />
+		<None Remove="Fonts\Vazir-Bold-FD-WOL.ttf" />
+		<None Remove="Fonts\Vazir-FD-WOL.ttf" />
+		<None Remove="Fonts\Vazir-FD.ttf" />
 		<None Remove="Fonts\Vazir.ttf" />
+		<None Remove="Fonts\Yekan.ttf" />
 		<None Remove="Images\0.png" />
 		<None Remove="Images\1.PNG" />
 		<None Remove="Images\10.PNG" />
@@ -69,7 +74,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Resource Include="Fonts\Vazir-Black-FD-WOL.ttf" />
+		<Resource Include="Fonts\Vazir-Bold-FD-WOL.ttf" />
+		<Resource Include="Fonts\Vazir-FD-WOL.ttf" />
+		<Resource Include="Fonts\Vazir-FD.ttf" />
 		<Resource Include="Fonts\Vazir.ttf" />
+		<Resource Include="Fonts\Yekan.ttf" />
 		<Resource Include="Images\0.png" />
 		<Resource Include="Images\1.PNG" />
 		<Resource Include="Images\10.PNG" />

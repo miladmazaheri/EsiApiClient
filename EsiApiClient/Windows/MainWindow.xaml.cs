@@ -33,18 +33,30 @@ namespace IPAClient.Windows
         /// <summary>
         /// از این تایمر برای تلاش مجدد برای دریافت اطلاعات اولیه از سرور در صورت بروز خطا استفاده می شود
         /// </summary>
-        //private DispatcherTimer _recheckTimer;
         private FingerPrintHelper _fingerPrintHelper;
         private RfidHelper _rfidHelper;
         private MonitorHelper _monitorHelper;
-        private readonly ReservationService _reservationService;
         private MonitorDto monitorDto;
+        private DispatcherTimer _borderTimer;
+
+        private readonly ReservationService _reservationService;
         public MainWindow()
         {
             InitializeComponent();
             _reservationService = new ReservationService();
             SetLabelsVisible(false);
+            _borderTimer = new DispatcherTimer();
+            _borderTimer.Tick += BorderTimerOnTick;
+            _borderTimer.Interval = new TimeSpan(0, 0, 5);
+        }
 
+        private void BorderTimerOnTick(object sender, EventArgs e)
+        {
+            brdFingerPrint.Visibility = Visibility.Collapsed;
+            brdRfId.Visibility = Visibility.Collapsed;
+            lblError.Content = string.Empty;
+            recError.Visibility = Visibility.Collapsed;
+            _borderTimer.IsEnabled = false;
         }
 
         private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
@@ -117,13 +129,10 @@ namespace IPAClient.Windows
                         SetBackGroundImage("21");
                     }
                     ClearLabels();
-                    HideBorder(brdFingerPrint);
-                    HideBorder(brdRfId);
                     SetLabelsVisible(true);
                     await InitFingerPrintListener();
                     await InitRfIdListener();
 
-                    InitRfIdListener();
 
                 }
             }
@@ -293,12 +302,12 @@ namespace IPAClient.Windows
 
         private void SetLabelsVisible(bool isVisible)
         {
-            lblDate.Visibility = lblName.Visibility = lblNumber.Visibility = lblVade.Visibility = lblShift.Visibility = lblShiftCompany.Visibility = isVisible ? Visibility.Visible : Visibility.Collapsed;
+            lblTime.Visibility = lblDate.Visibility = lblName.Visibility = lblNumber.Visibility = lblVade.Visibility = lblShift.Visibility = lblShiftCompany.Visibility = isVisible ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void ClearLabels()
         {
-            lblName.Content = lblNumber.Content = lblVade.Content = lblShift.Content = lblShiftCompany.Content = string.Empty;
+            lblError.Content = lblName.Content = lblNumber.Content = lblVade.Content = lblShift.Content = lblShiftCompany.Content = string.Empty;
         }
 
         private void UpdateLabels(Reservation reservation)
@@ -310,15 +319,10 @@ namespace IPAClient.Windows
             lblShiftCompany.Content = reservation.Des_Contract_Order;
         }
 
-        private void HideBorder(Border brd)
-        {
-            brd.Visibility = Visibility.Collapsed;
-        }
+
 
         private void ShowBorder(Border brd, bool isSuccess)
         {
-            HideBorder(brdFingerPrint);
-            HideBorder(brdRfId);
             brd.BorderBrush = new SolidColorBrush(isSuccess ? Color.FromRgb(0, 255, 0) : Color.FromRgb(255, 0, 0));
             brd.Visibility = Visibility.Visible;
             if (isSuccess)
@@ -330,11 +334,16 @@ namespace IPAClient.Windows
                 System.Media.SystemSounds.Asterisk.Play();
             }
 
+            if (!_borderTimer.IsEnabled)
+            {
+                _borderTimer.Start();
+            }
         }
 
         private void UpdateDateLabel()
         {
-            lblDate.Content = SystemTimeHelper.CurrentPersinaFullDateTime();
+            lblDate.Content = SystemTimeHelper.CurrentPersinaFullDate();
+            lblTime.Content = DateTime.Now.ToString("HH:mm",new CultureInfo("fa-IR"));
         }
 
         private async void BtnKeyPad_OnMouseDown(object sender, MouseButtonEventArgs e)
@@ -429,20 +438,26 @@ namespace IPAClient.Windows
         {
             await Dispatcher.Invoke(async () =>
             {
-                if (obj != uint.MaxValue)
+                try
                 {
-                    //حذف رقم اول کد خوانده شده
-                    var objStr = obj.ToString();
-                    var num = objStr.Substring(1, objStr.Length - 1);
-                    lblNumber.Content = num;
-                    ShowBorder(brdFingerPrint, true);
-                    await CheckReservation(num);
+                    if (obj != uint.MaxValue)
+                    {
+                        //حذف رقم اول کد خوانده شده
+                        var objStr = obj.ToString();
+                        var num = objStr.Substring(1, objStr.Length - 1);
+                        ShowBorder(brdFingerPrint, true);
+                        await CheckReservation(num);
+                    }
+                    else
+                    {
+                        ShowBorder(brdFingerPrint, false);
+                    }
                 }
-                else
+                catch (Exception e)
                 {
-                    ShowBorder(brdFingerPrint, false);
+                    App.AddLog(e);
                 }
-            });
+            }, DispatcherPriority.Normal);
         }
 
         #endregion
@@ -490,17 +505,16 @@ namespace IPAClient.Windows
             {
                 if (personnelNumber != 0)
                 {
-                    lblNumber.Content = personnelNumber.ToString();
                     if (!isActive)
                     {
-                        lblName.Content = "کارت غیر فعال است";
+                        ShowError("کارت غیر فعال است");
                         ShowBorder(brdRfId, false);
                         return;
                     }
 
                     if (isExp)
                     {
-                        lblName.Content = "کارت منقضی شده است";
+                        ShowError("کارت منقضی شده است");
                         ShowBorder(brdRfId, false);
                         return;
                     }
@@ -508,7 +522,7 @@ namespace IPAClient.Windows
                     ShowBorder(brdRfId, true);
                     await CheckReservation(personnelNumber.ToString());
                 }
-            });
+            }, DispatcherPriority.Normal);
 
             return true;
         }
@@ -569,7 +583,7 @@ namespace IPAClient.Windows
                     else
                     {
                         //TODO How To Show Message?
-                        lblName.Content = "رزرو یافت نشد";
+                        ShowError("رزرو یافت نشد");
                         return;
                     }
                 }
@@ -588,13 +602,17 @@ namespace IPAClient.Windows
                 }
                 else
                 {
-                    lblName.Content = "رزرو یافت نشد";
+                    ShowError("رزرو یافت نشد");
                     //TODO How To Show Message?
                 }
             }
 
         }
 
-
+        private void ShowError(string error)
+        {
+            lblError.Content = error;
+            recError.Visibility = Visibility.Visible;
+        }
     }
 }
