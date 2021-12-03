@@ -14,6 +14,7 @@ namespace DataLayer.Services
         public ReservationService()
         {
             _context = new EsiDbContext();
+            _context.Database.Migrate();
         }
         public async Task InsertAsync(List<Reservation> reservations)
         {
