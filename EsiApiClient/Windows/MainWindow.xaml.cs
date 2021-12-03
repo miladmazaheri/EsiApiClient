@@ -130,7 +130,7 @@ namespace IPAClient.Windows
                     }
                     ClearLabels();
                     SetLabelsVisible(true);
-                    //await InitFingerPrintListener();
+                    await InitFingerPrintListener();
                     await InitRfIdListener();
 
 
@@ -617,6 +617,11 @@ namespace IPAClient.Windows
               recError.Visibility = Visibility.Visible;
           }, DispatcherPriority.Normal);
 
+        }
+
+        private void BtnClose_OnClick(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Application.Current.Shutdown();
         }
     }
 }
