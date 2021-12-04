@@ -11,4 +11,10 @@
     <PackageReference Include="System.IO.Ports" Version="5.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="MonitorDtoSample.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
