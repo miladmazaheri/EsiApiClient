@@ -55,7 +55,7 @@ namespace IPAClient.Windows
             brdFingerPrint.Visibility = Visibility.Collapsed;
             brdRfId.Visibility = Visibility.Collapsed;
             lblError.Content = string.Empty;
-            recError.Visibility = Visibility.Collapsed;
+            brdNoReserve.Visibility = Visibility.Collapsed;
             _borderTimer.IsEnabled = false;
         }
 
@@ -614,7 +614,7 @@ namespace IPAClient.Windows
             Dispatcher.Invoke(() =>
           {
               lblError.Content = error;
-              recError.Visibility = Visibility.Visible;
+              brdNoReserve.Visibility = Visibility.Visible;
           }, DispatcherPriority.Normal);
 
         }

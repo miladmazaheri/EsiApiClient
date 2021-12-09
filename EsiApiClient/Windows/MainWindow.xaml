@@ -22,9 +22,9 @@
         <Border  x:Name="brdFingerPrint" BorderBrush="Red" Margin="838,440,287,129" BorderThickness="3" CornerRadius="8" Visibility="Collapsed"/>
         <Label x:Name="btnKeyPad" Content="" HorizontalAlignment="Left" Margin="668,434,0,0" VerticalAlignment="Top" Width="151" Height="141" MouseDown="BtnKeyPad_OnMouseDown"/>
         <Label   x:Name="lblError" Content="میلاد مظاهری سلام خوبی  چطوری" Foreground="red" FontFamily="{StaticResource Vazir}" FontSize="28" FontWeight="ExtraBold" Margin="112,482,731,147"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-        <Rectangle x:Name="recError" HorizontalAlignment="Left" Height="189" Margin="228,0,0,0" Stroke="Black" VerticalAlignment="Center" Width="210" Fill="#ff0000"  Opacity="0.2" RadiusX="109.5" RadiusY="109.5" Visibility="Collapsed"/>
+        
         <Button x:Name="btnClose"  HorizontalAlignment="Left" VerticalAlignment="Top" Height="17" Width="19" Click="BtnClose_OnClick"/>
-        <Border x:Name="brdFood" BorderBrush="Green" CornerRadius="10" BorderThickness="2,2,2,2" Margin="93,65,708,62" Visibility="Visible">
+        <Border x:Name="brdFood" BorderBrush="Green" CornerRadius="10" BorderThickness="2,2,2,2" Margin="93,65,708,62" Visibility="Collapsed">
             <Border.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                     <GradientStop Color="#191a2b" Offset="0.25" />
@@ -62,6 +62,7 @@
                 </Grid>
             </StackPanel>
         </Border>
+        <Border x:Name="brdNoReserve" BorderBrush="Red" CornerRadius="10" BorderThickness="4" Margin="93,65,708,62" Visibility="Visible" />
 
     </Grid>
 </Window>
