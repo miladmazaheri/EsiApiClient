@@ -130,8 +130,8 @@ namespace IPAClient.Windows
                     }
                     ClearLabels();
                     SetLabelsVisible(true);
-                    await InitFingerPrintListener();
-                    await InitRfIdListener();
+                    //await InitFingerPrintListener();
+                    //await InitRfIdListener();
 
 
                 }
