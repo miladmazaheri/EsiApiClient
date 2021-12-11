@@ -61,7 +61,17 @@ namespace IPAClient.Models
 
     public class MonitorDto
     {
+        /// <summary>
+        /// 1 = F1 اتمام غذا
+        /// 2 = F2 در حال آماده سازی
+        /// 3 = F3
+        /// 4 = F4
+        /// </summary>
         public int Command { get; set; }
+        /// <summary>
+        /// Without Reserve Personnel Number
+        /// </summary>
+        public string WRPN { get; set; }
         public string CurrentDateTime => SystemTimeHelper.CurrentPersinaFullDateTime();
         public TimeSpan CurrentMealRemainTime { get; set; }
 
