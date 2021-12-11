@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -37,7 +38,7 @@ namespace IPAClient
         public static string MainInfoFilePath => Directory.GetCurrentDirectory() + @"\mainInfo.json";
         public static DateTime? LastFullUpdateTime { get; set; }
         public static DateTime? LastMealUpdateTime { get; set; }
-
+        Mutex _myMutex;
         private static ILogger Logger;
         public App()
         {
@@ -72,20 +73,14 @@ namespace IPAClient
         }
         protected override async void OnStartup(StartupEventArgs e)
         {
+
             base.OnStartup(e);
-
-            //var model = new MonitorDto()
-            //{
-            //    CurrentMealRemainTime = new TimeSpan(2, 40, 35),
-            //};
-            //model.AddToQueue(new Reservation() { Main_Course = new List<Food>() { new Food() }, Appetizer_Dessert = new List<Food>() { new Food() } });
-            //model.AddToQueue(new Reservation());
-            //model.AddToQueue(new Reservation());
-            //model.AddToQueue(new Reservation());
-            //model.AddToQueue(new Reservation());
-            //model.InsertOrUpdateRemainFood(new RemainFoodModel(), new RemainFoodModel(), new RemainFoodModel());
-
-            //var str = JsonSerializer.Serialize(model);
+            _myMutex = new Mutex(true, "MyWPFApplication", out var aIsNewInstance);
+            if (!aIsNewInstance)
+            {
+                MessageBox.Show("نسخه ی دیگری از برنامه در حال اجراست");
+                App.Current.Shutdown();
+            }
 
             ManageUnhandledExceptions();
             SetStartup();
