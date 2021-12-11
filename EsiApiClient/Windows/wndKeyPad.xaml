@@ -24,7 +24,8 @@
         <Label x:Name="btn0" Tag="0" Content="" HorizontalAlignment="Left" Margin="273,507,0,0" VerticalAlignment="Top" Width="100" Height="95" MouseDown="btnNumberClick"/>
         <Label x:Name="btnReset"  Content="" HorizontalAlignment="Left" Margin="163,507,0,0" VerticalAlignment="Top" Width="100" Height="95" MouseDown="BtnReset_OnMouseDown"/>
         <Label x:Name="btnOk" Content="" HorizontalAlignment="Left" Margin="383,509,0,0" VerticalAlignment="Top" Width="100" Height="95" MouseDown="BtnOk_OnMouseDown"/>
-
+        <Label x:Name="btnBack1" Content="" HorizontalAlignment="Left" Margin="839,434,0,0" VerticalAlignment="Top" Width="151" Height="141" MouseDown="BtnBack1_OnMouseDown" />
+        <Label x:Name="btnBack2" Content="" HorizontalAlignment="Left" Margin="1009,434,0,0" VerticalAlignment="Top" Width="151" Height="141" MouseDown="BtnBack1_OnMouseDown" />
 
     </Grid>
 </Window>
