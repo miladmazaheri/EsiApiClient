@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:IPAClient.Windows"
         mc:Ignorable="d"
-        Title="wndKeyPad" Style="{StaticResource AppWindow}"  Width="1280" Height="720" Loaded="WndKeyPad_OnLoaded">
+        Title="wndKeyPad" Style="{StaticResource AppWindow}"  Width="1280" Height="720" Loaded="WndKeyPad_OnLoaded" Background="Black">
     <Grid x:Name="grdMain">
         <Grid.Background>
             <ImageBrush ImageSource="../Images/22.png"/>
