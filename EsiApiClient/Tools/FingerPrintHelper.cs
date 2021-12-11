@@ -14,7 +14,7 @@ namespace IPAClient.Tools
         private readonly SerialPort serialPort1;
         private readonly byte[] tmp_in_ch = new byte[2];
         private uint USR_ID;
-
+        public bool IsConnected => serialPort1?.IsOpen ?? false;
         public FingerPrintHelper(int dataBits = 8, Parity parity = Parity.None, StopBits stopBits = StopBits.One, int baudRate = 115200, string portName = "COM3", Action<uint> dataReceivedAction = null)
         {
             _dataReceivedAction = dataReceivedAction;

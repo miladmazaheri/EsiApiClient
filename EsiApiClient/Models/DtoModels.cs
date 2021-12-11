@@ -39,7 +39,7 @@ namespace IPAClient.Models
         public string Company { get; set; }
         public List<Food> MainFoods { get; set; }
         public List<Food> SubsidiaryFoods { get; set; }
-
+        public TimeSpan DeliveryTime { get; set; }
         public PersonnelFoodDto()
         {
 
@@ -61,7 +61,7 @@ namespace IPAClient.Models
 
     public class MonitorDto
     {
-
+        public int Command { get; set; }
         public string CurrentDateTime => SystemTimeHelper.CurrentPersinaFullDateTime();
         public TimeSpan CurrentMealRemainTime { get; set; }
 
@@ -85,7 +85,7 @@ namespace IPAClient.Models
         {
             return JsonSerializer.Serialize(this);
         }
-     
+
         public void InsertOrUpdateRemainFood(params RemainFoodModel[] remainFoods)
         {
             foreach (var food in remainFoods)

@@ -13,11 +13,14 @@ namespace IPAClient.Windows
     public partial class wndConfirmConfig : Window
     {
         private readonly ConfigModel _configModel;
-        public wndConfirmConfig(ConfigModel configModel)
+        public wndConfirmConfig(ConfigModel configModel,bool isRfidConnected=false,bool isFingerConnected=false)
         {
             InitializeComponent();
             _configModel = configModel;
             lblError.Visibility = Visibility.Hidden;
+
+            brdRfId.BorderBrush = isRfidConnected ? new SolidColorBrush(Color.FromRgb(0, 255, 0)) : new SolidColorBrush(Color.FromRgb(255, 0, 0));
+            brdFinger.BorderBrush = isFingerConnected ? new SolidColorBrush(Color.FromRgb(0, 255, 0)) : new SolidColorBrush(Color.FromRgb(255, 0, 0));
         }
 
 

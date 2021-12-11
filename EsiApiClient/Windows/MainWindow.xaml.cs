@@ -623,5 +623,10 @@ namespace IPAClient.Windows
         {
             System.Windows.Application.Current.Shutdown();
         }
+
+        private void btnInfo_Click(object sender, RoutedEventArgs e)
+        {
+            _ = new wndConfirmConfig(App.AppConfig, _rfidHelper?.IsConnected ?? false, _fingerPrintHelper?.IsConnected ?? false).ShowDialog();
+        }
     }
 }

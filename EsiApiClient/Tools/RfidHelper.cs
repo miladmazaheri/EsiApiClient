@@ -12,7 +12,8 @@ namespace IPAClient.Tools
     {
         private readonly Func<uint, bool, bool, Task<bool>> _dataReceivedAction;
         private readonly SerialPort _serialPort1;
-        private volatile bool _isFree=true;
+        private volatile bool _isFree = true;
+        public bool IsConnected => _serialPort1?.IsOpen ?? false;
         public RfidHelper(int dataBits = 8, Parity parity = Parity.None, StopBits stopBits = StopBits.One, int baudRate = 19200, string portName = "COM4", Func<uint, bool, bool, Task<bool>> dataReceivedAction = null)
         {
             _dataReceivedAction = dataReceivedAction;

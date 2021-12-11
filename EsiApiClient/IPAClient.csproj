@@ -55,6 +55,7 @@
 		<None Remove="Images\ipa.ico" />
 		<None Remove="Images\ipa.png" />
 		<None Remove="Images\NeedConfig.PNG" />
+		<None Remove="Images\rfid.png" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -115,6 +116,7 @@
 		<Resource Include="Images\9.PNG" />
 		<Resource Include="Images\ipa.ico" />
 		<Resource Include="Images\ipa.png" />
+		<Resource Include="Images\rfid.png" />
 	</ItemGroup>
 
 
