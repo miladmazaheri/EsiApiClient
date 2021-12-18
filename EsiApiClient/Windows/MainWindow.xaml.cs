@@ -20,6 +20,7 @@ using IPAClient.Tools;
 using DataLayer.Services;
 using DataLayer.Entities;
 using System.Linq;
+using System.Media;
 using System.Windows.Input;
 using System.Windows.Interop;
 
@@ -130,8 +131,8 @@ namespace IPAClient.Windows
                     }
                     ClearLabels();
                     SetLabelsVisible(true);
-                    //await InitFingerPrintListener();
-                    //await InitRfIdListener();
+                    await InitFingerPrintListener();
+                    await InitRfIdListener();
 
 
                 }
@@ -325,14 +326,8 @@ namespace IPAClient.Windows
         {
             brd.BorderBrush = new SolidColorBrush(isSuccess ? Color.FromRgb(0, 255, 0) : Color.FromRgb(255, 0, 0));
             brd.Visibility = Visibility.Visible;
-            if (isSuccess)
-            {
-                System.Media.SystemSounds.Hand.Play();
-            }
-            else
-            {
-                System.Media.SystemSounds.Asterisk.Play();
-            }
+
+            PlaySound(isSuccess);
 
             if (!_borderTimer.IsEnabled)
             {
@@ -631,6 +626,17 @@ namespace IPAClient.Windows
         private void btnInfo_Click(object sender, RoutedEventArgs e)
         {
             _ = new wndConfirmConfig(App.AppConfig, _rfidHelper?.IsConnected ?? false, _fingerPrintHelper?.IsConnected ?? false).ShowDialog();
+        }
+
+
+        private void PlaySound(bool isOk)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                SoundPlayer player = new SoundPlayer(isOk ? "Sounds/ok.wav" : "Sounds/NotOk.wav");
+                player.Load();
+                player.Play();
+            });
         }
     }
 }

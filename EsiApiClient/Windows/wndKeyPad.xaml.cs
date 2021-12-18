@@ -67,5 +67,12 @@ namespace IPAClient.Windows
         }
 
 
+        private void BtnBack1_OnMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            PersonnelNumber = null;
+            Close();
+        }
+
+
     }
 }

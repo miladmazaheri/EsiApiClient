@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31919.166
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31911.196
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IPAClient", "EsiApiClient\IPAClient.csproj", "{F59D0EE4-0CA7-4196-B891-8F262D205F42}"
 EndProject
@@ -13,7 +13,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApi", "TestApi\TestApi.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestForArm", "TestForArm\TestForArm.csproj", "{D45928DD-8816-4A24-AB74-861EB4B20236}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EpsilonService", "EpsilonService\EpsilonService.csproj", "{14ED8BDD-CE3E-4ED5-BA65-2FE0C7D5B275}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EpsilonService", "EpsilonService\EpsilonService.csproj", "{14ED8BDD-CE3E-4ED5-BA65-2FE0C7D5B275}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EpsilonBackgroundService", "EpsilonBackgroundService\EpsilonBackgroundService.csproj", "{2FC67395-AA89-4DC7-91B6-330213EA8CB1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{14ED8BDD-CE3E-4ED5-BA65-2FE0C7D5B275}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{14ED8BDD-CE3E-4ED5-BA65-2FE0C7D5B275}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{14ED8BDD-CE3E-4ED5-BA65-2FE0C7D5B275}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2FC67395-AA89-4DC7-91B6-330213EA8CB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FC67395-AA89-4DC7-91B6-330213EA8CB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FC67395-AA89-4DC7-91B6-330213EA8CB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FC67395-AA89-4DC7-91B6-330213EA8CB1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
