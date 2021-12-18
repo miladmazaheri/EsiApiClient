@@ -436,6 +436,7 @@ namespace IPAClient.Windows
 
         private async void FingerPrintDataReceived(uint obj)
         {
+            if (!IsActive) return;
             await Dispatcher.Invoke(async () =>
             {
                 try
@@ -501,6 +502,7 @@ namespace IPAClient.Windows
 
         private async Task<bool> RfidDataReceivedAction(uint personnelNumber, bool isActive, bool isExp)
         {
+            if (!IsActive) return true;
             await Dispatcher.Invoke(async () =>
             {
                 if (personnelNumber != 0)
@@ -584,6 +586,7 @@ namespace IPAClient.Windows
                     {
                         //TODO How To Show Message?
                         ShowError("رزرو یافت نشد");
+                        monitorDto.WRPN = personnelNumber;
                         return;
                     }
                 }
@@ -598,15 +601,16 @@ namespace IPAClient.Windows
                     var remainFood = await _reservationService.GetMealFoodRemain(DateTime.Now.ToServerDateFormat(), App.CurrentMealCode);
                     monitorDto.InsertOrUpdateRemainFood(remainFood.Select(x => new RemainFoodModel(x.Title, x.Remain, x.Total)).ToArray());
                     monitorDto.AddToQueue(offlineReserve);
-                    await SendMonitorData(monitorDto.ToJson());
+                    
                 }
                 else
                 {
                     ShowError("رزرو یافت نشد");
+                    monitorDto.WRPN = personnelNumber;
                     //TODO How To Show Message?
                 }
             }
-
+            await SendMonitorData(monitorDto.ToJson());
         }
 
         private void ShowError(string error)
