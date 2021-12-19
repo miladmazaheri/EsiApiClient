@@ -29,18 +29,27 @@ namespace IPAClient.Windows
 
         private async void SendRequest()
         {
-            var res = await ApiClient.Maininfo_Register_Device_Fun(new MAININFO_REGISTER_DEVICE_FUN_Input(
-                new MAININFO_REGISTER_DEVICE_FUN_Input_Data
-                {
-                    Device_Category = _configModel.Device_Category,
-                    Device_Cod = _configModel.Device_Cod,
-                    Device_Name = _configModel.Device_Name,
-                    Device_Type = _configModel.Device_Type,
-                    IP = _configModel.IP,
-                    Num_Queue = _configModel.Num_Queue,
-                    Restaurant_Cod = _configModel.Restaurant_Cod,
-                }));
-            var isSuccess = res?.MAININFO_REGISTER_DEVICE_FUN.Any(x => x.Message_Code == "WS300") ?? false;
+            var isSuccess = false;
+            try
+            {
+                var res = await ApiClient.Maininfo_Register_Device_Fun(new MAININFO_REGISTER_DEVICE_FUN_Input(
+                    new MAININFO_REGISTER_DEVICE_FUN_Input_Data
+                    {
+                        Device_Category = _configModel.Device_Category,
+                        Device_Cod = _configModel.Device_Cod,
+                        Device_Name = _configModel.Device_Name,
+                        Device_Type = _configModel.Device_Type,
+                        IP = _configModel.IP,
+                        Num_Queue = _configModel.Num_Queue,
+                        Restaurant_Cod = _configModel.Restaurant_Cod,
+                    }));
+                isSuccess = res?.MAININFO_REGISTER_DEVICE_FUN.Any(x => x.Message_Code == "WS300") ?? false;
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+
             SetBackGroundImage(isSuccess);
             if (isSuccess)
             {

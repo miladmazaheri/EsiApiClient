@@ -57,6 +57,7 @@ namespace IPAClient.Windows
             brdRfId.Visibility = Visibility.Collapsed;
             lblError.Content = string.Empty;
             brdNoReserve.Visibility = Visibility.Collapsed;
+            lblNumber.Content = string.Empty;
             _borderTimer.IsEnabled = false;
         }
 
@@ -131,7 +132,7 @@ namespace IPAClient.Windows
                     }
                     ClearLabels();
                     SetLabelsVisible(true);
-                    await InitFingerPrintListener();
+                    //await InitFingerPrintListener();
                     await InitRfIdListener();
 
 
@@ -287,7 +288,7 @@ namespace IPAClient.Windows
 
         private async Task ShowConfirmConfigAsync(ConfigModel configModel)
         {
-            _ = new wndConfirmConfig(configModel).ShowDialog();
+            _ = new wndConfirmConfig(configModel, _rfidHelper?.IsConnected ?? false, _fingerPrintHelper?.IsConnected ?? false).ShowDialog();
             await CheckConfigStatusAndInitUtilitiesAsync();
         }
 
@@ -431,9 +432,10 @@ namespace IPAClient.Windows
 
         private async void FingerPrintDataReceived(uint obj)
         {
-            if (!IsActive) return;
             await Dispatcher.Invoke(async () =>
             {
+                lblNumber.Content = obj.ToString();
+                if (!IsActive) return;
                 try
                 {
                     if (obj != uint.MaxValue)
@@ -497,9 +499,11 @@ namespace IPAClient.Windows
 
         private async Task<bool> RfidDataReceivedAction(uint personnelNumber, bool isActive, bool isExp)
         {
-            if (!IsActive) return true;
+            
             await Dispatcher.Invoke(async () =>
             {
+                lblNumber.Content = personnelNumber;
+                if (!IsActive) return;
                 if (personnelNumber != 0)
                 {
                     if (!isActive)
@@ -568,10 +572,7 @@ namespace IPAClient.Windows
 
         private async Task CheckReservation(string personnelNumber)
         {
-            Dispatcher.Invoke(() =>
-            {
-                lblNumber.Content = personnelNumber;
-            }, DispatcherPriority.Normal);
+           
             
             if (App.AppConfig.CheckOnline)
             {
@@ -628,9 +629,9 @@ namespace IPAClient.Windows
             System.Windows.Application.Current.Shutdown();
         }
 
-        private void btnInfo_Click(object sender, RoutedEventArgs e)
+        private async void btnInfo_Click(object sender, RoutedEventArgs e)
         {
-            _ = new wndConfirmConfig(App.AppConfig, _rfidHelper?.IsConnected ?? false, _fingerPrintHelper?.IsConnected ?? false).ShowDialog();
+            await ShowConfirmConfigAsync(App.AppConfig);
         }
 
 
