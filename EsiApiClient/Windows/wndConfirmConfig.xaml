@@ -37,11 +37,11 @@
         <Label x:Name="btnCheckOnline" Content="" HorizontalAlignment="Left" Margin="521,515,0,0" VerticalAlignment="Top" Width="53" Height="31" MouseDown="BtnCheckOnline_OnMouseDown"/>
         <Label x:Name="lblError" Content="تنظیمات نامعتبر است" HorizontalAlignment="Left" Margin="569,604,0,0" VerticalAlignment="Top" Width="130" Height="32"
             Foreground="Red" FontFamily="{StaticResource Vazir}" FontSize="13"/>
-        <Border  x:Name="brdRfId" BorderBrush="LawnGreen" Margin="533,86,710,581" BorderThickness="2" CornerRadius="2" Visibility="Visible" Background="White">
+        <Border  x:Name="brdRfId" BorderBrush="LawnGreen" Height="35" Width="40" Margin="527,87,713,582" BorderThickness="2" CornerRadius="2" Visibility="Visible" Background="White">
             <Image  Source="/Images/rfid.png" Margin="4" Stretch="Fill"/>
         </Border>
-        <Border  x:Name="brdFinger" BorderBrush="Red" Margin="582,86,660,581" BorderThickness="2" CornerRadius="2" Visibility="Visible" Background="White">
-            <Image  Source="/Images/Finger.png" Stretch="Fill"/>
+        <Border  x:Name="brdFinger" BorderBrush="Red" Height="35" Width="40" Margin="572,87,668,582" BorderThickness="2" CornerRadius="2" Visibility="Visible" Background="White">
+            <Image   Source="/Images/Finger.png" Stretch="Fill"/>
         </Border>
 
     </Grid>

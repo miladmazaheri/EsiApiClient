@@ -52,6 +52,7 @@
 		<None Remove="Images\9.PNG" />
 		<None Remove="Images\CompleteConfig.PNG" />
 		<None Remove="Images\ConfirmConfig.png" />
+		<None Remove="Images\Finger.png" />
 		<None Remove="Images\Food\Chelogoosght.jpg" />
 		<None Remove="Images\Food\CheloJooje.jpg" />
 		<None Remove="Images\Food\Chelokoobide.jpg" />
@@ -122,6 +123,7 @@
 		<Resource Include="Images\7.PNG" />
 		<Resource Include="Images\8.PNG" />
 		<Resource Include="Images\9.PNG" />
+		<Resource Include="Images\Finger.png" />
 		<Resource Include="Images\Food\Chelogoosght.jpg" />
 		<Resource Include="Images\Food\CheloJooje.jpg" />
 		<Resource Include="Images\Food\Chelokoobide.jpg" />
