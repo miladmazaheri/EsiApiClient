@@ -571,8 +571,6 @@ namespace IPAClient.Windows
 
         private async Task CheckReservation(string personnelNumber)
         {
-           
-            
             if (App.AppConfig.CheckOnline)
             {
                 var res = await ApiClient.Restrn_Queue_Have_Reserve_Fun(new RESTRN_QUEUE_HAVE_RESERVE_FUN_Input_Data() { Device_Cod = App.AppConfig.Device_Cod, Num_Prsn = personnelNumber });
@@ -586,7 +584,7 @@ namespace IPAClient.Windows
                     {
                         //TODO How To Show Message?
                         ShowError("رزرو یافت نشد");
-                        monitorDto.WRPN = personnelNumber;
+                        monitorDto.AddNoReserveToQueue(personnelNumber); 
                         return;
                     }
                 }
@@ -606,7 +604,7 @@ namespace IPAClient.Windows
                 else
                 {
                     ShowError("رزرو یافت نشد");
-                    monitorDto.WRPN = personnelNumber;
+                    monitorDto.AddNoReserveToQueue(personnelNumber);
                     //TODO How To Show Message?
                 }
             }
