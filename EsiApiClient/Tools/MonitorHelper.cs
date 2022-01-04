@@ -15,9 +15,12 @@ namespace IPAClient.Tools
         private readonly StopBits _stopBits;
         private readonly int _baudRate;
         private readonly string _portName;
-
+        private readonly Action _commandOne;
+        private readonly Action _commandTwo;
+        private readonly Action _commandThree;
+        private readonly Action _commandFour;
         private SerialPort _monitorSerialPort;
-        public MonitorHelper(int dataBits = 8, Parity parity = Parity.None, StopBits stopBits = StopBits.One, int baudRate = 115200, string portName = "COM4")
+        public MonitorHelper(int dataBits = 8, Parity parity = Parity.None, StopBits stopBits = StopBits.One, int baudRate = 115200, string portName = "COM4", Action commandOne = null, Action commandTwo = null, Action commandThree = null, Action commandFour = null)
         {
             _dataBits = dataBits;
             _parity = parity;
@@ -25,6 +28,10 @@ namespace IPAClient.Tools
             _baudRate = baudRate;
             _portName = portName;
             InitPort();
+            _commandOne = commandOne;
+            _commandTwo = commandTwo;
+            _commandThree = commandThree;
+            _commandFour = commandFour;
         }
 
 
@@ -38,15 +45,35 @@ namespace IPAClient.Tools
                 BaudRate = _baudRate,
                 PortName = _portName
             };
+            _monitorSerialPort.DataReceived += MonitorSerialPort_DataReceived;
+            OpenPort();
+        }
+
+        private async void MonitorSerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            var command = _monitorSerialPort.ReadLine();
+            switch (command)
+            {
+                case "1"://دستور اتمام غذا
+                    _commandOne?.Invoke();
+                    break;
+                case "2"://در حال آماده سازی
+                    _commandTwo?.Invoke();
+                    break;
+                case "3":
+                    _commandThree?.Invoke();
+                    break;
+                case "4":
+                    _commandFour?.Invoke();
+                    break;
+            }
         }
 
         public void SendDate(string dataStr)
         {
-            OpenPort();
             dataStr = dataStr.Replace("\r\n", string.Empty).Replace("\n", string.Empty) + Environment.NewLine;
             var messageBytes = Encoding.UTF8.GetBytes(dataStr);
             _monitorSerialPort.Write(messageBytes, 0, messageBytes.Length);
-            ClosePort();
         }
 
         private void OpenPort()
@@ -67,6 +94,7 @@ namespace IPAClient.Tools
 
         public void Dispose()
         {
+            ClosePort();
             _monitorSerialPort.Dispose();
             _monitorSerialPort = null;
         }

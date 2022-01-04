@@ -50,8 +50,10 @@
 		<None Remove="Images\7.PNG" />
 		<None Remove="Images\8.PNG" />
 		<None Remove="Images\9.PNG" />
+		<None Remove="Images\AmadeSazi.png" />
 		<None Remove="Images\CompleteConfig.PNG" />
 		<None Remove="Images\ConfirmConfig.png" />
+		<None Remove="Images\Etmam.png" />
 		<None Remove="Images\Finger.png" />
 		<None Remove="Images\Food\Chelogoosght.jpg" />
 		<None Remove="Images\Food\CheloJooje.jpg" />
@@ -63,6 +65,7 @@
 		<None Remove="Images\Food\Salad.jpg" />
 		<None Remove="Images\ipa.ico" />
 		<None Remove="Images\ipa.png" />
+		<None Remove="Images\mainPageFoodIcon.png" />
 		<None Remove="Images\NeedConfig.PNG" />
 		<None Remove="Images\rfid.png" />
 	</ItemGroup>
@@ -123,6 +126,8 @@
 		<Resource Include="Images\7.PNG" />
 		<Resource Include="Images\8.PNG" />
 		<Resource Include="Images\9.PNG" />
+		<Resource Include="Images\AmadeSazi.png" />
+		<Resource Include="Images\Etmam.png" />
 		<Resource Include="Images\Finger.png" />
 		<Resource Include="Images\Food\Chelogoosght.jpg" />
 		<Resource Include="Images\Food\CheloJooje.jpg" />
@@ -134,6 +139,7 @@
 		<Resource Include="Images\Food\Salad.jpg" />
 		<Resource Include="Images\ipa.ico" />
 		<Resource Include="Images\ipa.png" />
+		<Resource Include="Images\mainPageFoodIcon.png" />
 		<Resource Include="Images\rfid.png" />
 	</ItemGroup>
 

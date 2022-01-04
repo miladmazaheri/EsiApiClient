@@ -13,7 +13,7 @@
         <Label   x:Name="lblDate" Content="1400/09/01 دوشنبه" Foreground="Yellow" FontFamily="{StaticResource Vazir}" FontSize="18" Margin="870,125,226,542"  HorizontalContentAlignment="Center"/>
         <Label   x:Name="lblTime" Content="14:06" Foreground="Yellow" FontFamily="{StaticResource Vazir}" FontSize="18" Margin="1058,126,135,541"  HorizontalContentAlignment="Center"/>
 
-        <Label   x:Name="lblName" Content="میلاد مظاهری سلام خوبی  " Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="35" FontWeight="ExtraBold" Margin="668,214,116,416"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        <Label   x:Name="lblName" Content="میلاد مظاهری   " Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="35" FontWeight="ExtraBold" Margin="668,214,116,416"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
         <Label   x:Name="lblNumber" Content="125458" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="22" FontWeight="ExtraBold" Margin="874,317,272,347"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
         <Label   x:Name="lblVade" Content="ناهار" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="18" FontWeight="ExtraBold" Margin="668,317,544,346"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
         <Label   x:Name="lblShift" Content="صبح" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="18" FontWeight="ExtraBold" Margin="992,377,222,288"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
@@ -21,9 +21,9 @@
         <Border  x:Name="brdRfId" BorderBrush="LawnGreen" Margin="1007,440,116,129" BorderThickness="3" CornerRadius="8" Visibility="Collapsed"/>
         <Border  x:Name="brdFingerPrint" BorderBrush="Red" Margin="838,440,287,129" BorderThickness="3" CornerRadius="8" Visibility="Collapsed"/>
         <Label x:Name="btnKeyPad" Content="" HorizontalAlignment="Left" Margin="668,434,0,0" VerticalAlignment="Top" Width="151" Height="141" MouseDown="BtnKeyPad_OnMouseDown"/>
-        <Label   x:Name="lblError" Content="میلاد مظاهری سلام خوبی  چطوری" Foreground="red" FontFamily="{StaticResource Vazir}" FontSize="28" FontWeight="ExtraBold" Margin="112,482,731,147"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        <Label   x:Name="lblError" Content="" Foreground="red" FontFamily="{StaticResource Vazir}" FontSize="28" FontWeight="ExtraBold" Margin="112,482,731,147"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
 
-        <Border x:Name="brdFood" BorderBrush="Green" CornerRadius="10" BorderThickness="2,2,2,2" Margin="93,65,708,62" Visibility="Collapsed">
+        <Border x:Name="brdFood" BorderBrush="Green" CornerRadius="10" BorderThickness="2,2,2,2" Margin="93,65,708,62" Visibility="Visible">
             <Border.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                     <GradientStop Color="#191a2b" Offset="0.25" />
@@ -41,7 +41,7 @@
                         <DropShadowEffect BlurRadius="50" Direction="200" />
                     </Border.Effect>
                     <Border.Background>
-                        <ImageBrush ImageSource="/Images/Food/CheloJooje.jpg"  Stretch="Fill"></ImageBrush>
+                        <ImageBrush ImageSource="/Images/Food/mainPageFoodIcon.png"  Stretch="Fill"></ImageBrush>
                     </Border.Background>
 
                 </Border>
