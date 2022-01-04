@@ -43,6 +43,7 @@ namespace IPAClient.Tools
         public void SendDate(string dataStr)
         {
             OpenPort();
+            dataStr = dataStr.Replace("\r\n", string.Empty).Replace("\n", string.Empty) + Environment.NewLine;
             var messageBytes = Encoding.UTF8.GetBytes(dataStr);
             _monitorSerialPort.Write(messageBytes, 0, messageBytes.Length);
             ClosePort();
