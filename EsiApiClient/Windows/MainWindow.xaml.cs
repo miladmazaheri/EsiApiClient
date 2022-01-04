@@ -433,7 +433,6 @@ namespace IPAClient.Windows
         {
             await Dispatcher.Invoke(async () =>
             {
-                lblNumber.Content = obj.ToString();
                 if (!IsActive) return;
                 try
                 {
@@ -442,6 +441,7 @@ namespace IPAClient.Windows
                         //حذف رقم اول کد خوانده شده
                         var objStr = obj.ToString();
                         var num = objStr.Substring(1, objStr.Length - 1);
+                        lblNumber.Content = num.StartsWith("429496729") ? "ناشناس" :num;
                         ShowBorder(brdFingerPrint, true);
                         await CheckReservation(num);
                     }
