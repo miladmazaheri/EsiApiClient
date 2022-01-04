@@ -71,7 +71,6 @@ namespace IPAClient.Models
         /// <summary>
         /// Without Reserve Personnel Number
         /// </summary>
-        public string WRPN { get; set; }
         public string CurrentDateTime => SystemTimeHelper.CurrentPersinaFullDateTime();
         public TimeSpan CurrentMealRemainTime { get; set; }
 

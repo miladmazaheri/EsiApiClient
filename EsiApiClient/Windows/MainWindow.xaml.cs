@@ -569,7 +569,7 @@ namespace IPAClient.Windows
             }
         }
         wndCommandOne wndCommandOne = null;
-        private async void MonitorCommand1()
+        private async Task MonitorCommand1()
         {
             await Dispatcher.Invoke(async() =>
             {
@@ -590,7 +590,7 @@ namespace IPAClient.Windows
             }, DispatcherPriority.Normal);
         }
         wndCommandTwo wndCommandTwo = null;
-        private async void MonitorCommand2()
+        private async Task MonitorCommand2()
         {
             await Dispatcher.Invoke( async () =>
             {
@@ -628,7 +628,6 @@ namespace IPAClient.Windows
                     {
                         //TODO How To Show Message?
                         ShowError("رزرو یافت نشد");
-                        monitorDto.WRPN = personnelNumber;
                         return;
                     }
                 }
@@ -648,7 +647,6 @@ namespace IPAClient.Windows
                 else
                 {
                     ShowError("رزرو یافت نشد");
-                    monitorDto.WRPN = personnelNumber;
                     //TODO How To Show Message?
                 }
             }
