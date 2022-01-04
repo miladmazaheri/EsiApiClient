@@ -40,7 +40,7 @@ namespace ApiWrapper.Dto
     #region MainInfo_Send_Lookup_Data_Fun
     public class MainInfo_Send_Lookup_Data_Fun_Output
     {
-        public string MainInfo_Send_Lookup_Data_Fun { get; set; }
+        public string MAININFO_SEND_LOOKUP_DATA_FUN { get; set; }
     }
 
     public class MainInfo_Send_Lookup_Data_Fun
@@ -48,9 +48,10 @@ namespace ApiWrapper.Dto
         public List<Meal> Meals { get; set; }
         public List<Restaurant> Restaurant { get; set; }
         public List<Direction> Direction { get; set; }
-        public List<DeviceCategory> Device_Category { get; set; }
-        public List<DeviceType> Device_Type { get; set; }
-        public List<QueueNumber> Queue_Number { get; set; }
+
+        //public List<DeviceCategory> Device_Category { get; set; }
+        //public List<DeviceType> Device_Type { get; set; }
+        //public List<QueueNumber> Queue_Number { get; set; }
 
         public DateTime ServerDateTime { get; set; }
     }
@@ -79,6 +80,7 @@ namespace ApiWrapper.Dto
         public string Cod_Data { get; set; }
         public string Des_Data { get; set; }
         public List<Device> Devices { get; set; }
+
     }
 
     public class Direction
@@ -98,6 +100,7 @@ namespace ApiWrapper.Dto
         public string Cod_Data { get; set; }
         public string Des_Data { get; set; }
     }
+
 
     public class QueueNumber
     {
@@ -128,7 +131,7 @@ namespace ApiWrapper.Dto
 
         public string ToJsonString()
         {
-            return "{\"JSON_CHARACTER\": \"[{\"DEVICE_COD\":\"" + Device_Cod + "\", \"DATE\":\"" + Date + "\", \"COD_MEAL\":\"" + Cod_Meal + "\"}]\" }";
+            return "{\"JSON_CHARACTER\": \"[{\\\"DEVICE_COD\\\":\\\"" + Device_Cod + "\\\", \\\"DATE\\\":\\\"" + Date + "\\\", \\\"COD_MEAL\\\":\\\"" + Cod_Meal + "\\\"}]\" }";
         }
     }
 
@@ -139,7 +142,7 @@ namespace ApiWrapper.Dto
 
     public class MainInfo_Send_Offline_Data_Fun_Output
     {
-        public string MainInfoSendOfflineDataFun { get; set; }
+        public string MAININFO_SEND_OFFLINE_DATA_FUN { get; set; }
     }
     public class MainInfo_Send_Offline_Data_Fun_Output_Data
     {

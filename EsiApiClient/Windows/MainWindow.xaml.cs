@@ -173,7 +173,7 @@ namespace IPAClient.Windows
                     else
                     {
                         SetBackGroundImage("10");
-                        await File.WriteAllTextAsync(App.ConfigFilePath, JsonSerializer.Serialize(mainInfo));
+                        await File.WriteAllTextAsync(App.MainInfoFilePath, JsonSerializer.Serialize(mainInfo));
                         App.MainInfo = mainInfo;
                         SystemTimeHelper.SetSystemTime(mainInfo.ServerDateTime);
                         UpdateDateLabel();

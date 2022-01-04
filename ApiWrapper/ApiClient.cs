@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using ApiWrapper.Dto;
@@ -51,11 +52,12 @@ namespace ApiWrapper
         {
             try
             {
-                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/MainInfo_Send_Lookup_Data_Fun", new StringContent("{\"JSON_CHARACTER\":\"[]\"}"));
+                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/MainInfo_Send_Lookup_Data_Fun", new StringContent("{\"JSON_CHARACTER\":\"[]\"}",Encoding.UTF8,"application/json"));
                 var resAsString = await response.Content.ReadAsStringAsync();
+                resAsString = resAsString.ToNormalJsonString();
                 var res1 = JsonSerializer.Deserialize<MainInfo_Send_Lookup_Data_Fun_Output>(resAsString);
-                if (res1 != null && string.IsNullOrWhiteSpace(res1.MainInfo_Send_Lookup_Data_Fun)) return null;
-                var res2 = JsonSerializer.Deserialize<MainInfo_Send_Lookup_Data_Fun>(res1.MainInfo_Send_Lookup_Data_Fun);
+                if (res1 != null && string.IsNullOrWhiteSpace(res1.MAININFO_SEND_LOOKUP_DATA_FUN)) return null;
+                var res2 = JsonSerializer.Deserialize<MainInfo_Send_Lookup_Data_Fun>(res1.MAININFO_SEND_LOOKUP_DATA_FUN);
                 if (res2 == null) return null;
 
                 //Read Server Date Time From Response Header
@@ -90,11 +92,12 @@ namespace ApiWrapper
         {
             try
             {
-                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/MainInfo_Send_Offline_Data_Fun", new StringContent(input.ToJsonString()));
+                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/MainInfo_Send_Offline_Data_Fun", new StringContent(input.ToJsonString(), Encoding.UTF8, "application/json"));
                 var resAsString = await response.Content.ReadAsStringAsync();
+                resAsString = resAsString.ToNormalJsonString();
                 var res1 = JsonSerializer.Deserialize<MainInfo_Send_Offline_Data_Fun_Output>(resAsString);
-                if (res1 != null && string.IsNullOrWhiteSpace(res1.MainInfoSendOfflineDataFun)) return null;
-                return JsonSerializer.Deserialize<List<MainInfo_Send_Offline_Data_Fun_Output_Data>>(res1.MainInfoSendOfflineDataFun);
+                if (res1 != null && string.IsNullOrWhiteSpace(res1.MAININFO_SEND_OFFLINE_DATA_FUN)) return null;
+                return JsonSerializer.Deserialize<List<MainInfo_Send_Offline_Data_Fun_Output_Data>>(res1.MAININFO_SEND_OFFLINE_DATA_FUN);
             }
             catch (Exception ex)
             {
@@ -109,7 +112,7 @@ namespace ApiWrapper
         {
             try
             {
-                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/MainInfo_Synchronize_Data_Fun", new StringContent(JsonSerializer.Serialize(input)));
+                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/MainInfo_Synchronize_Data_Fun", new StringContent(JsonSerializer.Serialize(input), Encoding.UTF8, "application/json"));
                 var resAsString = await response.Content.ReadAsStringAsync();
                 return JsonSerializer.Deserialize<MainInfo_Synchronize_Data_Fun_Output>(resAsString);
             }
@@ -126,7 +129,7 @@ namespace ApiWrapper
         {
             try
             {
-                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/Maininfo_Register_Device_Fun", new StringContent(JsonSerializer.Serialize(input)));
+                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/Maininfo_Register_Device_Fun", new StringContent(JsonSerializer.Serialize(input), Encoding.UTF8, "application/json"));
                 var resAsString = await response.Content.ReadAsStringAsync();
                 return JsonSerializer.Deserialize<MAININFO_REGISTER_DEVICE_FUN_Output>(resAsString);
             }
@@ -143,7 +146,7 @@ namespace ApiWrapper
         {
             try
             {
-                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/MainInfo_User_Authenticate_Fun", new StringContent(JsonSerializer.Serialize(input)));
+                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/MainInfo_User_Authenticate_Fun", new StringContent(JsonSerializer.Serialize(input), Encoding.UTF8, "application/json"));
                 var resAsString = await response.Content.ReadAsStringAsync();
                 return JsonSerializer.Deserialize<MainInfo_User_Authenticate_Fun_Output>(resAsString);
             }
@@ -160,7 +163,7 @@ namespace ApiWrapper
         {
             try
             {
-                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/Restrn_Queue_Have_Reserve_Fun", new StringContent(JsonSerializer.Serialize(input)));
+                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/Restrn_Queue_Have_Reserve_Fun", new StringContent(JsonSerializer.Serialize(input), Encoding.UTF8, "application/json"));
                 var resAsString = await response.Content.ReadAsStringAsync();
                 try
                 {
@@ -187,5 +190,9 @@ namespace ApiWrapper
             _logger?.LogError(ex, $"ApiError-{(new StackFrame(1, true).GetMethod()?.Name ?? "")}");
         }
 
+        public static string ToNormalJsonString(this string input)
+        {
+            return input?.Replace("\\n", string.Empty).Replace("\n", string.Empty).Replace("\\r\\n", string.Empty).Replace("\r\n", string.Empty);
+        }
     }
 }
