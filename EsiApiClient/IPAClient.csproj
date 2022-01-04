@@ -60,6 +60,7 @@
 		<None Remove="Images\Food\Chelokoobide.jpg" />
 		<None Remove="Images\Food\Dorchin.jpg" />
 		<None Remove="Images\Food\Estamboli.jpg" />
+		<None Remove="Images\Food\mainPageFoodIcon.png" />
 		<None Remove="Images\Food\Nooshidani.jpg" />
 		<None Remove="Images\Food\Qeyme.jpg" />
 		<None Remove="Images\Food\Salad.jpg" />
@@ -134,12 +135,12 @@
 		<Resource Include="Images\Food\Chelokoobide.jpg" />
 		<Resource Include="Images\Food\Dorchin.jpg" />
 		<Resource Include="Images\Food\Estamboli.jpg" />
+		<Resource Include="Images\Food\mainPageFoodIcon.png" />
 		<Resource Include="Images\Food\Nooshidani.jpg" />
 		<Resource Include="Images\Food\Qeyme.jpg" />
 		<Resource Include="Images\Food\Salad.jpg" />
 		<Resource Include="Images\ipa.ico" />
 		<Resource Include="Images\ipa.png" />
-		<Resource Include="Images\mainPageFoodIcon.png" />
 		<Resource Include="Images\rfid.png" />
 	</ItemGroup>
 
