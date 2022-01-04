@@ -67,7 +67,7 @@ namespace IPAClient.Models
         /// 3 = F3
         /// 4 = F4
         /// </summary>
-        public int Command { get; set; }
+        public string Command { get; private set; } = string.Empty;
         /// <summary>
         /// Without Reserve Personnel Number
         /// </summary>
@@ -111,6 +111,11 @@ namespace IPAClient.Models
                 }
 
             }
+        }
+
+        public void SetCommand(string command)
+        {
+            Command = command;
         }
     }
 }
