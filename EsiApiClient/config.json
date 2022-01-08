@@ -1,14 +1,14 @@
-{
-  "Restaurant_Cod": "test",
-  "Device_Category": "test",
-  "Device_Type": "test",
-  "Device_Name": "test",
-  "Device_Cod": "test",
+﻿{
+  "Restaurant_Cod": "91",
+  "Device_Category": "RESTAURANT_ID_EQUIPMENT",
+  "Device_Type": "Fix",
+  "Device_Name": "تجهیزات شناسایی رستوران امور مهندسی",
+  "Device_Cod": "REQ-91",
   "IP": "test",
   "Num_Queue": "test",
   "WebServiceUrl": "http://eis.msc.ir/",
   "WebServiceAuthToken": "Basic TkFNRk9PRHVzZXIxOjUxZjIzMDQxYWNkOGRmNzlkMWIxOGY2ZjE2ZWE4YzM2",
   "CheckOnline": false,
   "IsConfirmed": true,
-  "IsDemo": true
+  "IsDemo": false
 }

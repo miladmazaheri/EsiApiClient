@@ -173,7 +173,7 @@ namespace IPAClient.Windows
                     else
                     {
                         SetBackGroundImage("10");
-                        await File.WriteAllTextAsync(App.ConfigFilePath, JsonSerializer.Serialize(mainInfo));
+                        await File.WriteAllTextAsync(App.MainInfoFilePath, JsonSerializer.Serialize(mainInfo));
                         App.MainInfo = mainInfo;
                         SystemTimeHelper.SetSystemTime(mainInfo.ServerDateTime);
                         UpdateDateLabel();
@@ -433,7 +433,6 @@ namespace IPAClient.Windows
         {
             await Dispatcher.Invoke(async () =>
             {
-                lblNumber.Content = obj.ToString();
                 if (!IsActive) return;
                 try
                 {
@@ -442,6 +441,7 @@ namespace IPAClient.Windows
                         //حذف رقم اول کد خوانده شده
                         var objStr = obj.ToString();
                         var num = objStr.Substring(1, objStr.Length - 1);
+                        lblNumber.Content = num.StartsWith("429496729") ? "ناشناس" : num;
                         ShowBorder(brdFingerPrint, true);
                         await CheckReservation(num);
                     }
@@ -498,7 +498,7 @@ namespace IPAClient.Windows
 
         private async Task<bool> RfidDataReceivedAction(uint personnelNumber, bool isActive, bool isExp)
         {
-            
+
             await Dispatcher.Invoke(async () =>
             {
                 lblNumber.Content = personnelNumber;
@@ -538,7 +538,7 @@ namespace IPAClient.Windows
                 {
                     if (!File.Exists(App.MonitorConfigFilePath))
                     {
-                        _monitorHelper = new MonitorHelper();
+                        _monitorHelper = new MonitorHelper(commandOne: MonitorCommand1, commandTwo: MonitorCommand2);
                     }
                     else
                     {
@@ -551,13 +551,13 @@ namespace IPAClient.Windows
                         catch (Exception e)
                         {
                             App.AddLog(e);
-                            _monitorHelper = new MonitorHelper();
+                            _monitorHelper = new MonitorHelper(commandOne: MonitorCommand1, commandTwo: MonitorCommand2);
                         }
 
                         _monitorHelper = monitorConfigModel == null ?
-                            new MonitorHelper() :
+                            new MonitorHelper(commandOne: MonitorCommand1, commandTwo: MonitorCommand2) :
                             new MonitorHelper(monitorConfigModel.DataBits, monitorConfigModel.Parity, monitorConfigModel.StopBits,
-                                monitorConfigModel.BaudRate, monitorConfigModel.PortName);
+                                monitorConfigModel.BaudRate, monitorConfigModel.PortName, commandOne: MonitorCommand1, commandTwo: MonitorCommand2);
                     }
                 }
 
@@ -568,9 +568,45 @@ namespace IPAClient.Windows
                 App.AddLog(e);
             }
         }
+        wndCommandOne wndCommandOne = null;
+        private void MonitorCommand1()
+        {
+            Dispatcher.Invoke(() =>
+            {
+                if (wndCommandOne == null)
+                {
+                    wndCommandOne = new wndCommandOne();
+                    wndCommandOne.ShowDialog();
+                }
+                else
+                {
+                    wndCommandOne.Close();
+                    wndCommandOne = null;
+                }
+            }, DispatcherPriority.Normal);
+        }
+        wndCommandTwo wndCommandTwo = null;
+        private void MonitorCommand2()
+        {
+            Dispatcher.Invoke(() =>
+            {
+                if (wndCommandTwo == null)
+                {
+                    wndCommandTwo = new wndCommandTwo();
+                    wndCommandTwo.ShowDialog();
+                }
+                else
+                {
+                    wndCommandTwo.Close();
+                    wndCommandTwo = null;
+                }
+            }, DispatcherPriority.Normal);
+        }
 
         private async Task CheckReservation(string personnelNumber)
         {
+           
+            
             if (App.AppConfig.CheckOnline)
             {
                 var res = await ApiClient.Restrn_Queue_Have_Reserve_Fun(new RESTRN_QUEUE_HAVE_RESERVE_FUN_Input_Data() { Device_Cod = App.AppConfig.Device_Cod, Num_Prsn = personnelNumber });
@@ -599,7 +635,7 @@ namespace IPAClient.Windows
                     var remainFood = await _reservationService.GetMealFoodRemain(DateTime.Now.ToServerDateFormat(), App.CurrentMealCode);
                     monitorDto.InsertOrUpdateRemainFood(remainFood.Select(x => new RemainFoodModel(x.Title, x.Remain, x.Total)).ToArray());
                     monitorDto.AddToQueue(offlineReserve);
-                    
+
                 }
                 else
                 {

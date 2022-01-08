@@ -29,6 +29,7 @@ namespace IPAClient.Tools
 
         public static bool SetSystemTime(DateTime dt)
         {
+            dt = dt.ToUniversalTime();
             SYSTEMTIME st = new SYSTEMTIME
             {
                 wYear = (short)dt.Year,
@@ -77,6 +78,11 @@ namespace IPAClient.Tools
         {
             var now = DateTime.Now;
             return  now.ToPersianDateTextify();
+        }
+
+        public static string ToNormalJsonString(this string input)
+        {
+            return input?.Replace("\\n", string.Empty).Replace("\n", string.Empty).Replace("\\r\\n", string.Empty).Replace("\r\n", string.Empty);
         }
     }
 }
