@@ -56,8 +56,15 @@ namespace TestForArm
             {
                 try
                 {
-                    var messageBytes = Encoding.UTF8.GetBytes(txtJson.Text);
-                    _serialPort.Write(messageBytes, 0, messageBytes.Length);
+                    if (rdbW.IsChecked ?? true)
+                    {
+                        var messageBytes = Encoding.UTF8.GetBytes(txtJson.Text.Replace("\r\n", " ") + "\n");
+                        _serialPort.Write(messageBytes, 0, messageBytes.Length);
+                    }
+                    else
+                    {
+                        _serialPort.WriteLine(txtJson.Text.Replace("\r\n", " "));
+                    }
                     btnSend.Content = "Data Sent";
                 }
                 catch (Exception)

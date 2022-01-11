@@ -1,5 +1,6 @@
 {
-  "CurrentDateTime": "19:33 1400/09/09 دوشنبه",
+  "Command": null,
+  "CurrentDateTime": "12:31 1400/02/04 دوشنبه",
   "CurrentMealRemainTime": {
     "Ticks": 96350000000,
     "Days": 0,
@@ -9,9 +10,21 @@
     "Seconds": 35
   },
   "RemainFoods": [
-    { "Title": "چلو کباب", "Remain": 123, "Total": 150 },
-    { "Title": "جوجه کباب", "Remain": 13, "Total": 200 },
-    { "Title": "خوراک مرغ", "Remain": 250, "Total": 350 }
+    {
+      "Title": "چلو کباب",
+      "Remain": 123,
+      "Total": 150
+    },
+    {
+      "Title": "جوجه کباب",
+      "Remain": 13,
+      "Total": 200
+    },
+    {
+      "Title": "خوراک مرغ",
+      "Remain": 250,
+      "Total": 350
+    }
   ],
   "PersonnelFoods": [
     {
@@ -20,12 +33,32 @@
       "Meal": "ناهار",
       "Shift": "شیفت اول صبحکار",
       "Company": "ایپا",
+      "DeliveryTime": {
+        "Ticks": 96350000000,
+        "Days": 0,
+        "Hours": 2,
+        "Milliseconds": 0,
+        "Minutes": 40,
+        "Seconds": 35
+      },
       "MainFoods": [
-        { "Des_Food": "چلو کباب", "Num_Amount": "1", "Typ_Serv_Unit": "عدد" }
+        {
+          "Des_Food": "چلو کباب",
+          "Num_Amount": "1",
+          "Typ_Serv_Unit": "عدد"
+        }
       ],
       "SubsidiaryFoods": [
-        { "Des_Food": "ماست", "Num_Amount": "1", "Typ_Serv_Unit": "عدد" },
-        { "Des_Food": "سالاد", "Num_Amount": "1", "Typ_Serv_Unit": "عدد" }
+        {
+          "Des_Food": "ماست",
+          "Num_Amount": "1",
+          "Typ_Serv_Unit": "عدد"
+        },
+        {
+          "Des_Food": "سالاد",
+          "Num_Amount": "1",
+          "Typ_Serv_Unit": "عدد"
+        }
       ]
     },
     {
@@ -34,12 +67,32 @@
       "Meal": "ناهار",
       "Shift": "شیفت اول صبحکار",
       "Company": "ایپا",
+      "DeliveryTime": {
+        "Ticks": 96350000000,
+        "Days": 0,
+        "Hours": 2,
+        "Milliseconds": 0,
+        "Minutes": 40,
+        "Seconds": 35
+      },
       "MainFoods": [
-        { "Des_Food": "جوجه کباب", "Num_Amount": "1", "Typ_Serv_Unit": "عدد" }
+        {
+          "Des_Food": "جوجه کباب",
+          "Num_Amount": "1",
+          "Typ_Serv_Unit": "عدد"
+        }
       ],
       "SubsidiaryFoods": [
-        { "Des_Food": "ماست", "Num_Amount": "1", "Typ_Serv_Unit": "عدد" },
-        { "Des_Food": "نوشابه", "Num_Amount": "1", "Typ_Serv_Unit": "عدد" }
+        {
+          "Des_Food": "ماست",
+          "Num_Amount": "1",
+          "Typ_Serv_Unit": "عدد"
+        },
+        {
+          "Des_Food": "نوشابه",
+          "Num_Amount": "1",
+          "Typ_Serv_Unit": "عدد"
+        }
       ]
     },
     {
@@ -48,13 +101,37 @@
       "Meal": "ناهار",
       "Shift": "شیفت اول صبحکار",
       "Company": "ایپا",
+      "DeliveryTime": {
+        "Ticks": 96350000000,
+        "Days": 0,
+        "Hours": 2,
+        "Milliseconds": 0,
+        "Minutes": 40,
+        "Seconds": 35
+      },
       "MainFoods": [
-        { "Des_Food": "خوراک مرغ", "Num_Amount": "1", "Typ_Serv_Unit": "عدد" }
+        {
+          "Des_Food": "خوراک مرغ",
+          "Num_Amount": "1",
+          "Typ_Serv_Unit": "عدد"
+        }
       ],
       "SubsidiaryFoods": [
-        { "Des_Food": "نوشابه", "Num_Amount": "1", "Typ_Serv_Unit": "عدد" },
-        { "Des_Food": "سالاد", "Num_Amount": "1", "Typ_Serv_Unit": "عدد" },
-        { "Des_Food": "ماست", "Num_Amount": "1", "Typ_Serv_Unit": "عدد" }
+        {
+          "Des_Food": "نوشابه",
+          "Num_Amount": "1",
+          "Typ_Serv_Unit": "عدد"
+        },
+        {
+          "Des_Food": "سالاد",
+          "Num_Amount": "1",
+          "Typ_Serv_Unit": "عدد"
+        },
+        {
+          "Des_Food": "ماست",
+          "Num_Amount": "1",
+          "Typ_Serv_Unit": "عدد"
+        }
       ]
     },
     {
@@ -63,12 +140,32 @@
       "Meal": "ناهار",
       "Shift": "شیفت اول صبحکار",
       "Company": "ایپا",
+      "DeliveryTime": {
+        "Ticks": 96350000000,
+        "Days": 0,
+        "Hours": 2,
+        "Milliseconds": 0,
+        "Minutes": 40,
+        "Seconds": 35
+      },
       "MainFoods": [
-        { "Des_Food": "چلو کباب", "Num_Amount": "1", "Typ_Serv_Unit": "عدد" }
+        {
+          "Des_Food": "چلو کباب",
+          "Num_Amount": "1",
+          "Typ_Serv_Unit": "عدد"
+        }
       ],
       "SubsidiaryFoods": [
-        { "Des_Food": "ماست", "Num_Amount": "1", "Typ_Serv_Unit": "عدد" },
-        { "Des_Food": "سالاد", "Num_Amount": "1", "Typ_Serv_Unit": "عدد" }
+        {
+          "Des_Food": "ماست",
+          "Num_Amount": "1",
+          "Typ_Serv_Unit": "عدد"
+        },
+        {
+          "Des_Food": "سالاد",
+          "Num_Amount": "1",
+          "Typ_Serv_Unit": "عدد"
+        }
       ]
     },
     {
@@ -77,12 +174,32 @@
       "Meal": "ناهار",
       "Shift": "شیفت اول صبحکار",
       "Company": "ایپا",
+      "DeliveryTime": {
+        "Ticks": 96350000000,
+        "Days": 0,
+        "Hours": 2,
+        "Milliseconds": 0,
+        "Minutes": 40,
+        "Seconds": 35
+      },
       "MainFoods": [
-        { "Des_Food": "چلو کباب", "Num_Amount": "1", "Typ_Serv_Unit": "عدد" }
+        {
+          "Des_Food": "چلو کباب",
+          "Num_Amount": "1",
+          "Typ_Serv_Unit": "عدد"
+        }
       ],
       "SubsidiaryFoods": [
-        { "Des_Food": "ماست", "Num_Amount": "1", "Typ_Serv_Unit": "عدد" },
-        { "Des_Food": "سالاد", "Num_Amount": "1", "Typ_Serv_Unit": "عدد" }
+        {
+          "Des_Food": "ماست",
+          "Num_Amount": "1",
+          "Typ_Serv_Unit": "عدد"
+        },
+        {
+          "Des_Food": "سالاد",
+          "Num_Amount": "1",
+          "Typ_Serv_Unit": "عدد"
+        }
       ]
     }
   ]

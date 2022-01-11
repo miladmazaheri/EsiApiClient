@@ -54,7 +54,15 @@ namespace IPAClient.Models
             Company = reservation.Des_Contract_Order;
 
             MainFoods = reservation.Main_Course;
-            MainFoods = reservation.Appetizer_Dessert;
+            SubsidiaryFoods = reservation.Appetizer_Dessert;
+        }
+        public PersonnelFoodDto(string noReservePersonnelCode)
+        {
+            PersonnelNumber = noReservePersonnelCode;
+            MainFoods = new List<Food>(){new Food()
+            {
+                Des_Food = "رزرو یافت نشد",
+            }};
         }
 
     }
@@ -90,9 +98,18 @@ namespace IPAClient.Models
             }
             PersonnelFoods.Add(new PersonnelFoodDto(reservation));
         }
+
+        public void AddNoReserveToQueue(string personnelCode)
+        {
+            if (PersonnelFoods.Count == 5)
+            {
+                PersonnelFoods.Remove(PersonnelFoods[0]);
+            }
+            PersonnelFoods.Add(new PersonnelFoodDto(personnelCode));
+        }
         public string ToJson()
         {
-            return JsonSerializer.Serialize(this);
+            return JsonSerializer.Serialize(this, options: new JsonSerializerOptions() { WriteIndented = false }).Replace("\r\n", " ") + "\n";
         }
 
         public void InsertOrUpdateRemainFood(params RemainFoodModel[] remainFoods)
