@@ -14,6 +14,7 @@
         public bool CheckOnline { get; set; }
         public bool IsConfirmed { get; set; }
         public bool IsDemo { get; set; }
+        public bool Logging { get; set; }
 
         public bool IsValid()
         {

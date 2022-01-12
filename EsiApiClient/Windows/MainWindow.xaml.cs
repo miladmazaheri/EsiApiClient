@@ -578,7 +578,7 @@ namespace IPAClient.Windows
                     monitorDto.SetCommand("1");
                     await SendMonitorData(monitorDto.ToJson());
                     wndCommandOne = new wndCommandOne();
-                    wndCommandOne.ShowDialog();
+                    wndCommandOne.Show();
                 }
                 else
                 {
@@ -599,7 +599,7 @@ namespace IPAClient.Windows
                     monitorDto.SetCommand("2");
                     await SendMonitorData(monitorDto.ToJson());
                     wndCommandTwo = new wndCommandTwo();
-                    wndCommandTwo.ShowDialog();
+                    wndCommandTwo.Show();
                 }
                 else
                 {

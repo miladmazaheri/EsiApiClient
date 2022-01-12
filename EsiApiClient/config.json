@@ -10,5 +10,6 @@
   "WebServiceAuthToken": "Basic TkFNRk9PRHVzZXIxOjUxZjIzMDQxYWNkOGRmNzlkMWIxOGY2ZjE2ZWE4YzM2",
   "CheckOnline": false,
   "IsConfirmed": true,
-  "IsDemo": false
+  "IsDemo": false,
+  "Logging": false
 }
