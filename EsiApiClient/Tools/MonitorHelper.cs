@@ -15,12 +15,12 @@ namespace IPAClient.Tools
         private readonly StopBits _stopBits;
         private readonly int _baudRate;
         private readonly string _portName;
-        private readonly Action _commandOne;
-        private readonly Action _commandTwo;
-        private readonly Action _commandThree;
-        private readonly Action _commandFour;
+        private readonly Func<Task> _commandOne;
+        private readonly Func<Task> _commandTwo;
+        private readonly Func<Task> _commandThree;
+        private readonly Func<Task> _commandFour;
         private SerialPort _monitorSerialPort;
-        public MonitorHelper(int dataBits = 8, Parity parity = Parity.None, StopBits stopBits = StopBits.One, int baudRate = 115200, string portName = "COM4", Action commandOne = null, Action commandTwo = null, Action commandThree = null, Action commandFour = null)
+        public MonitorHelper(int dataBits = 8, Parity parity = Parity.None, StopBits stopBits = StopBits.One, int baudRate = 115200, string portName = "COM4", Func<Task> commandOne = null, Func<Task> commandTwo = null, Func<Task> commandThree = null, Func<Task> commandFour = null)
         {
             _dataBits = dataBits;
             _parity = parity;
@@ -55,16 +55,16 @@ namespace IPAClient.Tools
             switch (command)
             {
                 case "1"://دستور اتمام غذا
-                    _commandOne?.Invoke();
+                    await _commandOne?.Invoke();
                     break;
                 case "2"://در حال آماده سازی
-                    _commandTwo?.Invoke();
+                    await _commandTwo?.Invoke();
                     break;
                 case "3":
-                    _commandThree?.Invoke();
+                    await _commandThree?.Invoke();
                     break;
                 case "4":
-                    _commandFour?.Invoke();
+                    await _commandFour?.Invoke();
                     break;
             }
         }

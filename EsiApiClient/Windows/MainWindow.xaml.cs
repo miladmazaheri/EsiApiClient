@@ -569,34 +569,42 @@ namespace IPAClient.Windows
             }
         }
         wndCommandOne wndCommandOne = null;
-        private void MonitorCommand1()
+        private async Task MonitorCommand1()
         {
-            Dispatcher.Invoke(() =>
+            await Dispatcher.Invoke(async() =>
             {
                 if (wndCommandOne == null)
                 {
+                    monitorDto.SetCommand("1");
+                    await SendMonitorData(monitorDto.ToJson());
                     wndCommandOne = new wndCommandOne();
-                    wndCommandOne.ShowDialog();
+                    wndCommandOne.Show();
                 }
                 else
                 {
+                    monitorDto.SetCommand(string.Empty);
+                    await SendMonitorData(monitorDto.ToJson());
                     wndCommandOne.Close();
                     wndCommandOne = null;
                 }
             }, DispatcherPriority.Normal);
         }
         wndCommandTwo wndCommandTwo = null;
-        private void MonitorCommand2()
+        private async Task MonitorCommand2()
         {
-            Dispatcher.Invoke(() =>
+            await Dispatcher.Invoke( async () =>
             {
                 if (wndCommandTwo == null)
                 {
+                    monitorDto.SetCommand("2");
+                    await SendMonitorData(monitorDto.ToJson());
                     wndCommandTwo = new wndCommandTwo();
-                    wndCommandTwo.ShowDialog();
+                    wndCommandTwo.Show();
                 }
                 else
                 {
+                    monitorDto.SetCommand(string.Empty);
+                    await SendMonitorData(monitorDto.ToJson());
                     wndCommandTwo.Close();
                     wndCommandTwo = null;
                 }

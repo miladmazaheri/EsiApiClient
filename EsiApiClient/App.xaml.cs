@@ -96,7 +96,8 @@ namespace IPAClient
 
         private void ConfigureApiClient()
         {
-            ApiClient.SetLogger(Logger);
+            if (AppConfig.Logging)
+                ApiClient.SetLogger(Logger);
         }
         private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
@@ -138,7 +139,8 @@ namespace IPAClient
 
         public static void AddLog(Exception ex)
         {
-            Logger.LogError(ex, "");
+            if (AppConfig.Logging)
+                Logger.LogError(ex, "");
         }
     }
 }
