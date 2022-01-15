@@ -1,64 +1,49 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
-using System.IO.Ports;
+using System.Linq;
 using System.Management;
+using System.Media;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using ApiWrapper;
 using ApiWrapper.Dto;
-using DNTPersianUtils.Core;
+using DataLayer.Entities;
+using DataLayer.Services;
 using IPAClient.Models;
 using IPAClient.Tools;
-using DataLayer.Services;
-using DataLayer.Entities;
-using System.Linq;
-using System.Media;
-using System.Windows.Input;
-using System.Windows.Interop;
 
 namespace IPAClient.Windows
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    ///     Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        /// <summary>
-        /// از این تایمر برای تلاش مجدد برای دریافت اطلاعات اولیه از سرور در صورت بروز خطا استفاده می شود
-        /// </summary>
-        private FingerPrintHelper _fingerPrintHelper;
-        private RfidHelper _rfidHelper;
-        private MonitorHelper _monitorHelper;
-        private MonitorDto monitorDto;
-        private DispatcherTimer _borderTimer;
-        private DispatcherTimer _mainTimer;
-
         private readonly ReservationService _reservationService;
+        private DispatcherTimer _borderTimer;
+        private FingerPrintHelper _fingerPrintHelper;
+        private DispatcherTimer _labelTimer;
+        private DispatcherTimer _mainTimer;
+        private MonitorDto _monitorDto;
+        private MonitorHelper _monitorHelper;
+        private RfidHelper _rfIdHelper;
+        private wndCommandOne _wndCommandOne;
+        private wndCommandTwo _wndCommandTwo;
+
         public MainWindow()
         {
             InitializeComponent();
             _reservationService = new ReservationService();
-            SetLabelsVisible(false);
-            _borderTimer = new DispatcherTimer();
-            _borderTimer.Tick += BorderTimerOnTick;
-            _borderTimer.Interval = new TimeSpan(0, 0, 5);
-
-
-        }
-
-        private void InitMainTimer()
-        {
-            _mainTimer = new DispatcherTimer();
-            _mainTimer.Tick += MainTimerOnTick;
-            _mainTimer.Interval = new TimeSpan(0, 1, 0);
+            InitBorderTimer();
+            InitLabelTimer();
         }
 
         private void BorderTimerOnTick(object sender, EventArgs e)
@@ -68,67 +53,33 @@ namespace IPAClient.Windows
             lblError.Content = string.Empty;
             brdNoReserve.Visibility = Visibility.Collapsed;
             lblNumber.Content = string.Empty;
-            _borderTimer.IsEnabled = false;
+            _borderTimer.Stop();
         }
 
-        private async void MainTimerOnTick(object sender, EventArgs e)
+        private void BtnClose_OnClick(object sender, RoutedEventArgs e)
         {
-            // در هر روز همه ی اطلاعات بروز میشود
-            if (App.LastFullUpdateTime == null || App.LastFullUpdateTime.Value.IsNextDay())
-            {
-                await GetConfigFromServerAsync();
-            }
-            //هر 30 دقیقه اطلاعات رزرو وعده فعلی بروز میشود
-            else if (App.LastMealUpdateTime == null || App.LastMealUpdateTime.Value.IsMinutePassed(30))
-            {
-                await UpdateCurrentMealReservationFromServer();
-            }
-            await SetCurrnetMeal();
-            UpdateDateLabel();
-
-            await SendMonitorData(monitorDto.ToJson());
+            Application.Current.Shutdown();
         }
 
-        private async Task SetCurrnetMeal()
+        private async void btnInfo_Click(object sender, RoutedEventArgs e)
         {
-            var activeMeal = App.MainInfo.Meals.FirstOrDefault(x => x.IsCurrentMeal);
-            var activeMealCode = activeMeal?.Cod_Data;
-            if (App.CurrentMealCode != activeMealCode)
-            {
-                App.CurrentMealCode = activeMealCode;
-                if (string.IsNullOrWhiteSpace(activeMealCode))
-                {
-                    App.IsActive = false;
-                    monitorDto?.Clear();
-                }
-                else
-                {
-                    App.IsActive = true;
-                    await SetRemainFoods();
-                }
-            }
-
-            if(monitorDto != null)
-            {
-                if (activeMeal != null && activeMeal.StartTime.HasValue && activeMeal.EndTime.HasValue)
-                {
-
-                    monitorDto.CurrentMealRemainTime = activeMeal.StartTime.Value - activeMeal.EndTime.Value;
-                }
-                else
-                {
-                    monitorDto.CurrentMealRemainTime = new TimeSpan(0, 0, 0);
-                }
-            }
+            await ShowConfirmConfigAsync(App.AppConfig);
         }
 
-        private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
+        private async void BtnKeyPad_OnMouseDown(object sender, MouseButtonEventArgs e)
         {
-            await CheckConfigStatusAndInitUtilitiesAsync();
-            //در زمان هایی که برنامه مشغول کار دیگری نیست اجرا میشود
-            //ComponentDispatcher.ThreadIdle += new EventHandler(CheckTimeForAutoUpdate);
-            monitorDto = new MonitorDto();
-            //InitilizeRecheckTimer();
+            if (App.IsActive || !App.AppConfig.CheckMealTime)
+            {
+                var wndKeyPad = new wndKeyPad();
+                wndKeyPad.ShowDialog();
+                if (!string.IsNullOrWhiteSpace(wndKeyPad.PersonnelNumber))
+                    await CheckReservation(wndKeyPad.PersonnelNumber);
+            }
+            else
+            {
+                ShowError("خارج از وعده");
+                _monitorDto.AddMessageToQueue("", "خارج از وعده");
+            }
         }
 
         //private async void CheckTimeForAutoUpdate(object sender, EventArgs e)
@@ -178,351 +129,80 @@ namespace IPAClient.Windows
                 else
                 {
                     App.AppConfig = configModel;
-                    ApiClient.SetAuthToken(string.IsNullOrWhiteSpace(configModel.WebServiceAuthToken) ? "Basic TkFNRk9PRHVzZXIxOjUxZjIzMDQxYWNkOGRmNzlkMWIxOGY2ZjE2ZWE4YzM2" : configModel.WebServiceAuthToken);
-                    ApiClient.SetBaseUrl(string.IsNullOrWhiteSpace(configModel.WebServiceUrl) ? "http://eis.msc.ir/" : configModel.WebServiceUrl);
+                    ApiClient.SetAuthToken(string.IsNullOrWhiteSpace(configModel.WebServiceAuthToken)
+                        ? "Basic TkFNRk9PRHVzZXIxOjUxZjIzMDQxYWNkOGRmNzlkMWIxOGY2ZjE2ZWE4YzM2"
+                        : configModel.WebServiceAuthToken);
+                    ApiClient.SetBaseUrl(string.IsNullOrWhiteSpace(configModel.WebServiceUrl)
+                        ? "http://eis.msc.ir/"
+                        : configModel.WebServiceUrl);
                     if (!App.AppConfig.IsDemo)
-                    {
                         await GetConfigFromServerAsync();
-                        //InitReConfigListener();
-                    }
+                    //Commented Because Of Uknown Error That Says We Should Install .Net 4 !!!
+                    //InitReConfigListener();
                     else
-                    {
                         SetBackGroundImage("21");
-                    }
+
                     ClearLabels();
-                    SetLabelsVisible(true);
                     await InitFingerPrintListener();
                     await InitRfIdListener();
-                    InitMainTimer();
+                    InitAndStartMainTimer();
                 }
             }
         }
 
-        private async Task GetConfigFromServerAsync()
+        private async Task CheckReservation(string personnelNumber)
         {
-            //_recheckTimer.Stop();
-            if (!App.AppConfig.IsDemo)
+            if (App.AppConfig.CheckOnline)
             {
-                //دریافت اطلاعات اولیه و تاریخ و ساعت سرور 
-                SetBackGroundImage("9");
-                try
+                var res = await ApiClient.Restrn_Queue_Have_Reserve_Fun(new RESTRN_QUEUE_HAVE_RESERVE_FUN_Input_Data
+                    {Device_Cod = App.AppConfig.Device_Cod, Num_Prsn = personnelNumber});
+                if (res != null)
                 {
-                    var mainInfo = await ApiClient.MainInfo_Send_Lookup_Data_Fun();
-                    if (mainInfo == null)
-                    {
-                        if (File.Exists(App.MainInfoFilePath))
-                        {
-                            var mainInfoContent = await File.ReadAllTextAsync(App.MainInfoFilePath);
-                            try
-                            {
-                                mainInfo = JsonSerializer.Deserialize<MainInfo_Send_Lookup_Data_Fun>(mainInfoContent);
-                            }
-                            catch (Exception e)
-                            {
-                                App.AddLog(e);
-                                throw;
-                            }
-                            App.MainInfo = mainInfo;
-                        }
-                        else
-                        {
-                            throw new Exception("Main Info File Not Found");
-                        }
-                    }
-                    else
-                    {
-                        SetBackGroundImage("10");
-                        await File.WriteAllTextAsync(App.MainInfoFilePath, JsonSerializer.Serialize(mainInfo));
-                        App.MainInfo = mainInfo;
-                        SystemTimeHelper.SetSystemTime(mainInfo.ServerDateTime);
-                        UpdateDateLabel();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    App.AddLog(ex);
-                    SetBackGroundImage("11");
-                    //_recheckTimer.Start();
+                    if (res.IsSuccessFull) return;
+
+                    var message = "رزرو آنلاین یافت نشد";
+                    ShowError(message);
+                    _monitorDto.AddMessageToQueue(personnelNumber, message);
                     return;
-                }
-                //دریافت اطلاعات هویتی پرسنل
-                SetBackGroundImage("12");
-                //TODO Update Personnel Info
-                Thread.Sleep(2000);
-                SetBackGroundImage("13");
-
-                //دریافت رزرواسیون آفلاین
-                SetBackGroundImage("15");
-                try
-                {
-                    await GetAllMealsReservationsFromServer();
-                    SetBackGroundImage("16");
-                }
-                catch (Exception ex)
-                {
-                    App.AddLog(ex);
-                    SetBackGroundImage("17");
-                    //_recheckTimer.Start();
-                    return;
-                }
-            }
-            App.LastFullUpdateTime = DateTime.Now;
-            App.LastMealUpdateTime = DateTime.Now;
-            //تصویر پس زمینه آماده به کار
-            SetBackGroundImage("21");
-        }
-
-        private async Task GetAllMealsReservationsFromServer()
-        {
-            if (App.MainInfo?.Meals != null && App.MainInfo.Meals.Any())
-            {
-                foreach (var meal in App.MainInfo.Meals)
-                {
-                    var reservationDate =
-                        await ApiClient.MainInfo_Send_Offline_Data_Fun(new MainInfo_Send_Offline_Data_Fun_Input_Data(App.AppConfig.Device_Cod, DateTime.Now.ToServerDateFormat(), meal.Cod_Data));
-
-                    await _reservationService.InsertAsync(reservationDate.Select(x => MapToReservation(x, meal.Cod_Data)).ToList());
-
-                    var minMealTime = reservationDate.Min(x => x.Num_Tim_Str_Meal_Rsmls).ToTimeSpan();
-                    var maxMealTime = reservationDate.Max(x => x.Num_Tim_End_Meal_Rsmls).ToTimeSpan();
-
-                    meal.StartTime = minMealTime;
-                    meal.EndTime = maxMealTime;
-                }
-                await SetCurrnetMeal();
-            }
-        }
-
-        private async Task UpdateCurrentMealReservationFromServer()
-        {
-            var reservationDate = await ApiClient.MainInfo_Send_Offline_Data_Fun(new MainInfo_Send_Offline_Data_Fun_Input_Data(App.AppConfig.Device_Cod, DateTime.Now.ToServerDateFormat(), App.CurrentMealCode));
-            await _reservationService.InsertAsync(reservationDate.Select(x => MapToReservation(x, App.CurrentMealCode)).ToList());
-            App.LastMealUpdateTime = DateTime.Now;
-        }
-
-        private Reservation MapToReservation(MainInfo_Send_Offline_Data_Fun_Output_Data input, string mealCode)
-        {
-            var res = new Reservation
-            {
-                Id = Guid.NewGuid(),
-                Date = DateTime.Now.ToString(),
-                Cod_Meal = mealCode,
-                Date_Use = null,
-                Status = null,
-                Time_Use = null,
-
-
-                Cod_Contract_Order = input.Cod_Contract_Order,
-                Cod_Coupon = input.Cod_Coupon,
-                Cod_Resturant = input.Cod_Resturant,
-                Cod_Serial = input.Cod_Serial,
-                Dat_Day_Mepdy = input.Dat_Day_Mepdy,
-                Des_Contract_Order = input.Des_Contract_Order,
-                Des_Food_Order_Mepdy = input.Des_Food_Order_Mepdy,
-                Des_Nam_Meal = input.Des_Nam_Meal,
-                Des_Nam_Resturant_Rstm = input.Des_Nam_Resturant_Rstm,
-                Employee_Shift_Name = input.Employee_Shift_Name,
-                First_Name_Ide = input.First_Name_Ide,
-                Last_Name_Ide = input.Last_Name_Ide,
-                Lkp_Cod_Order_Mepdy_Means = input.Lkp_Cod_Order_Mepdy_Means,
-                Meal_Plan_Day_Id = input.Meal_Plan_Day_Id,
-                Num_Ide = input.Num_Ide,
-                Num_Tim_End_Meal_Rsmls = input.Num_Tim_End_Meal_Rsmls,
-                Num_Tim_Str_Meal_Rsmls = input.Num_Tim_Str_Meal_Rsmls,
-                Num_Tot_Coupon_Rccpn = input.Num_Tot_Coupon_Rccpn,
-                Receiver_Meal_Plan_Day_Id = input.Receiver_Meal_Plan_Day_Id,
-                Reciver_Coupon_Id = input.Reciver_Coupon_Id,
-
-            };
-
-            foreach (var mainFood in input.Main_Course)
-            {
-                res.Foods.Add(
-                    new Food
-                    {
-                        IsMain = true,
-                        ReservationId = res.Id,
-
-                        Des_Food = mainFood.Des_Food,
-                        Num_Amount = mainFood.Num_Amount.ToString(),
-                        Typ_Serv_Unit = mainFood.Typ_Serv_Unit
-                    });
-            }
-
-            foreach (var appFood in input.Appetizer_Dessert)
-            {
-                res.Foods.Add(
-                    new Food
-                    {
-                        IsMain = false,
-                        ReservationId = res.Id,
-
-                        Des_Food = appFood.Des_Food,
-                        Num_Amount = appFood.Num_Amount,
-                        Typ_Serv_Unit = appFood.Typ_Serv_Unit
-                    });
-            }
-
-            return res;
-        }
-
-        #region ٌWindow Functions
-        private async Task ShowNeedConfigAsync()
-        {
-            _ = new wndNeedConfig().ShowDialog();
-            await CheckConfigStatusAndInitUtilitiesAsync();
-        }
-
-        private async Task ShowConfirmConfigAsync(ConfigModel configModel)
-        {
-            _ = new wndConfirmConfig(configModel, _rfidHelper?.IsConnected ?? false, _fingerPrintHelper?.IsConnected ?? false).ShowDialog();
-            await CheckConfigStatusAndInitUtilitiesAsync();
-        }
-
-        private void SetBackGroundImage(string imageName)
-        {
-            Dispatcher.BeginInvoke(() =>
-            {
-                dgMain.Background =
-                    new ImageBrush(new BitmapImage(
-                        new Uri(@$"pack://application:,,,/IPAClient;component/Images/{imageName}.png")));
-            });
-        }
-
-        private void SetLabelsVisible(bool isVisible)
-        {
-            lblTime.Visibility = lblDate.Visibility = lblName.Visibility = lblNumber.Visibility = lblVade.Visibility = lblShift.Visibility = lblShiftCompany.Visibility = isVisible ? Visibility.Visible : Visibility.Collapsed;
-        }
-
-        private void ClearLabels()
-        {
-            lblError.Content = lblName.Content = lblNumber.Content = lblVade.Content = lblShift.Content = lblShiftCompany.Content = string.Empty;
-        }
-
-        private void UpdateLabels(Reservation reservation)
-        {
-            lblName.Content = reservation.First_Name_Ide + " " + reservation.Last_Name_Ide;
-            lblNumber.Content = reservation.Num_Ide;
-            lblVade.Content = reservation.Des_Nam_Meal;
-            lblShift.Content = reservation.Employee_Shift_Name;
-            lblShiftCompany.Content = reservation.Des_Contract_Order;
-        }
-
-
-
-        private void ShowBorder(Border brd, bool isSuccess)
-        {
-            brd.BorderBrush = new SolidColorBrush(isSuccess ? Color.FromRgb(0, 255, 0) : Color.FromRgb(255, 0, 0));
-            brd.Visibility = Visibility.Visible;
-
-            PlaySound(isSuccess);
-
-            if (!_borderTimer.IsEnabled)
-            {
-                _borderTimer.Start();
-            }
-        }
-
-        private void UpdateDateLabel()
-        {
-            lblDate.Content = SystemTimeHelper.CurrentPersinaFullDate();
-            lblTime.Content = DateTime.Now.ToString("HH:mm", new CultureInfo("fa-IR"));
-        }
-
-        private async void BtnKeyPad_OnMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if (App.IsActive || !App.AppConfig.CheckMealTime)
-            {
-                var wndKeyPad = new wndKeyPad();
-                wndKeyPad.ShowDialog();
-                if (!string.IsNullOrWhiteSpace(wndKeyPad.PersonnelNumber))
-                {
-                    await CheckReservation(wndKeyPad.PersonnelNumber);
                 }
             }
             else
             {
-                ShowError("خارج از وعده");
-                monitorDto.AddMessageToQueue("", "خارج از وعده");
-            }
-        }
-        #endregion
+                var offlineReserve = await _reservationService.FindReservationAsync(personnelNumber,
+                    App.CurrentMealCode, DateTime.Now.Date.ToServerDateFormat());
 
-        #region ReConfig Listener
-        private void InitReConfigListener()
-        {
-            ManagementEventWatcher watcher = new ManagementEventWatcher();
-            WqlEventQuery query = new WqlEventQuery("SELECT * FROM Win32_VolumeChangeEvent WHERE EventType = 2");
-            watcher.EventArrived += Watcher_EventArrived;
-            watcher.Query = query;
-            watcher.Start();
-        }
-
-        private async void Watcher_EventArrived(object sender, EventArrivedEventArgs e)
-        {
-            var driveNameProp = e.NewEvent.Properties["DriveName"];
-            if (!string.IsNullOrWhiteSpace(driveNameProp?.Value.ToString()))
-            {
-                var configFilePath = driveNameProp.Value + @"\reconfig.json";
-                if (File.Exists(configFilePath))
+                if (offlineReserve != null)
                 {
-                    try
-                    {
-                        var configContent = await File.ReadAllTextAsync(configFilePath);
-                        if (!string.IsNullOrWhiteSpace(configContent))
-                        {
-                            var configModel = JsonSerializer.Deserialize<ConfigModel>(configContent);
-                            if (configModel != null)
-                            {
-                                await ShowConfirmConfigAsync(configModel);
-                            }
-                        }
-                    }
-                    catch (Exception exception)
-                    {
-                        MessageBox.Show("Can Not Use Config File\n" + exception.Message);
-                    }
-                }
-            }
-
-        }
-        #endregion
-
-        #region Finger Print Listener
-        private async Task InitFingerPrintListener()
-        {
-            try
-            {
-                _fingerPrintHelper?.Dispose();
-
-                if (!File.Exists(App.FingerPrintConfigFilePath))
-                {
-                    _fingerPrintHelper = new FingerPrintHelper(dataReceivedAction: FingerPrintDataReceived);
+                    UpdateLabels(offlineReserve);
+                    _monitorDto.AddToQueue(offlineReserve);
+                    await SetRemainFoods();
                 }
                 else
                 {
-                    var fingerConfigContent = await File.ReadAllTextAsync(App.FingerPrintConfigFilePath);
-                    SerialPortConfigModel fingerConfigModel = null;
-                    try
-                    {
-                        fingerConfigModel = JsonSerializer.Deserialize<SerialPortConfigModel>(fingerConfigContent);
-                    }
-                    catch (Exception e)
-                    {
-                        App.AddLog(e);
-                        _fingerPrintHelper = new FingerPrintHelper(dataReceivedAction: FingerPrintDataReceived);
-                    }
-
-                    _fingerPrintHelper = fingerConfigModel == null ?
-                        new FingerPrintHelper(dataReceivedAction: FingerPrintDataReceived) :
-                        new FingerPrintHelper(fingerConfigModel.DataBits, fingerConfigModel.Parity, fingerConfigModel.StopBits, fingerConfigModel.BaudRate, fingerConfigModel.PortName, FingerPrintDataReceived);
+                    var message = "رزرو یافت نشد";
+                    ShowError(message);
+                    _monitorDto.AddMessageToQueue(personnelNumber, message);
                 }
             }
-            catch (Exception e)
-            {
-                App.AddLog(e);
-            }
 
+            await SendMonitorData(_monitorDto.ToJson());
+        }
+
+        private void ClearLabels()
+        {
+            Dispatcher.Invoke(() =>
+            {
+                lblError.Content = lblName.Content =
+                    lblNumber.Content = lblVade.Content =
+                        lblShift.Content = lblShiftCompany.Content =
+                            lblFoodName.Content = lblFoodNum.Content =
+                                lblAppFoodName0.Content = lblAppFoodNum0.Content =
+                                    lblAppFoodName1.Content = lblAppFoodNum1.Content =
+                                        lblAppFoodName2.Content = lblAppFoodNum2.Content =
+                                            string.Empty;
+                brdFood.Visibility = Visibility.Collapsed;
+                if (_labelTimer.IsEnabled) _labelTimer.Stop();
+            });
         }
 
         private async void FingerPrintDataReceived(uint obj)
@@ -552,7 +232,7 @@ namespace IPAClient.Windows
                     {
                         ShowError("خارج از وعده");
                         ShowBorder(brdRfId, false);
-                        monitorDto.AddMessageToQueue("", "خارج از وعده");
+                        _monitorDto.AddMessageToQueue("", "خارج از وعده");
                     }
                     //await CheckReservation("919633");
                 }
@@ -563,48 +243,356 @@ namespace IPAClient.Windows
             }, DispatcherPriority.Normal);
         }
 
-        #endregion
+        private async Task GetAllMealsReservationsFromServer()
+        {
+            if (App.MainInfo?.Meals != null && App.MainInfo.Meals.Any())
+            {
+                foreach (var meal in App.MainInfo.Meals)
+                {
+                    var reservationDate =
+                        await ApiClient.MainInfo_Send_Offline_Data_Fun(
+                            new MainInfo_Send_Offline_Data_Fun_Input_Data(App.AppConfig.Device_Cod,
+                                DateTime.Now.ToServerDateFormat(), meal.Cod_Data));
 
-        #region RfId Listener
-        private async Task InitRfIdListener()
+                    await _reservationService.InsertAsync(reservationDate
+                        .Select(x => MapToReservation(x, meal.Cod_Data)).ToList());
+
+                    var minMealTime = reservationDate.Min(x => x.Num_Tim_Str_Meal_Rsmls).ToTimeSpan();
+                    var maxMealTime = reservationDate.Max(x => x.Num_Tim_End_Meal_Rsmls).ToTimeSpan();
+
+                    meal.StartTime = minMealTime;
+                    meal.EndTime = maxMealTime;
+                }
+
+                await SetCurrentMeal();
+            }
+        }
+
+        private async Task GetConfigFromServerAsync()
+        {
+            //_recheckTimer.Stop();
+            if (!App.AppConfig.IsDemo)
+            {
+                //دریافت اطلاعات اولیه و تاریخ و ساعت سرور 
+                SetBackGroundImage("9");
+                try
+                {
+                    var mainInfo = await ApiClient.MainInfo_Send_Lookup_Data_Fun();
+                    if (mainInfo == null)
+                    {
+                        if (File.Exists(App.MainInfoFilePath))
+                        {
+                            var mainInfoContent = await File.ReadAllTextAsync(App.MainInfoFilePath);
+                            try
+                            {
+                                mainInfo = JsonSerializer.Deserialize<MainInfo_Send_Lookup_Data_Fun>(mainInfoContent);
+                            }
+                            catch (Exception e)
+                            {
+                                App.AddLog(e);
+                                throw;
+                            }
+
+                            App.MainInfo = mainInfo;
+                        }
+                        else
+                        {
+                            throw new Exception("Main Info File Not Found");
+                        }
+                    }
+                    else
+                    {
+                        SetBackGroundImage("10");
+                        await File.WriteAllTextAsync(App.MainInfoFilePath, JsonSerializer.Serialize(mainInfo));
+                        App.MainInfo = mainInfo;
+                        SystemTimeHelper.SetSystemTime(mainInfo.ServerDateTime);
+                        UpdateDateLabel();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    App.AddLog(ex);
+                    SetBackGroundImage("11");
+                    //_recheckTimer.Start();
+                    return;
+                }
+
+                //دریافت اطلاعات هویتی پرسنل
+                SetBackGroundImage("12");
+                //TODO Update Personnel Info
+                Thread.Sleep(2000);
+                SetBackGroundImage("13");
+
+                //دریافت رزرواسیون آفلاین
+                SetBackGroundImage("15");
+                try
+                {
+                    await GetAllMealsReservationsFromServer();
+                    SetBackGroundImage("16");
+                }
+                catch (Exception ex)
+                {
+                    App.AddLog(ex);
+                    SetBackGroundImage("17");
+                    //_recheckTimer.Start();
+                    return;
+                }
+            }
+
+            App.LastFullUpdateTime = DateTime.Now;
+            App.LastMealUpdateTime = DateTime.Now;
+            //تصویر پس زمینه آماده به کار
+            SetBackGroundImage("21");
+        }
+
+        private void InitAndStartMainTimer()
+        {
+            _mainTimer = new DispatcherTimer();
+            _mainTimer.Tick += MainTimerOnTick;
+            _mainTimer.Interval = new TimeSpan(0, 1, 0);
+            _mainTimer.Start();
+        }
+
+        private void InitBorderTimer()
+        {
+            _borderTimer = new DispatcherTimer();
+            _borderTimer.Tick += BorderTimerOnTick;
+            _borderTimer.Interval = new TimeSpan(0, 0, 5);
+        }
+
+        private async Task InitFingerPrintListener()
         {
             try
             {
-                _rfidHelper?.Dispose();
+                _fingerPrintHelper?.Dispose();
 
-                if (!File.Exists(App.RfIdConfigFilePath))
+                if (!File.Exists(App.FingerPrintConfigFilePath))
                 {
-                    _rfidHelper = new RfidHelper(dataReceivedAction: RfidDataReceivedAction);
+                    _fingerPrintHelper = new FingerPrintHelper(dataReceivedAction: FingerPrintDataReceived);
                 }
                 else
                 {
-                    var rfidConfigContent = await File.ReadAllTextAsync(App.RfIdConfigFilePath);
-                    SerialPortConfigModel rfidConfigModel = null;
+                    var fingerConfigContent = await File.ReadAllTextAsync(App.FingerPrintConfigFilePath);
+                    SerialPortConfigModel fingerConfigModel = null;
                     try
                     {
-                        rfidConfigModel = JsonSerializer.Deserialize<SerialPortConfigModel>(rfidConfigContent);
+                        fingerConfigModel = JsonSerializer.Deserialize<SerialPortConfigModel>(fingerConfigContent);
                     }
                     catch (Exception e)
                     {
                         App.AddLog(e);
-                        _rfidHelper = new RfidHelper(dataReceivedAction: RfidDataReceivedAction);
+                        _fingerPrintHelper = new FingerPrintHelper(dataReceivedAction: FingerPrintDataReceived);
                     }
 
-                    _rfidHelper = rfidConfigModel == null ?
-                        new RfidHelper(dataReceivedAction: RfidDataReceivedAction) :
-                        new RfidHelper(rfidConfigModel.DataBits, rfidConfigModel.Parity, rfidConfigModel.StopBits, rfidConfigModel.BaudRate, rfidConfigModel.PortName, RfidDataReceivedAction);
+                    _fingerPrintHelper = fingerConfigModel == null
+                        ? new FingerPrintHelper(dataReceivedAction: FingerPrintDataReceived)
+                        : new FingerPrintHelper(fingerConfigModel.DataBits, fingerConfigModel.Parity,
+                            fingerConfigModel.StopBits, fingerConfigModel.BaudRate, fingerConfigModel.PortName,
+                            FingerPrintDataReceived);
                 }
             }
             catch (Exception e)
             {
                 App.AddLog(e);
             }
-
         }
 
-        private async Task<bool> RfidDataReceivedAction(uint personnelNumber, bool isActive, bool isExp, string expDate)
+        private void InitLabelTimer()
         {
+            _labelTimer = new DispatcherTimer();
+            _labelTimer.Tick += LabelTimerOnTick;
+            _labelTimer.Interval = new TimeSpan(0, 0, 10);
+        }
 
+        private void InitReConfigListener()
+        {
+            var watcher = new ManagementEventWatcher();
+            var query = new WqlEventQuery("SELECT * FROM Win32_VolumeChangeEvent WHERE EventType = 2");
+            watcher.EventArrived += Watcher_EventArrived;
+            watcher.Query = query;
+            watcher.Start();
+        }
+
+        private async Task InitRfIdListener()
+        {
+            try
+            {
+                _rfIdHelper?.Dispose();
+
+                if (!File.Exists(App.RfIdConfigFilePath))
+                {
+                    _rfIdHelper = new RfidHelper(dataReceivedAction: RfIdDataReceivedAction);
+                }
+                else
+                {
+                    var rfIdConfigContent = await File.ReadAllTextAsync(App.RfIdConfigFilePath);
+                    SerialPortConfigModel rfIdConfigModel = null;
+                    try
+                    {
+                        rfIdConfigModel = JsonSerializer.Deserialize<SerialPortConfigModel>(rfIdConfigContent);
+                    }
+                    catch (Exception e)
+                    {
+                        App.AddLog(e);
+                        _rfIdHelper = new RfidHelper(dataReceivedAction: RfIdDataReceivedAction);
+                    }
+
+                    _rfIdHelper = rfIdConfigModel == null
+                        ? new RfidHelper(dataReceivedAction: RfIdDataReceivedAction)
+                        : new RfidHelper(rfIdConfigModel.DataBits, rfIdConfigModel.Parity, rfIdConfigModel.StopBits,
+                            rfIdConfigModel.BaudRate, rfIdConfigModel.PortName, RfIdDataReceivedAction);
+                }
+            }
+            catch (Exception e)
+            {
+                App.AddLog(e);
+            }
+        }
+
+        private void LabelTimerOnTick(object? sender, EventArgs e)
+        {
+            ClearLabels();
+        }
+
+        private async void MainTimerOnTick(object sender, EventArgs e)
+        {
+            // در هر روز همه ی اطلاعات بروز میشود
+            if (App.LastFullUpdateTime == null || App.LastFullUpdateTime.Value.IsNextDay())
+                await GetConfigFromServerAsync();
+            //هر 30 دقیقه اطلاعات رزرو وعده فعلی بروز میشود
+            else if (App.LastMealUpdateTime == null || App.LastMealUpdateTime.Value.IsMinutePassed(30))
+                await UpdateCurrentMealReservationFromServer();
+
+            await SetCurrentMeal();
+            UpdateDateLabel();
+
+            await SendMonitorData(_monitorDto.ToJson());
+        }
+
+        private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            await CheckConfigStatusAndInitUtilitiesAsync();
+            //در زمان هایی که برنامه مشغول کار دیگری نیست اجرا میشود
+            //ComponentDispatcher.ThreadIdle += new EventHandler(CheckTimeForAutoUpdate);
+            _monitorDto = new MonitorDto();
+            //InitilizeRecheckTimer();
+        }
+
+        private Reservation MapToReservation(MainInfo_Send_Offline_Data_Fun_Output_Data input, string mealCode)
+        {
+            var res = new Reservation
+            {
+                Id = Guid.NewGuid(),
+                Date = DateTime.Now.ToString(CultureInfo.InvariantCulture),
+                Cod_Meal = mealCode,
+                Date_Use = null,
+                Status = null,
+                Time_Use = null,
+
+
+                Cod_Contract_Order = input.Cod_Contract_Order,
+                Cod_Coupon = input.Cod_Coupon,
+                Cod_Resturant = input.Cod_Resturant,
+                Cod_Serial = input.Cod_Serial,
+                Dat_Day_Mepdy = input.Dat_Day_Mepdy,
+                Des_Contract_Order = input.Des_Contract_Order,
+                Des_Food_Order_Mepdy = input.Des_Food_Order_Mepdy,
+                Des_Nam_Meal = input.Des_Nam_Meal,
+                Des_Nam_Resturant_Rstm = input.Des_Nam_Resturant_Rstm,
+                Employee_Shift_Name = input.Employee_Shift_Name,
+                First_Name_Ide = input.First_Name_Ide,
+                Last_Name_Ide = input.Last_Name_Ide,
+                Lkp_Cod_Order_Mepdy_Means = input.Lkp_Cod_Order_Mepdy_Means,
+                Meal_Plan_Day_Id = input.Meal_Plan_Day_Id,
+                Num_Ide = input.Num_Ide,
+                Num_Tim_End_Meal_Rsmls = input.Num_Tim_End_Meal_Rsmls,
+                Num_Tim_Str_Meal_Rsmls = input.Num_Tim_Str_Meal_Rsmls,
+                Num_Tot_Coupon_Rccpn = input.Num_Tot_Coupon_Rccpn,
+                Receiver_Meal_Plan_Day_Id = input.Receiver_Meal_Plan_Day_Id,
+                Reciver_Coupon_Id = input.Reciver_Coupon_Id
+            };
+
+            foreach (var mainFood in input.Main_Course)
+                res.Foods.Add(
+                    new Food
+                    {
+                        IsMain = true,
+                        ReservationId = res.Id,
+
+                        Des_Food = mainFood.Des_Food,
+                        Num_Amount = mainFood.Num_Amount.ToString(),
+                        Typ_Serv_Unit = mainFood.Typ_Serv_Unit
+                    });
+
+            foreach (var appFood in input.Appetizer_Dessert)
+                res.Foods.Add(
+                    new Food
+                    {
+                        IsMain = false,
+                        ReservationId = res.Id,
+
+                        Des_Food = appFood.Des_Food,
+                        Num_Amount = appFood.Num_Amount,
+                        Typ_Serv_Unit = appFood.Typ_Serv_Unit
+                    });
+
+            return res;
+        }
+
+        private async Task MonitorCommand1()
+        {
+            await Dispatcher.Invoke(async () =>
+            {
+                if (_wndCommandOne == null)
+                {
+                    _monitorDto.SetCommand("1");
+                    await SendMonitorData(_monitorDto.ToJson());
+                    _wndCommandOne = new wndCommandOne();
+                    _wndCommandOne.Show();
+                }
+                else
+                {
+                    _monitorDto.SetCommand(string.Empty);
+                    await SendMonitorData(_monitorDto.ToJson());
+                    _wndCommandOne.Close();
+                    _wndCommandOne = null;
+                }
+            }, DispatcherPriority.Normal);
+        }
+
+        private async Task MonitorCommand2()
+        {
+            await Dispatcher.Invoke(async () =>
+            {
+                if (_wndCommandTwo == null)
+                {
+                    _monitorDto.SetCommand("2");
+                    await SendMonitorData(_monitorDto.ToJson());
+                    _wndCommandTwo = new wndCommandTwo();
+                    _wndCommandTwo.Show();
+                }
+                else
+                {
+                    _monitorDto.SetCommand(string.Empty);
+                    await SendMonitorData(_monitorDto.ToJson());
+                    _wndCommandTwo.Close();
+                    _wndCommandTwo = null;
+                }
+            }, DispatcherPriority.Normal);
+        }
+
+        private void PlaySound(bool isOk)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                var player = new SoundPlayer(isOk ? "Sounds/ok.wav" : "Sounds/NotOk.wav");
+                player.Load();
+                player.Play();
+            });
+        }
+
+        private async Task<bool> RfIdDataReceivedAction(uint personnelNumber, bool isActive, bool isExp, string expDate)
+        {
             await Dispatcher.Invoke(async () =>
             {
                 if (App.IsActive || !App.AppConfig.CheckMealTime)
@@ -618,8 +606,8 @@ namespace IPAClient.Windows
                         {
                             ShowError("کارت غیر فعال است");
                             ShowBorder(brdRfId, false);
-                            monitorDto.AddMessageToQueue(pNumStr, "کارت غیر فعال است");
-                            await SendMonitorData(monitorDto.ToJson());
+                            _monitorDto.AddMessageToQueue(pNumStr, "کارت غیر فعال است");
+                            await SendMonitorData(_monitorDto.ToJson());
                             return;
                         }
 
@@ -628,8 +616,8 @@ namespace IPAClient.Windows
                             var message = "کارت منقضی شده است " + expDate;
                             ShowError(message);
                             ShowBorder(brdRfId, false);
-                            monitorDto.AddMessageToQueue(pNumStr, message);
-                            await SendMonitorData(monitorDto.ToJson());
+                            _monitorDto.AddMessageToQueue(pNumStr, message);
+                            await SendMonitorData(_monitorDto.ToJson());
                             return;
                         }
 
@@ -641,14 +629,12 @@ namespace IPAClient.Windows
                 {
                     ShowError("خارج از وعده");
                     ShowBorder(brdRfId, false);
-                    monitorDto.AddMessageToQueue("", "خارج از وعده");
+                    _monitorDto.AddMessageToQueue("", "خارج از وعده");
                 }
             }, DispatcherPriority.Normal);
 
             return true;
         }
-
-        #endregion
 
         private async Task SendMonitorData(string dataStr)
         {
@@ -667,18 +653,22 @@ namespace IPAClient.Windows
                         SerialPortConfigModel monitorConfigModel = null;
                         try
                         {
-                            monitorConfigModel = JsonSerializer.Deserialize<SerialPortConfigModel>(monitorConfigContent);
+                            monitorConfigModel =
+                                JsonSerializer.Deserialize<SerialPortConfigModel>(monitorConfigContent);
                         }
                         catch (Exception e)
                         {
                             App.AddLog(e);
-                            _monitorHelper = new MonitorHelper(commandOne: MonitorCommand1, commandTwo: MonitorCommand2);
+                            _monitorHelper =
+                                new MonitorHelper(commandOne: MonitorCommand1, commandTwo: MonitorCommand2);
                         }
 
-                        _monitorHelper = monitorConfigModel == null ?
-                            new MonitorHelper(commandOne: MonitorCommand1, commandTwo: MonitorCommand2) :
-                            new MonitorHelper(monitorConfigModel.DataBits, monitorConfigModel.Parity, monitorConfigModel.StopBits,
-                                monitorConfigModel.BaudRate, monitorConfigModel.PortName, commandOne: MonitorCommand1, commandTwo: MonitorCommand2);
+                        _monitorHelper = monitorConfigModel == null
+                            ? new MonitorHelper(commandOne: MonitorCommand1, commandTwo: MonitorCommand2)
+                            : new MonitorHelper(monitorConfigModel.DataBits, monitorConfigModel.Parity,
+                                monitorConfigModel.StopBits,
+                                monitorConfigModel.BaudRate, monitorConfigModel.PortName, MonitorCommand1,
+                                MonitorCommand2);
                     }
                 }
 
@@ -689,127 +679,167 @@ namespace IPAClient.Windows
                 App.AddLog(e);
             }
         }
-        wndCommandOne wndCommandOne = null;
-        private async Task MonitorCommand1()
+
+        private void SetBackGroundImage(string imageName)
         {
-            await Dispatcher.Invoke(async () =>
+            Dispatcher.BeginInvoke(() =>
             {
-                if (wndCommandOne == null)
+                dgMain.Background =
+                    new ImageBrush(new BitmapImage(
+                        new Uri(@$"pack://application:,,,/IPAClient;component/Images/{imageName}.png")));
+            });
+        }
+
+        private async Task SetCurrentMeal()
+        {
+            var activeMeal = App.MainInfo.Meals.FirstOrDefault(x => x.IsCurrentMeal);
+            var activeMealCode = activeMeal?.Cod_Data;
+            if (App.CurrentMealCode != activeMealCode)
+            {
+                App.CurrentMealCode = activeMealCode;
+                if (string.IsNullOrWhiteSpace(activeMealCode))
                 {
-                    monitorDto.SetCommand("1");
-                    await SendMonitorData(monitorDto.ToJson());
-                    wndCommandOne = new wndCommandOne();
-                    wndCommandOne.Show();
+                    App.IsActive = false;
+                    _monitorDto?.Clear();
                 }
                 else
                 {
-                    monitorDto.SetCommand(string.Empty);
-                    await SendMonitorData(monitorDto.ToJson());
-                    wndCommandOne.Close();
-                    wndCommandOne = null;
-                }
-            }, DispatcherPriority.Normal);
-        }
-        wndCommandTwo wndCommandTwo = null;
-        private async Task MonitorCommand2()
-        {
-            await Dispatcher.Invoke(async () =>
-           {
-               if (wndCommandTwo == null)
-               {
-                   monitorDto.SetCommand("2");
-                   await SendMonitorData(monitorDto.ToJson());
-                   wndCommandTwo = new wndCommandTwo();
-                   wndCommandTwo.Show();
-               }
-               else
-               {
-                   monitorDto.SetCommand(string.Empty);
-                   await SendMonitorData(monitorDto.ToJson());
-                   wndCommandTwo.Close();
-                   wndCommandTwo = null;
-               }
-           }, DispatcherPriority.Normal);
-        }
-
-        private async Task CheckReservation(string personnelNumber)
-        {
-
-
-            if (App.AppConfig.CheckOnline)
-            {
-                var res = await ApiClient.Restrn_Queue_Have_Reserve_Fun(new RESTRN_QUEUE_HAVE_RESERVE_FUN_Input_Data() { Device_Cod = App.AppConfig.Device_Cod, Num_Prsn = personnelNumber });
-                if (res != null)
-                {
-                    if (res.IsSuccessFull)
-                    {
-                        return;
-                    }
-                    else
-                    {
-                        //TODO How To Show Message?
-                        ShowError("رزرو آنلاین یافت نشد");
-                        monitorDto.AddMessageToQueue(personnelNumber, "رزرو آنلاین یافت نشد");
-                        return;
-                    }
-                }
-            }
-            else
-            {
-                var offlineReserve = await _reservationService.FindReservationAsync(personnelNumber, App.CurrentMealCode, DateTime.Now.Date.ToServerDateFormat());
-
-                if (offlineReserve != null)
-                {
-                    UpdateLabels(offlineReserve);
-
-                    monitorDto.AddToQueue(offlineReserve);
+                    App.IsActive = true;
                     await SetRemainFoods();
                 }
-                else
-                {
-                    ShowError("رزرو یافت نشد");
-                    monitorDto.AddMessageToQueue(personnelNumber, "رزرو یافت نشد");
-                    //TODO How To Show Message?
-                }
             }
-            await SendMonitorData(monitorDto.ToJson());
+
+            if (_monitorDto != null)
+            {
+                if (activeMeal is {StartTime: { }, EndTime: { }})
+                    _monitorDto.CurrentMealRemainTime = activeMeal.StartTime.Value - activeMeal.EndTime.Value;
+                else
+                    _monitorDto.CurrentMealRemainTime = new TimeSpan(0, 0, 0);
+            }
         }
+
 
         private async Task SetRemainFoods()
         {
-            var remainFood = await _reservationService.GetMealFoodRemain(DateTime.Now.ToServerDateFormat(), App.CurrentMealCode);
-            monitorDto.InsertOrUpdateRemainFood(remainFood.Select(x => new RemainFoodModel(x.Title, x.Remain, x.Total)).ToArray());
+            var remainFood =
+                await _reservationService.GetMealFoodRemain(DateTime.Now.ToServerDateFormat(), App.CurrentMealCode);
+            _monitorDto.InsertOrUpdateRemainFood(remainFood.Select(x => new RemainFoodModel(x.Title, x.Remain, x.Total))
+                .ToArray());
+        }
+
+        private void ShowBorder(Border brd, bool isSuccess)
+        {
+            brd.BorderBrush = new SolidColorBrush(isSuccess ? Color.FromRgb(0, 255, 0) : Color.FromRgb(255, 0, 0));
+            brd.Visibility = Visibility.Visible;
+
+            PlaySound(isSuccess);
+
+            _borderTimer.Start();
+        }
+
+        private async Task ShowConfirmConfigAsync(ConfigModel configModel)
+        {
+            _ = new wndConfirmConfig(configModel, _rfIdHelper?.IsConnected ?? false,
+                _fingerPrintHelper?.IsConnected ?? false).ShowDialog();
+            await CheckConfigStatusAndInitUtilitiesAsync();
         }
 
         private void ShowError(string error)
         {
             Dispatcher.Invoke(() =>
-          {
-              lblError.Content = error;
-              brdNoReserve.Visibility = Visibility.Visible;
-          }, DispatcherPriority.Normal);
-
-        }
-
-        private void BtnClose_OnClick(object sender, RoutedEventArgs e)
-        {
-            System.Windows.Application.Current.Shutdown();
-        }
-
-        private async void btnInfo_Click(object sender, RoutedEventArgs e)
-        {
-            await ShowConfirmConfigAsync(App.AppConfig);
-        }
-
-
-        private void PlaySound(bool isOk)
-        {
-            Task.Factory.StartNew(() =>
             {
-                SoundPlayer player = new SoundPlayer(isOk ? "Sounds/ok.wav" : "Sounds/NotOk.wav");
-                player.Load();
-                player.Play();
+                lblError.Content = error;
+                brdNoReserve.Visibility = Visibility.Visible;
+            }, DispatcherPriority.Normal);
+        }
+
+        private async Task ShowNeedConfigAsync()
+        {
+            _ = new wndNeedConfig().ShowDialog();
+            await CheckConfigStatusAndInitUtilitiesAsync();
+        }
+
+        private async Task UpdateCurrentMealReservationFromServer()
+        {
+            var reservationDate = await ApiClient.MainInfo_Send_Offline_Data_Fun(
+                new MainInfo_Send_Offline_Data_Fun_Input_Data(App.AppConfig.Device_Cod,
+                    DateTime.Now.ToServerDateFormat(), App.CurrentMealCode));
+            await _reservationService.InsertAsync(reservationDate.Select(x => MapToReservation(x, App.CurrentMealCode))
+                .ToList());
+            App.LastMealUpdateTime = DateTime.Now;
+        }
+
+        private void UpdateDateLabel()
+        {
+            lblDate.Content = SystemTimeHelper.CurrentPersinaFullDate();
+            lblTime.Content = DateTime.Now.ToString("HH:mm", new CultureInfo("fa-IR"));
+        }
+
+        private void UpdateLabels(Reservation reservation)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                lblName.Content = reservation.First_Name_Ide + " " + reservation.Last_Name_Ide;
+                lblNumber.Content = reservation.Num_Ide;
+                lblVade.Content = reservation.Des_Nam_Meal;
+                lblShift.Content = reservation.Employee_Shift_Name;
+                lblShiftCompany.Content = reservation.Des_Contract_Order;
+                var mainFood = reservation.Foods.FirstOrDefault(x => x.IsMain);
+                if (mainFood != null)
+                {
+                    lblFoodName.Content = mainFood.Des_Food;
+                    lblFoodNum.Content = mainFood.Num_Amount;
+                }
+                else
+                {
+                    lblFoodName.Content = "نامشخص";
+                    lblFoodNum.Content = string.Empty;
+                }
+
+                var appFoods = reservation.Foods.Where(x => !x.IsMain).ToList();
+                for (var i = 0; i < 3; i++)
+                {
+                    var appFood = appFoods.Skip(i).Take(1).FirstOrDefault();
+                    if (appFood == null) break;
+                    switch (i)
+                    {
+                        case 0:
+                            lblAppFoodName0.Content = appFood.Des_Food;
+                            lblAppFoodNum0.Content = appFood.Num_Amount;
+                            break;
+                        case 1:
+                            lblAppFoodName1.Content = appFood.Des_Food;
+                            lblAppFoodNum1.Content = appFood.Num_Amount;
+                            break;
+                        case 2:
+                            lblAppFoodName2.Content = appFood.Des_Food;
+                            lblAppFoodNum2.Content = appFood.Num_Amount;
+                            break;
+                    }
+                }
+
+                brdFood.Visibility = Visibility.Visible;
+                if (!_labelTimer.IsEnabled) _labelTimer.Start();
             });
+        }
+
+        private async void Watcher_EventArrived(object sender, EventArrivedEventArgs e)
+        {
+            var driveNameProp = e.NewEvent.Properties["DriveName"];
+            if (string.IsNullOrWhiteSpace(driveNameProp.Value.ToString())) return;
+            var configFilePath = driveNameProp.Value + @"\reconfig.json";
+            if (!File.Exists(configFilePath)) return;
+            try
+            {
+                var configContent = await File.ReadAllTextAsync(configFilePath);
+                if (string.IsNullOrWhiteSpace(configContent)) return;
+                var configModel = JsonSerializer.Deserialize<ConfigModel>(configContent);
+                if (configModel != null) await ShowConfirmConfigAsync(configModel);
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show("Can Not Use Config File\n" + exception.Message);
+            }
         }
     }
 }

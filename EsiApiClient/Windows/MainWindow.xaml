@@ -23,7 +23,7 @@
         <Label x:Name="btnKeyPad" Content="" HorizontalAlignment="Left" Margin="668,434,0,0" VerticalAlignment="Top" Width="151" Height="141" MouseDown="BtnKeyPad_OnMouseDown"/>
         <Label   x:Name="lblError" Content="" Foreground="red" FontFamily="{StaticResource Vazir}" FontSize="28" FontWeight="ExtraBold" Margin="112,482,731,147"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
 
-        <Border x:Name="brdFood" BorderBrush="Green" CornerRadius="10" BorderThickness="2,2,2,2" Margin="93,65,708,62" Visibility="Collapsed">
+        <Border x:Name="brdFood" BorderBrush="Green" CornerRadius="10" BorderThickness="2,2,2,2" Margin="93,65,708,62" Visibility="Visible">
             <Border.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                     <GradientStop Color="#191a2b" Offset="0.25" />
@@ -48,15 +48,15 @@
                 <Grid Margin="10" Height="265">
                     <Label    Content="غذای اصلی" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="11"  HorizontalContentAlignment="Right" Margin="366,0,15,234"/>
                     <Label   Content="تعداد" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="11"  HorizontalContentAlignment="Right" Margin="44,0,354,234"/>
-                    <Label    Content="چلو جوجه کباب" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="30" FontWeight="ExtraBold" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Margin="119,31,15,168"/>
-                    <Label    Content="3" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="30" FontWeight="ExtraBold" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Margin="56,31,354,168"/>
+                    <Label x:Name="lblFoodName"   Content="چلو جوجه کباب" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="30" FontWeight="ExtraBold" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Margin="119,31,15,168"/>
+                    <Label  x:Name="lblFoodNum"  Content="3" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="30" FontWeight="ExtraBold" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Margin="56,31,354,168"/>
                     <Label    Content="دورچین" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="11"  HorizontalContentAlignment="Right" Margin="366,115,15,119"/>
-                    <Label    Content="نوشابه مشکی" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="18" FontWeight="ExtraBold" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Margin="119,137,15,81"/>
-                    <Label    Content="2" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="18" FontWeight="ExtraBold" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Margin="56,137,354,81"/>
-                    <Label    Content="زیتون پرورده" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="18" FontWeight="ExtraBold" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Margin="119,175,15,43"/>
-                    <Label    Content="1" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="18" FontWeight="ExtraBold" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Margin="56,175,354,43"/>
-                    <Label    Content="سالاد شیرازی" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="18" FontWeight="ExtraBold" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Margin="119,218,15,0"/>
-                    <Label    Content="2" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="18" FontWeight="ExtraBold" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Margin="56,218,354,0"/>
+                    <Label  x:Name="lblAppFoodName0"  Content="نوشابه مشکی" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="18" FontWeight="ExtraBold" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Margin="119,137,15,81"/>
+                    <Label  x:Name="lblAppFoodNum0"  Content="2" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="18" FontWeight="ExtraBold" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Margin="56,137,354,81"/>
+                    <Label  x:Name="lblAppFoodName1"  Content="زیتون پرورده" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="18" FontWeight="ExtraBold" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Margin="119,175,15,43"/>
+                    <Label  x:Name="lblAppFoodNum1"  Content="1" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="18" FontWeight="ExtraBold" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Margin="56,175,354,43"/>
+                    <Label  x:Name="lblAppFoodName2"  Content="سالاد شیرازی" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="18" FontWeight="ExtraBold" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Margin="119,218,15,0"/>
+                    <Label  x:Name="lblAppFoodNum2" Content="2" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="18" FontWeight="ExtraBold" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Margin="56,218,354,0"/>
 
                 </Grid>
             </StackPanel>
