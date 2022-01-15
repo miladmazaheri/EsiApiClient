@@ -133,5 +133,11 @@ namespace IPAClient.Models
         {
             Command = command;
         }
+
+        public void Clear()
+        {
+            RemainFoods = new List<RemainFoodModel>();
+            PersonnelFoods = new List<PersonnelFoodDto>();
+        }
     }
 }

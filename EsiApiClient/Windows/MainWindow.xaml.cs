@@ -39,6 +39,7 @@ namespace IPAClient.Windows
         private MonitorHelper _monitorHelper;
         private MonitorDto monitorDto;
         private DispatcherTimer _borderTimer;
+        private DispatcherTimer _mainTimer;
 
         private readonly ReservationService _reservationService;
         public MainWindow()
@@ -49,6 +50,15 @@ namespace IPAClient.Windows
             _borderTimer = new DispatcherTimer();
             _borderTimer.Tick += BorderTimerOnTick;
             _borderTimer.Interval = new TimeSpan(0, 0, 5);
+
+
+        }
+
+        private void InitMainTimer()
+        {
+            _mainTimer = new DispatcherTimer();
+            _mainTimer.Tick += MainTimerOnTick;
+            _mainTimer.Interval = new TimeSpan(0, 1, 0);
         }
 
         private void BorderTimerOnTick(object sender, EventArgs e)
@@ -61,16 +71,7 @@ namespace IPAClient.Windows
             _borderTimer.IsEnabled = false;
         }
 
-        private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
-        {
-            await CheckConfigStatusAndInitUtilitiesAsync();
-            //در زمان هایی که برنامه مشغول کار دیگری نیست اجرا میشود
-            ComponentDispatcher.ThreadIdle += new EventHandler(CheckTimeForAutoUpdate);
-            monitorDto = new MonitorDto();
-            //InitilizeRecheckTimer();
-        }
-
-        private async void CheckTimeForAutoUpdate(object sender, EventArgs e)
+        private async void MainTimerOnTick(object sender, EventArgs e)
         {
             // در هر روز همه ی اطلاعات بروز میشود
             if (App.LastFullUpdateTime == null || App.LastFullUpdateTime.Value.IsNextDay())
@@ -82,11 +83,69 @@ namespace IPAClient.Windows
             {
                 await UpdateCurrentMealReservationFromServer();
             }
-            //ClearLabels();
-            //HideBorder(brdFingerPrint);
-            //HideBorder(brdRfId);
-            App.CurrentMealCode = App.MainInfo?.Meals?.FirstOrDefault(x => x.IsCurrentMeal)?.Cod_Data;
+            await SetCurrnetMeal();
+            UpdateDateLabel();
+
+            await SendMonitorData(monitorDto.ToJson());
         }
+
+        private async Task SetCurrnetMeal()
+        {
+            var activeMeal = App.MainInfo.Meals.FirstOrDefault(x => x.IsCurrentMeal);
+            var activeMealCode = activeMeal?.Cod_Data;
+            if (App.CurrentMealCode != activeMealCode)
+            {
+                App.CurrentMealCode = activeMealCode;
+                if (string.IsNullOrWhiteSpace(activeMealCode))
+                {
+                    App.IsActive = false;
+                    monitorDto?.Clear();
+                }
+                else
+                {
+                    App.IsActive = true;
+                    await SetRemainFoods();
+                }
+            }
+
+            if(monitorDto != null)
+            {
+                if (activeMeal != null && activeMeal.StartTime.HasValue && activeMeal.EndTime.HasValue)
+                {
+
+                    monitorDto.CurrentMealRemainTime = activeMeal.StartTime.Value - activeMeal.EndTime.Value;
+                }
+                else
+                {
+                    monitorDto.CurrentMealRemainTime = new TimeSpan(0, 0, 0);
+                }
+            }
+        }
+
+        private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            await CheckConfigStatusAndInitUtilitiesAsync();
+            //در زمان هایی که برنامه مشغول کار دیگری نیست اجرا میشود
+            //ComponentDispatcher.ThreadIdle += new EventHandler(CheckTimeForAutoUpdate);
+            monitorDto = new MonitorDto();
+            //InitilizeRecheckTimer();
+        }
+
+        //private async void CheckTimeForAutoUpdate(object sender, EventArgs e)
+        //{
+        //    // در هر روز همه ی اطلاعات بروز میشود
+        //    if (App.LastFullUpdateTime == null || App.LastFullUpdateTime.Value.IsNextDay())
+        //    {
+        //        await GetConfigFromServerAsync();
+        //    }
+        //    //هر 30 دقیقه اطلاعات رزرو وعده فعلی بروز میشود
+        //    else if (App.LastMealUpdateTime == null || App.LastMealUpdateTime.Value.IsMinutePassed(30))
+        //    {
+        //        await UpdateCurrentMealReservationFromServer();
+        //    }
+
+        //    App.CurrentMealCode = App.MainInfo?.Meals?.FirstOrDefault(x => x.IsCurrentMeal)?.Cod_Data;
+        //}
 
         private async Task CheckConfigStatusAndInitUtilitiesAsync()
         {
@@ -134,7 +193,7 @@ namespace IPAClient.Windows
                     SetLabelsVisible(true);
                     await InitFingerPrintListener();
                     await InitRfIdListener();
-
+                    InitMainTimer();
                 }
             }
         }
@@ -230,7 +289,7 @@ namespace IPAClient.Windows
                     meal.StartTime = minMealTime;
                     meal.EndTime = maxMealTime;
                 }
-                App.CurrentMealCode = App.MainInfo.Meals.FirstOrDefault(x => x.IsCurrentMeal)?.Cod_Data;
+                await SetCurrnetMeal();
             }
         }
 
@@ -372,11 +431,19 @@ namespace IPAClient.Windows
 
         private async void BtnKeyPad_OnMouseDown(object sender, MouseButtonEventArgs e)
         {
-            var wndKeyPad = new wndKeyPad();
-            wndKeyPad.ShowDialog();
-            if (!string.IsNullOrWhiteSpace(wndKeyPad.PersonnelNumber))
+            if (App.IsActive || !App.AppConfig.CheckMealTime)
             {
-                await CheckReservation(wndKeyPad.PersonnelNumber);
+                var wndKeyPad = new wndKeyPad();
+                wndKeyPad.ShowDialog();
+                if (!string.IsNullOrWhiteSpace(wndKeyPad.PersonnelNumber))
+                {
+                    await CheckReservation(wndKeyPad.PersonnelNumber);
+                }
+            }
+            else
+            {
+                ShowError("خارج از وعده");
+                monitorDto.AddMessageToQueue("", "خارج از وعده");
             }
         }
         #endregion
@@ -465,19 +532,29 @@ namespace IPAClient.Windows
                 if (!IsActive) return;
                 try
                 {
-                    if (obj != uint.MaxValue)
+                    if (App.IsActive || !App.AppConfig.CheckMealTime)
                     {
-                        //حذف رقم اول کد خوانده شده
-                        var objStr = obj.ToString();
-                        var num = objStr.Substring(1, objStr.Length - 1);
-                        lblNumber.Content = num.StartsWith("429496729") ? "ناشناس" : num;
-                        ShowBorder(brdFingerPrint, true);
-                        await CheckReservation(num);
+                        if (obj != uint.MaxValue)
+                        {
+                            //حذف رقم اول کد خوانده شده
+                            var objStr = obj.ToString();
+                            var num = objStr.Substring(1, objStr.Length - 1);
+                            lblNumber.Content = num.StartsWith("429496729") ? "ناشناس" : num;
+                            ShowBorder(brdFingerPrint, true);
+                            await CheckReservation(num);
+                        }
+                        else
+                        {
+                            ShowBorder(brdFingerPrint, false);
+                        }
                     }
                     else
                     {
-                        ShowBorder(brdFingerPrint, false);
+                        ShowError("خارج از وعده");
+                        ShowBorder(brdRfId, false);
+                        monitorDto.AddMessageToQueue("", "خارج از وعده");
                     }
+                    //await CheckReservation("919633");
                 }
                 catch (Exception e)
                 {
@@ -525,37 +602,46 @@ namespace IPAClient.Windows
 
         }
 
-        private async Task<bool> RfidDataReceivedAction(uint personnelNumber, bool isActive, bool isExp,string expDate)
+        private async Task<bool> RfidDataReceivedAction(uint personnelNumber, bool isActive, bool isExp, string expDate)
         {
 
             await Dispatcher.Invoke(async () =>
             {
-                var pNumStr = personnelNumber.ToString();
-                lblNumber.Content = pNumStr;
-                if (!IsActive) return;
-                if (personnelNumber != 0)
+                if (App.IsActive || !App.AppConfig.CheckMealTime)
                 {
-                    if (!isActive)
+                    var pNumStr = personnelNumber.ToString();
+                    lblNumber.Content = pNumStr;
+                    if (!IsActive) return;
+                    if (personnelNumber != 0)
                     {
-                        ShowError("کارت غیر فعال است");
-                        ShowBorder(brdRfId, false);
-                        monitorDto.AddMessageToQueue(pNumStr, "کارت غیر فعال است");
-                        await SendMonitorData(monitorDto.ToJson());
-                        return;
-                    }
+                        if (!isActive)
+                        {
+                            ShowError("کارت غیر فعال است");
+                            ShowBorder(brdRfId, false);
+                            monitorDto.AddMessageToQueue(pNumStr, "کارت غیر فعال است");
+                            await SendMonitorData(monitorDto.ToJson());
+                            return;
+                        }
 
-                    if (isExp)
-                    {
-                        var message = "کارت منقضی شده است " + expDate;
-                        ShowError(message);
-                        ShowBorder(brdRfId, false);
-                        monitorDto.AddMessageToQueue(pNumStr, message);
-                        await SendMonitorData(monitorDto.ToJson());
-                        return;
-                    }
+                        if (isExp)
+                        {
+                            var message = "کارت منقضی شده است " + expDate;
+                            ShowError(message);
+                            ShowBorder(brdRfId, false);
+                            monitorDto.AddMessageToQueue(pNumStr, message);
+                            await SendMonitorData(monitorDto.ToJson());
+                            return;
+                        }
 
-                    ShowBorder(brdRfId, true);
-                    await CheckReservation(pNumStr);
+                        ShowBorder(brdRfId, true);
+                        await CheckReservation(pNumStr);
+                    }
+                }
+                else
+                {
+                    ShowError("خارج از وعده");
+                    ShowBorder(brdRfId, false);
+                    monitorDto.AddMessageToQueue("", "خارج از وعده");
                 }
             }, DispatcherPriority.Normal);
 
@@ -675,19 +761,24 @@ namespace IPAClient.Windows
                 if (offlineReserve != null)
                 {
                     UpdateLabels(offlineReserve);
-                    var remainFood = await _reservationService.GetMealFoodRemain(DateTime.Now.ToServerDateFormat(), App.CurrentMealCode);
-                    monitorDto.InsertOrUpdateRemainFood(remainFood.Select(x => new RemainFoodModel(x.Title, x.Remain, x.Total)).ToArray());
-                    monitorDto.AddToQueue(offlineReserve);
 
+                    monitorDto.AddToQueue(offlineReserve);
+                    await SetRemainFoods();
                 }
                 else
                 {
                     ShowError("رزرو یافت نشد");
-                    monitorDto.AddMessageToQueue(personnelNumber,"رزرو یافت نشد");
+                    monitorDto.AddMessageToQueue(personnelNumber, "رزرو یافت نشد");
                     //TODO How To Show Message?
                 }
             }
             await SendMonitorData(monitorDto.ToJson());
+        }
+
+        private async Task SetRemainFoods()
+        {
+            var remainFood = await _reservationService.GetMealFoodRemain(DateTime.Now.ToServerDateFormat(), App.CurrentMealCode);
+            monitorDto.InsertOrUpdateRemainFood(remainFood.Select(x => new RemainFoodModel(x.Title, x.Remain, x.Total)).ToArray());
         }
 
         private void ShowError(string error)

@@ -10,11 +10,11 @@ namespace IPAClient.Tools
 {
     public class RfidHelper : IDisposable
     {
-        private readonly Func<uint, bool, bool,string, Task<bool>> _dataReceivedAction;
+        private readonly Func<uint, bool, bool, string, Task<bool>> _dataReceivedAction;
         private readonly SerialPort _serialPort1;
         private volatile bool _isFree = true;
         public bool IsConnected => _serialPort1?.IsOpen ?? false;
-        public RfidHelper(int dataBits = 8, Parity parity = Parity.None, StopBits stopBits = StopBits.One, int baudRate = 19200, string portName = "COM4", Func<uint, bool, bool,string, Task<bool>> dataReceivedAction = null)
+        public RfidHelper(int dataBits = 8, Parity parity = Parity.None, StopBits stopBits = StopBits.One, int baudRate = 19200, string portName = "COM4", Func<uint, bool, bool, string, Task<bool>> dataReceivedAction = null)
         {
             _dataReceivedAction = dataReceivedAction;
             _serialPort1 = new SerialPort
@@ -49,7 +49,7 @@ namespace IPAClient.Tools
                     };
 
                     var parsedData = ParsDate(txt);
-                    _isFree = (_dataReceivedAction == null || await _dataReceivedAction.Invoke(parsedData.number, parsedData.isActive, parsedData.isExp,parsedData.expDate));
+                    _isFree = (_dataReceivedAction == null || await _dataReceivedAction.Invoke(parsedData.number, parsedData.isActive, parsedData.isExp, parsedData.expDate));
                 }
             }
             catch (Exception)
@@ -58,7 +58,7 @@ namespace IPAClient.Tools
             }
         }
 
-        private (uint number, bool isActive, bool isExp,string expDate) ParsDate(string txt)
+        private (uint number, bool isActive, bool isExp, string expDate) ParsDate(string txt)
         {
             var parts = txt.Split("\r").Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
 
@@ -72,7 +72,7 @@ namespace IPAClient.Tools
                 {
                     number = uint.Parse(part.Split(":")[1]);
                 }
-                else if (part.StartsWith("EXPDATE"))
+                else if (part.StartsWith("EXPDATE") && number.ToString().Length > 6) // فقط برای پرسنل غیر فولاد که کد پرسنلی بزرگتر از 6 رقم است
                 {
                     var strDate = part.Split(":")[1];
                     var dateParts = strDate.Split("/").Select(int.Parse).ToList();

@@ -11,5 +11,6 @@
   "CheckOnline": false,
   "IsConfirmed": true,
   "IsDemo": false,
-  "Logging": false
+  "Logging": false,
+  "CheckMealTime": false
 }
