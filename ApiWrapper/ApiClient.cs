@@ -52,7 +52,7 @@ namespace ApiWrapper
         {
             try
             {
-                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/MainInfo_Send_Lookup_Data_Fun", new StringContent("{\"JSON_CHARACTER\":\"[]\"}",Encoding.UTF8,"application/json"));
+                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/MainInfo_Send_Lookup_Data_Fun", new StringContent("{\"JSON_CHARACTER\":\"[]\"}", Encoding.UTF8, "application/json"));
                 var resAsString = await response.Content.ReadAsStringAsync();
                 resAsString = resAsString.ToNormalJsonString();
                 var res1 = JsonSerializer.Deserialize<MainInfo_Send_Lookup_Data_Fun_Output>(resAsString);
@@ -108,18 +108,24 @@ namespace ApiWrapper
         /// <summary>
         /// همگام سازی اطلاعات Client
         /// </summary>
-        public static async Task<MainInfo_Synchronize_Data_Fun_Output> MainInfo_Synchronize_Data_Fun(MainInfo_Synchronize_Data_Fun_Input input)
+        public static async Task<(bool isSuccessful, string message)> MainInfo_Synchronize_Data_Fun(MainInfo_Synchronize_Data_Fun_Input input)
         {
             try
             {
-                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/MainInfo_Synchronize_Data_Fun", new StringContent(JsonSerializer.Serialize(input), Encoding.UTF8, "application/json"));
+                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/MainInfo_Synchronize_Data_Fun", new StringContent(input.ToJsonString(), Encoding.UTF8, "application/json"));
                 var resAsString = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<MainInfo_Synchronize_Data_Fun_Output>(resAsString);
+                var res1 = JsonSerializer.Deserialize<MainInfo_Synchronize_Data_Fun_Output>(resAsString);
+                if (res1 == null || string.IsNullOrWhiteSpace(res1.MainInfo_Synchronize_Data_Fun)) return (false, "خطا در تبدیل پاسخ سرور");
+                var serverMessages = JsonSerializer.Deserialize<List<ServerMessage>>(res1.MainInfo_Synchronize_Data_Fun);
+                if (serverMessages == null || !serverMessages.Any()) return (false, "خطا در تبدیل پاسخ سرور");
+                var firstMessage = serverMessages.FirstOrDefault();
+                var isSuccessful = firstMessage?.Message_Type.ToLower() == "i";
+                return (isSuccessful, firstMessage?.Message_Description);
             }
             catch (Exception ex)
             {
                 AddLog(ex);
-                return null;
+                return (false, ex.Message);
             }
         }
         /// <summary>

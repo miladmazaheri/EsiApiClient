@@ -155,7 +155,7 @@ namespace IPAClient.Windows
             if (App.AppConfig.CheckOnline)
             {
                 var res = await ApiClient.Restrn_Queue_Have_Reserve_Fun(new RESTRN_QUEUE_HAVE_RESERVE_FUN_Input_Data
-                    {Device_Cod = App.AppConfig.Device_Cod, Num_Prsn = personnelNumber});
+                { Device_Cod = App.AppConfig.Device_Cod, Num_Prsn = personnelNumber });
                 if (res != null)
                 {
                     if (res.IsSuccessFull) return;
@@ -701,6 +701,11 @@ namespace IPAClient.Windows
                 {
                     App.IsActive = false;
                     _monitorDto?.Clear();
+#pragma warning disable CS4014
+                    //DO NOT NEED await 
+                    //بعد از اتمام زمان هر وعده اطلاعات تحویل غذا را به وب سرویس ارسال میکند
+                    Task.Factory.StartNew(SendDeliveredReservationsToServer);
+#pragma warning restore CS4014
                 }
                 else
                 {
@@ -711,10 +716,23 @@ namespace IPAClient.Windows
 
             if (_monitorDto != null)
             {
-                if (activeMeal is {StartTime: { }, EndTime: { }})
+                if (activeMeal is { StartTime: { }, EndTime: { } })
                     _monitorDto.CurrentMealRemainTime = activeMeal.StartTime.Value - activeMeal.EndTime.Value;
                 else
                     _monitorDto.CurrentMealRemainTime = new TimeSpan(0, 0, 0);
+            }
+        }
+
+        private async void SendDeliveredReservationsToServer()
+        {
+            var reservesToSend = await _reservationService.GetDeliveredReservesToSendAsync();
+            if (reservesToSend is not {Count: > 0}) return;
+            var syncResult = await ApiClient.MainInfo_Synchronize_Data_Fun(new MainInfo_Synchronize_Data_Fun_Input(reservesToSend
+                .Select(x => new MainInfo_Synchronize_Data_Fun_Input_Data(App.AppConfig.Device_Cod, x.Reciver_Coupon_Id, x.Status, x.Date_Use, x.Time_Use)).ToList()));
+
+            if (!syncResult.isSuccessful)
+            {
+                App.AddLog(new Exception(syncResult.message));
             }
         }
 

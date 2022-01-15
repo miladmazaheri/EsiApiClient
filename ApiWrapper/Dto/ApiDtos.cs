@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ApiWrapper.Dto
 {
@@ -61,8 +62,8 @@ namespace ApiWrapper.Dto
         public string Cod_Data { get; set; }
         public string Des_Data { get; set; }
 
-        public TimeSpan? StartTime  { get; set; }
-        public TimeSpan? EndTime  { get; set; }
+        public TimeSpan? StartTime { get; set; }
+        public TimeSpan? EndTime { get; set; }
 
         public bool IsCurrentMeal => StartTime.HasValue && EndTime.HasValue && DateTime.Now.TimeOfDay >= StartTime && DateTime.Now.TimeOfDay <= EndTime;
     }
@@ -236,14 +237,37 @@ namespace ApiWrapper.Dto
         }
     }
 
-    public class MainInfo_Synchronize_Data_Fun_Input : BaseInput<MainInfo_Synchronize_Data_Fun_Input_Data>
+    public class MainInfo_Synchronize_Data_Fun_Input
     {
+        public List<MainInfo_Synchronize_Data_Fun_Input_Data> Items { get; set; }
 
+        public MainInfo_Synchronize_Data_Fun_Input()
+        {
+
+        }
+
+        public MainInfo_Synchronize_Data_Fun_Input(List<MainInfo_Synchronize_Data_Fun_Input_Data> items)
+        {
+            Items = items;
+        }
+
+        public string ToJsonString()
+        {
+            var itemsStr = Items.Select(x =>
+
+                "{\\\"Cod_Device\\\":\\\"" + x.Device_Cod + "\\\"," +
+                " \\\"Id_Coupon_Reciver\\\":\\\"" + x.Reciver_Coupon_Id + "\\\"," +
+                " \\\"Status\\\":\\\"" + x.Status + "\\\"," +
+                " \\\"Date_Use\\\":\\\"" + x.Date_Use + "\\\"," +
+                " \\\"Time_Use\\\":\\\"" + x.Time_Use + "\\\"}");
+
+            return "{\"JSON_CHARACTER\": \"[" + itemsStr + "]\" }";
+        }
     }
 
     public class MainInfo_Synchronize_Data_Fun_Output
     {
-        public ServerMessage MainInfo_Synchronize_Data_Fun { get; set; }
+        public string MainInfo_Synchronize_Data_Fun { get; set; }
     }
 
     #endregion
