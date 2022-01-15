@@ -449,7 +449,7 @@ namespace IPAClient.Windows
             }
         }
 
-        private void LabelTimerOnTick(object? sender, EventArgs e)
+        private void LabelTimerOnTick(object sender, EventArgs e)
         {
             ClearLabels();
         }
