@@ -718,7 +718,6 @@ namespace IPAClient.Windows
             }
         }
 
-
         private async Task SetRemainFoods()
         {
             var remainFood =
