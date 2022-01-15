@@ -54,7 +54,7 @@ namespace DataLayer.Services
 
         public async Task<List<(string Title, int Total, int Remain)>> GetMealFoodRemain(string date, string mealCode)
         {
-            var data = await _context.Reservations.Where(x => x.Dat_Day_Mepdy == date && x.Cod_Meal == mealCode).Select(x => new { Title = x.Main_Course.First().Des_Food, Status = x.Status }).ToListAsync();
+            var data = await _context.Reservations.Where(x => x.Dat_Day_Mepdy == date && x.Cod_Meal == mealCode && x.Foods.Any()).Select(x => new { Title = x.Foods.First(x => x.IsMain).Des_Food, Status = x.Status }).ToListAsync();
             return data.GroupBy(x => x.Title).Select(x => (x.Key, x.Count(), x.Where(w => string.IsNullOrWhiteSpace(w.Status)).Count())).ToList();
         }
     }

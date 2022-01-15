@@ -8,6 +8,10 @@ namespace DataLayer.Entities
 {
     public class Reservation
     {
+        public Reservation()
+        {
+            Foods = new HashSet<Food>();
+        }
         public Guid Id { get; set; }
         public string Date { get; set; }
         public string Cod_Meal { get; set; }
@@ -37,19 +41,17 @@ namespace DataLayer.Entities
         public string Date_Use { get; set; }
         public string Time_Use { get; set; }
 
-        public List<Food> Main_Course { get; set; }
-        public List<Food> Appetizer_Dessert { get; set; }
+        public ICollection<Food> Foods { get; set; }
     }
 
-    public class Food : ValueObject
+    public class Food
     {
+        public long Id { get; set; }
         public string Des_Food { get; set; }
         public string Num_Amount { get; set; }
         public string Typ_Serv_Unit { get; set; }
-
-        protected override IEnumerable<object> GetEqualityComponents()
-        {
-            yield return Des_Food;
-        }
+        public bool IsMain { get; set; }
+        public Guid ReservationId { get; set; }
+        public Reservation Reservation { get; set; }
     }
 }

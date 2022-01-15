@@ -53,8 +53,8 @@ namespace IPAClient.Models
             Shift = reservation.Employee_Shift_Name;
             Company = reservation.Des_Contract_Order;
 
-            MainFoods = reservation.Main_Course;
-            SubsidiaryFoods = reservation.Appetizer_Dessert;
+            MainFoods = reservation.Foods.Where(x=>x.IsMain).ToList();
+            SubsidiaryFoods = reservation.Foods.Where(x=>!x.IsMain).ToList();
         }
         public PersonnelFoodDto(string noReservePersonnelCode)
         {

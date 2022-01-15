@@ -70,7 +70,7 @@ namespace ApiWrapper.Dto
     public class Device
     {
         public string Device_Category { get; set; }
-        public int Device_Id { get; set; }
+        public string Device_Id { get; set; }
         public string Des_Device { get; set; }
         public string Cod_Device { get; set; }
     }
@@ -167,23 +167,42 @@ namespace ApiWrapper.Dto
         public string Cod_Resturant { get; set; }
         public string Cod_Coupon { get; set; }
 
-        public List<Course> Main_Course { get; set; }
-        public List<Course> Appetizer_Dessert { get; set; }
+        public List<MainCourse> Main_Course { get; set; }
+        public List<AppetizerCourse> Appetizer_Dessert { get; set; }
 
     }
 
-    public class Course
+    public class MainCourse
+    {
+        public string Des_Food { get; set; }
+        public int Num_Amount { get; set; }
+        public string Typ_Serv_Unit { get; set; }
+
+        public MainCourse()
+        {
+
+        }
+
+        public MainCourse(string desFood, int numAmount, string typServUnit)
+        {
+            Des_Food = desFood;
+            Num_Amount = numAmount;
+            Typ_Serv_Unit = typServUnit;
+        }
+    }
+
+    public class AppetizerCourse
     {
         public string Des_Food { get; set; }
         public string Num_Amount { get; set; }
         public string Typ_Serv_Unit { get; set; }
 
-        public Course()
+        public AppetizerCourse()
         {
 
         }
 
-        public Course(string desFood, string numAmount, string typServUnit)
+        public AppetizerCourse(string desFood, string numAmount, string typServUnit)
         {
             Des_Food = desFood;
             Num_Amount = numAmount;

@@ -13,6 +13,7 @@ namespace DataLayer
         public string DbPath { get; private set; }
 
         public DbSet<Reservation> Reservations { get; set; }
+        public DbSet<Food> Foods { get; set; }
         public EsiDbContext()
         {
             var folder = Environment.SpecialFolder.LocalApplicationData;
@@ -30,8 +31,11 @@ namespace DataLayer
             {
                 r.HasKey(k => k.Id);
                 r.HasIndex(k => new { k.Date, k.Cod_Meal, k.Reciver_Coupon_Id, k.Num_Ide });
-                r.OwnsMany(x => x.Main_Course);
-                r.OwnsMany(x => x.Appetizer_Dessert);
+               
+            });
+            modelBuilder.Entity<Food>(r => {
+                r.HasKey(k => k.Id);
+                r.HasOne(x=>x.Reservation).WithMany(x=>x.Foods).HasForeignKey(x => x.ReservationId).IsRequired().OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

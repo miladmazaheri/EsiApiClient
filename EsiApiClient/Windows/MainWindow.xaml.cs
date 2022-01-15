@@ -243,7 +243,7 @@ namespace IPAClient.Windows
 
         private Reservation MapToReservation(MainInfo_Send_Offline_Data_Fun_Output_Data input, string mealCode)
         {
-            return new Reservation
+            var res = new Reservation
             {
                 Id = Guid.NewGuid(),
                 Date = DateTime.Now.ToString(),
@@ -252,8 +252,7 @@ namespace IPAClient.Windows
                 Status = null,
                 Time_Use = null,
 
-                Main_Course = input.Main_Course.Select(x => new Food { Des_Food = x.Des_Food, Num_Amount = x.Num_Amount, Typ_Serv_Unit = x.Typ_Serv_Unit }).ToList(),
-                Appetizer_Dessert = input.Appetizer_Dessert.Select(x => new Food { Des_Food = x.Des_Food, Num_Amount = x.Num_Amount, Typ_Serv_Unit = x.Typ_Serv_Unit }).ToList(),
+
                 Cod_Contract_Order = input.Cod_Contract_Order,
                 Cod_Coupon = input.Cod_Coupon,
                 Cod_Resturant = input.Cod_Resturant,
@@ -276,6 +275,36 @@ namespace IPAClient.Windows
                 Reciver_Coupon_Id = input.Reciver_Coupon_Id,
 
             };
+
+            foreach (var mainFood in input.Main_Course)
+            {
+                res.Foods.Add(
+                    new Food
+                    {
+                        IsMain = true,
+                        ReservationId = res.Id,
+
+                        Des_Food = mainFood.Des_Food,
+                        Num_Amount = mainFood.Num_Amount.ToString(),
+                        Typ_Serv_Unit = mainFood.Typ_Serv_Unit
+                    });
+            }
+
+            foreach (var appFood in input.Appetizer_Dessert)
+            {
+                res.Foods.Add(
+                    new Food
+                    {
+                        IsMain = false,
+                        ReservationId = res.Id,
+
+                        Des_Food = appFood.Des_Food,
+                        Num_Amount = appFood.Num_Amount,
+                        Typ_Serv_Unit = appFood.Typ_Serv_Unit
+                    });
+            }
+
+            return res;
         }
 
         #region ٌWindow Functions
@@ -571,7 +600,7 @@ namespace IPAClient.Windows
         wndCommandOne wndCommandOne = null;
         private async Task MonitorCommand1()
         {
-            await Dispatcher.Invoke(async() =>
+            await Dispatcher.Invoke(async () =>
             {
                 if (wndCommandOne == null)
                 {
@@ -592,29 +621,29 @@ namespace IPAClient.Windows
         wndCommandTwo wndCommandTwo = null;
         private async Task MonitorCommand2()
         {
-            await Dispatcher.Invoke( async () =>
-            {
-                if (wndCommandTwo == null)
-                {
-                    monitorDto.SetCommand("2");
-                    await SendMonitorData(monitorDto.ToJson());
-                    wndCommandTwo = new wndCommandTwo();
-                    wndCommandTwo.Show();
-                }
-                else
-                {
-                    monitorDto.SetCommand(string.Empty);
-                    await SendMonitorData(monitorDto.ToJson());
-                    wndCommandTwo.Close();
-                    wndCommandTwo = null;
-                }
-            }, DispatcherPriority.Normal);
+            await Dispatcher.Invoke(async () =>
+           {
+               if (wndCommandTwo == null)
+               {
+                   monitorDto.SetCommand("2");
+                   await SendMonitorData(monitorDto.ToJson());
+                   wndCommandTwo = new wndCommandTwo();
+                   wndCommandTwo.Show();
+               }
+               else
+               {
+                   monitorDto.SetCommand(string.Empty);
+                   await SendMonitorData(monitorDto.ToJson());
+                   wndCommandTwo.Close();
+                   wndCommandTwo = null;
+               }
+           }, DispatcherPriority.Normal);
         }
 
         private async Task CheckReservation(string personnelNumber)
         {
-           
-            
+
+
             if (App.AppConfig.CheckOnline)
             {
                 var res = await ApiClient.Restrn_Queue_Have_Reserve_Fun(new RESTRN_QUEUE_HAVE_RESERVE_FUN_Input_Data() { Device_Cod = App.AppConfig.Device_Cod, Num_Prsn = personnelNumber });
@@ -628,7 +657,7 @@ namespace IPAClient.Windows
                     {
                         //TODO How To Show Message?
                         ShowError("رزرو یافت نشد");
-                        monitorDto.AddNoReserveToQueue(personnelNumber); 
+                        monitorDto.AddNoReserveToQueue(personnelNumber);
                         return;
                     }
                 }
