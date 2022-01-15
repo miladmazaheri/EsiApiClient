@@ -530,7 +530,8 @@ namespace IPAClient.Windows
 
             await Dispatcher.Invoke(async () =>
             {
-                lblNumber.Content = personnelNumber;
+                var pNumStr = personnelNumber.ToString();
+                lblNumber.Content = pNumStr;
                 if (!IsActive) return;
                 if (personnelNumber != 0)
                 {
@@ -538,6 +539,8 @@ namespace IPAClient.Windows
                     {
                         ShowError("کارت غیر فعال است");
                         ShowBorder(brdRfId, false);
+                        monitorDto.AddMessageToQueue(pNumStr, "کارت غیر فعال است");
+                        await SendMonitorData(monitorDto.ToJson());
                         return;
                     }
 
@@ -545,11 +548,13 @@ namespace IPAClient.Windows
                     {
                         ShowError("کارت منقضی شده است");
                         ShowBorder(brdRfId, false);
+                        monitorDto.AddMessageToQueue(pNumStr, "کارت غیر فعال است");
+                        await SendMonitorData(monitorDto.ToJson());
                         return;
                     }
 
                     ShowBorder(brdRfId, true);
-                    await CheckReservation(personnelNumber.ToString());
+                    await CheckReservation(pNumStr);
                 }
             }, DispatcherPriority.Normal);
 
@@ -656,8 +661,8 @@ namespace IPAClient.Windows
                     else
                     {
                         //TODO How To Show Message?
-                        ShowError("رزرو یافت نشد");
-                        monitorDto.AddNoReserveToQueue(personnelNumber);
+                        ShowError("رزرو آنلاین یافت نشد");
+                        monitorDto.AddMessageToQueue(personnelNumber, "رزرو آنلاین یافت نشد");
                         return;
                     }
                 }
@@ -677,7 +682,7 @@ namespace IPAClient.Windows
                 else
                 {
                     ShowError("رزرو یافت نشد");
-                    monitorDto.AddNoReserveToQueue(personnelNumber);
+                    monitorDto.AddMessageToQueue(personnelNumber,"رزرو یافت نشد");
                     //TODO How To Show Message?
                 }
             }

@@ -56,12 +56,12 @@ namespace IPAClient.Models
             MainFoods = reservation.Foods.Where(x=>x.IsMain).ToList();
             SubsidiaryFoods = reservation.Foods.Where(x=>!x.IsMain).ToList();
         }
-        public PersonnelFoodDto(string noReservePersonnelCode)
+        public PersonnelFoodDto(string noReservePersonnelCode,string message)
         {
             PersonnelNumber = noReservePersonnelCode;
             MainFoods = new List<Food>(){new Food()
             {
-                Des_Food = "رزرو یافت نشد",
+                Des_Food = message,
             }};
         }
 
@@ -99,13 +99,13 @@ namespace IPAClient.Models
             PersonnelFoods.Add(new PersonnelFoodDto(reservation));
         }
 
-        public void AddNoReserveToQueue(string personnelCode)
+        public void AddMessageToQueue(string personnelCode,string message)
         {
             if (PersonnelFoods.Count == 5)
             {
                 PersonnelFoods.Remove(PersonnelFoods[0]);
             }
-            PersonnelFoods.Add(new PersonnelFoodDto(personnelCode));
+            PersonnelFoods.Add(new PersonnelFoodDto(personnelCode,message));
         }
         public string ToJson()
         {
