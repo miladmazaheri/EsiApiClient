@@ -124,7 +124,7 @@ namespace IPAClient.Windows
                     if (!App.AppConfig.IsDemo)
                     {
                         await GetConfigFromServerAsync();
-                        InitReConfigListener();
+                        //InitReConfigListener();
                     }
                     else
                     {
@@ -525,7 +525,7 @@ namespace IPAClient.Windows
 
         }
 
-        private async Task<bool> RfidDataReceivedAction(uint personnelNumber, bool isActive, bool isExp)
+        private async Task<bool> RfidDataReceivedAction(uint personnelNumber, bool isActive, bool isExp,string expDate)
         {
 
             await Dispatcher.Invoke(async () =>
@@ -546,9 +546,10 @@ namespace IPAClient.Windows
 
                     if (isExp)
                     {
-                        ShowError("کارت منقضی شده است");
+                        var message = "کارت منقضی شده است " + expDate;
+                        ShowError(message);
                         ShowBorder(brdRfId, false);
-                        monitorDto.AddMessageToQueue(pNumStr, "کارت غیر فعال است");
+                        monitorDto.AddMessageToQueue(pNumStr, message);
                         await SendMonitorData(monitorDto.ToJson());
                         return;
                     }

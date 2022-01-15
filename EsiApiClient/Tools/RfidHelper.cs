@@ -10,11 +10,11 @@ namespace IPAClient.Tools
 {
     public class RfidHelper : IDisposable
     {
-        private readonly Func<uint, bool, bool, Task<bool>> _dataReceivedAction;
+        private readonly Func<uint, bool, bool,string, Task<bool>> _dataReceivedAction;
         private readonly SerialPort _serialPort1;
         private volatile bool _isFree = true;
         public bool IsConnected => _serialPort1?.IsOpen ?? false;
-        public RfidHelper(int dataBits = 8, Parity parity = Parity.None, StopBits stopBits = StopBits.One, int baudRate = 19200, string portName = "COM4", Func<uint, bool, bool, Task<bool>> dataReceivedAction = null)
+        public RfidHelper(int dataBits = 8, Parity parity = Parity.None, StopBits stopBits = StopBits.One, int baudRate = 19200, string portName = "COM4", Func<uint, bool, bool,string, Task<bool>> dataReceivedAction = null)
         {
             _dataReceivedAction = dataReceivedAction;
             _serialPort1 = new SerialPort
@@ -49,7 +49,7 @@ namespace IPAClient.Tools
                     };
 
                     var parsedData = ParsDate(txt);
-                    _isFree = (_dataReceivedAction == null || await _dataReceivedAction.Invoke(parsedData.number, parsedData.isActive, parsedData.isExp));
+                    _isFree = (_dataReceivedAction == null || await _dataReceivedAction.Invoke(parsedData.number, parsedData.isActive, parsedData.isExp,parsedData.expDate));
                 }
             }
             catch (Exception)
@@ -58,13 +58,14 @@ namespace IPAClient.Tools
             }
         }
 
-        private (uint number, bool isActive, bool isExp) ParsDate(string txt)
+        private (uint number, bool isActive, bool isExp,string expDate) ParsDate(string txt)
         {
             var parts = txt.Split("\r").Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
 
             uint number = 0;
             var isExp = false;
             var isActive = false;
+            var expDate = string.Empty;
             foreach (var part in parts)
             {
                 if (part.StartsWith("USERCODE"))
@@ -78,6 +79,7 @@ namespace IPAClient.Tools
                     var year = dateParts[0] < 90 ? 1400 + dateParts[0] : 1300 + dateParts[0];
                     var persianDate = new PersianDay(year, dateParts[1], dateParts[2]);
                     isExp = persianDate.PersianDayToGregorian().Date <= DateTime.Now.Date;
+                    expDate = strDate;
                 }
                 else if (!part.StartsWith("CARDID"))
                 {
@@ -85,7 +87,7 @@ namespace IPAClient.Tools
                 }
             }
 
-            return (number, isActive, isExp);
+            return (number, isActive, isExp, expDate);
         }
 
 
