@@ -115,8 +115,8 @@ namespace ApiWrapper
                 var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/MainInfo_Synchronize_Data_Fun", new StringContent(input.ToJsonString(), Encoding.UTF8, "application/json"));
                 var resAsString = await response.Content.ReadAsStringAsync();
                 var res1 = JsonSerializer.Deserialize<MainInfo_Synchronize_Data_Fun_Output>(resAsString);
-                if (res1 == null || string.IsNullOrWhiteSpace(res1.MainInfo_Synchronize_Data_Fun)) return (false, "خطا در تبدیل پاسخ سرور");
-                var serverMessages = JsonSerializer.Deserialize<List<ServerMessage>>(res1.MainInfo_Synchronize_Data_Fun);
+                if (res1 == null || string.IsNullOrWhiteSpace(res1.MAININFO_SYNCHRONIZE_DATA_FUN)) return (false, "خطا در تبدیل پاسخ سرور");
+                var serverMessages = JsonSerializer.Deserialize<List<ServerMessage>>(res1.MAININFO_SYNCHRONIZE_DATA_FUN);
                 if (serverMessages == null || !serverMessages.Any()) return (false, "خطا در تبدیل پاسخ سرور");
                 var firstMessage = serverMessages.FirstOrDefault();
                 var isSuccessful = firstMessage?.Message_Type.ToLower() == "i";

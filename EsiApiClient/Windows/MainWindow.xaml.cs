@@ -44,6 +44,7 @@ namespace IPAClient.Windows
             _reservationService = new ReservationService();
             InitBorderTimer();
             InitLabelTimer();
+            ClearLabels();
         }
 
         private void BorderTimerOnTick(object sender, EventArgs e)
@@ -68,6 +69,7 @@ namespace IPAClient.Windows
 
         private async void BtnKeyPad_OnMouseDown(object sender, MouseButtonEventArgs e)
         {
+            ClearLabels();
             if (App.IsActive || !App.AppConfig.CheckMealTime)
             {
                 var wndKeyPad = new wndKeyPad();
@@ -195,11 +197,12 @@ namespace IPAClient.Windows
                 lblError.Content = lblName.Content =
                     lblNumber.Content = lblVade.Content =
                         lblShift.Content = lblShiftCompany.Content =
-                            lblFoodName.Content = lblFoodNum.Content =
+                              lblFoodNum.Content =
                                 lblAppFoodName0.Content = lblAppFoodNum0.Content =
                                     lblAppFoodName1.Content = lblAppFoodNum1.Content =
                                         lblAppFoodName2.Content = lblAppFoodNum2.Content =
                                             string.Empty;
+                lblFoodName.Text = string.Empty;
                 brdFood.Visibility = Visibility.Collapsed;
                 if (_labelTimer.IsEnabled) _labelTimer.Stop();
             });
@@ -207,6 +210,7 @@ namespace IPAClient.Windows
 
         private async void FingerPrintDataReceived(uint obj)
         {
+            ClearLabels();
             await Dispatcher.Invoke(async () =>
             {
                 if (!IsActive) return;
@@ -401,7 +405,7 @@ namespace IPAClient.Windows
         {
             _labelTimer = new DispatcherTimer();
             _labelTimer.Tick += LabelTimerOnTick;
-            _labelTimer.Interval = new TimeSpan(0, 0, 10);
+            _labelTimer.Interval = new TimeSpan(0, 0, 20);
         }
 
         private void InitReConfigListener()
@@ -459,8 +463,8 @@ namespace IPAClient.Windows
             // در هر روز همه ی اطلاعات بروز میشود
             if (App.LastFullUpdateTime == null || App.LastFullUpdateTime.Value.IsNextDay())
                 await GetConfigFromServerAsync();
-            //هر 30 دقیقه اطلاعات رزرو وعده فعلی بروز میشود
-            else if (App.LastMealUpdateTime == null || App.LastMealUpdateTime.Value.IsMinutePassed(30))
+            //هر App.AppConfig.GetFromServerIntervalMinutes دقیقه اطلاعات رزرو وعده فعلی بروز میشود
+            else if (App.LastMealUpdateTime == null || App.LastMealUpdateTime.Value.IsMinutePassed(App.AppConfig.GetFromServerIntervalMinutes))
                 await UpdateCurrentMealReservationFromServer();
 
             await SetCurrentMeal();
@@ -593,6 +597,7 @@ namespace IPAClient.Windows
 
         private async Task<bool> RfIdDataReceivedAction(uint personnelNumber, bool isActive, bool isExp, string expDate)
         {
+            ClearLabels();
             await Dispatcher.Invoke(async () =>
             {
                 if (App.IsActive || !App.AppConfig.CheckMealTime)
@@ -726,7 +731,7 @@ namespace IPAClient.Windows
         private async void SendDeliveredReservationsToServer()
         {
             var reservesToSend = await _reservationService.GetDeliveredReservesToSendAsync();
-            if (reservesToSend is not {Count: > 0}) return;
+            if (reservesToSend is not { Count: > 0 }) return;
             var syncResult = await ApiClient.MainInfo_Synchronize_Data_Fun(new MainInfo_Synchronize_Data_Fun_Input(reservesToSend
                 .Select(x => new MainInfo_Synchronize_Data_Fun_Input_Data(App.AppConfig.Device_Cod, x.Reciver_Coupon_Id, x.Status, x.Date_Use, x.Time_Use)).ToList()));
 
@@ -738,10 +743,13 @@ namespace IPAClient.Windows
 
         private async Task SetRemainFoods()
         {
-            var remainFood =
-                await _reservationService.GetMealFoodRemain(DateTime.Now.ToServerDateFormat(), App.CurrentMealCode);
-            _monitorDto.InsertOrUpdateRemainFood(remainFood.Select(x => new RemainFoodModel(x.Title, x.Remain, x.Total))
-                .ToArray());
+            if (_monitorDto is { })
+            {
+                var remainFood =
+              await _reservationService.GetMealFoodRemain(DateTime.Now.ToServerDateFormat(), App.CurrentMealCode);
+                _monitorDto.InsertOrUpdateRemainFood(remainFood.Select(x => new RemainFoodModel(x.Title, x.Remain, x.Total))
+                    .ToArray());
+            }
         }
 
         private void ShowBorder(Border brd, bool isSuccess)
@@ -804,12 +812,12 @@ namespace IPAClient.Windows
                 var mainFood = reservation.Foods.FirstOrDefault(x => x.IsMain);
                 if (mainFood != null)
                 {
-                    lblFoodName.Content = mainFood.Des_Food;
+                    lblFoodName.Text = mainFood.Des_Food;
                     lblFoodNum.Content = mainFood.Num_Amount;
                 }
                 else
                 {
-                    lblFoodName.Content = "نامشخص";
+                    lblFoodName.Text = "نامشخص";
                     lblFoodNum.Content = string.Empty;
                 }
 
@@ -831,6 +839,14 @@ namespace IPAClient.Windows
                         case 2:
                             lblAppFoodName2.Content = appFood.Des_Food;
                             lblAppFoodNum2.Content = appFood.Num_Amount;
+                            break;
+                        case 3:
+                            lblAppFoodName3.Content = appFood.Des_Food;
+                            lblAppFoodNum3.Content = appFood.Num_Amount;
+                            break;
+                        case 4:
+                            lblAppFoodName4.Content = appFood.Des_Food;
+                            lblAppFoodNum4.Content = appFood.Num_Amount;
                             break;
                     }
                 }

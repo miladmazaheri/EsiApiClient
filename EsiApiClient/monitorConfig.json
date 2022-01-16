@@ -3,5 +3,5 @@
   "Parity": 0,
   "StopBits": 1,
   "BaudRate": 115200,
-  "PortName": "COM1"
+  "PortName": "COM5"
 }

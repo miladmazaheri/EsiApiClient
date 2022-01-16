@@ -50,10 +50,24 @@ namespace IPAClient.Models
             Shift = reservation.Employee_Shift_Name;
             Company = reservation.Des_Contract_Order;
 
-            MainFoods = reservation.Foods.Where(x=>x.IsMain).ToList();
-            SubsidiaryFoods = reservation.Foods.Where(x=>!x.IsMain).ToList();
+            MainFoods = reservation.Foods.Where(x => x.IsMain).ToList();
+            SubsidiaryFoods = reservation.Foods.Where(x => !x.IsMain).ToList();
+            if (SubsidiaryFoods.Count > 3)
+            {
+                var overItems = SubsidiaryFoods.Skip(2).Take(SubsidiaryFoods.Count - 2).ToList();
+                overItems.ForEach(o =>
+                {
+                    SubsidiaryFoods.Remove(o);
+                });
+
+                SubsidiaryFoods.Add(new Food
+                {
+                    Des_Food = overItems.Select(x => x.Des_Food).Aggregate((a, b) => a + "-" + b),
+                    Num_Amount = "1"
+                });
+            }
         }
-        public PersonnelFoodDto(string noReservePersonnelCode,string message)
+        public PersonnelFoodDto(string noReservePersonnelCode, string message)
         {
             PersonnelNumber = noReservePersonnelCode;
             MainFoods = new List<Food>(){new Food()
@@ -96,17 +110,18 @@ namespace IPAClient.Models
             PersonnelFoods.Add(new PersonnelFoodDto(reservation));
         }
 
-        public void AddMessageToQueue(string personnelCode,string message)
+        public void AddMessageToQueue(string personnelCode, string message)
         {
             if (PersonnelFoods.Count == 5)
             {
                 PersonnelFoods.Remove(PersonnelFoods[0]);
             }
-            PersonnelFoods.Add(new PersonnelFoodDto(personnelCode,message));
+            PersonnelFoods.Add(new PersonnelFoodDto(personnelCode, message));
         }
         public string ToJson()
         {
-            return JsonSerializer.Serialize(this, options: new JsonSerializerOptions() { WriteIndented = false }).Replace("\r\n", " ") + "\n";
+            var options = new JsonSerializerOptions() { WriteIndented = false };//, ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve };
+            return JsonSerializer.Serialize(this, options).Replace("\r\n", " ") + "\n";
         }
 
         public void InsertOrUpdateRemainFood(params RemainFoodModel[] remainFoods)

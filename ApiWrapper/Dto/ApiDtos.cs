@@ -255,19 +255,19 @@ namespace ApiWrapper.Dto
         {
             var itemsStr = Items.Select(x =>
 
-                "{\\\"Cod_Device\\\":\\\"" + x.Device_Cod + "\\\"," +
-                " \\\"Id_Coupon_Reciver\\\":\\\"" + x.Reciver_Coupon_Id + "\\\"," +
+                "{\\\"Device_Cod\\\":\\\"" + x.Device_Cod + "\\\"," +
+                " \\\"*Reciver_Coupon_Id*\\\":\\\"" + x.Reciver_Coupon_Id + "\\\"," +
                 " \\\"Status\\\":\\\"" + x.Status + "\\\"," +
                 " \\\"Date_Use\\\":\\\"" + x.Date_Use + "\\\"," +
                 " \\\"Time_Use\\\":\\\"" + x.Time_Use + "\\\"}");
 
-            return "{\"JSON_CHARACTER\": \"[" + itemsStr + "]\" }";
+            return "{\"JSON_CHARACTER\": \"[" + itemsStr.Aggregate((a, b) => a + "," + b) + "]\" }";
         }
     }
 
     public class MainInfo_Synchronize_Data_Fun_Output
     {
-        public string MainInfo_Synchronize_Data_Fun { get; set; }
+        public string MAININFO_SYNCHRONIZE_DATA_FUN { get; set; }
     }
 
     #endregion
