@@ -128,6 +128,39 @@ namespace ApiWrapper
                 return (false, ex.Message);
             }
         }
+
+        /// <summary>
+        /// بررسی رزرو افراد در حالت آنلاین
+        /// </summary>
+        public static async Task<RESTRN_QUEUE_HAVE_RESERVE_FUN_Output> Restrn_Queue_Have_Reserve_Fun(RESTRN_QUEUE_HAVE_RESERVE_FUN_Input_Data input)
+        {
+            try
+            {
+                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/Restrn_Queue_Have_Reserve_Fun", new StringContent(input.ToJsonString(), Encoding.UTF8, "application/json"));
+                var resAsString = await response.Content.ReadAsStringAsync();
+                if (resAsString.Contains("Receiver_Full_Name"))
+                {
+                    var res1 = JsonSerializer.Deserialize<RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_OnSuccess>(resAsString);
+                    if (res1 == null || string.IsNullOrWhiteSpace(res1.RESTRN_QUEUE_HAVE_RESERVE_FUN)) return new RESTRN_QUEUE_HAVE_RESERVE_FUN_Output(false, null, null);
+                    var data =  JsonSerializer.Deserialize<List<RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_Data>>(res1.RESTRN_QUEUE_HAVE_RESERVE_FUN);
+                    return new RESTRN_QUEUE_HAVE_RESERVE_FUN_Output(true, null, data);
+                }
+                else
+                {
+                    var res1 = JsonSerializer.Deserialize<MainInfo_Synchronize_Data_Fun_Output>(resAsString);
+                    if (res1 == null || string.IsNullOrWhiteSpace(res1.MAININFO_SYNCHRONIZE_DATA_FUN)) return new RESTRN_QUEUE_HAVE_RESERVE_FUN_Output(false, null, null);
+                    var serverMessages = JsonSerializer.Deserialize<List<ServerMessage>>(res1.MAININFO_SYNCHRONIZE_DATA_FUN);
+                    return new RESTRN_QUEUE_HAVE_RESERVE_FUN_Output(false, serverMessages, null);
+                }
+            }
+            catch (Exception ex)
+            {
+                AddLog(ex);
+                return null;
+            }
+        }
+
+
         /// <summary>
         /// ثبت اطلاعات تجهیز جدید
         /// </summary>
@@ -162,34 +195,6 @@ namespace ApiWrapper
                 return null;
             }
         }
-        /// <summary>
-        /// بررسی رزرو افراد در حالت آنلاین
-        /// </summary>
-        public static async Task<RESTRN_QUEUE_HAVE_RESERVE_FUN_Output> Restrn_Queue_Have_Reserve_Fun(RESTRN_QUEUE_HAVE_RESERVE_FUN_Input_Data input)
-        {
-            try
-            {
-                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/Restrn_Queue_Have_Reserve_Fun", new StringContent(input.ToJsonString(), Encoding.UTF8, "application/json"));
-                var resAsString = await response.Content.ReadAsStringAsync();
-                try
-                {
-                    var res = JsonSerializer.Deserialize<RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_OnSuccess>(resAsString);
-                    return new RESTRN_QUEUE_HAVE_RESERVE_FUN_Output(true, null, res);
-                }
-                catch (Exception e)
-                {
-                    AddLog(e);
-                    var res = JsonSerializer.Deserialize<RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_OnFail>(resAsString);
-                    return new RESTRN_QUEUE_HAVE_RESERVE_FUN_Output(true, res, null);
-                }
-            }
-            catch (Exception ex)
-            {
-                AddLog(ex);
-                return null;
-            }
-        }
-
 
         private static void AddLog(Exception ex)
         {

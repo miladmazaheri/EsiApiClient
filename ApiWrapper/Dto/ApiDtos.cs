@@ -317,30 +317,26 @@ namespace ApiWrapper.Dto
     public class RESTRN_QUEUE_HAVE_RESERVE_FUN_Output
     {
         public bool IsSuccessFull { get; set; }
-        public RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_OnFail FailOutput { get; set; }
-        public RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_OnSuccess SuccessOutput { get; set; }
+        public List<ServerMessage> Messages { get; set; }
+        public List<RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_Data> Data { get; set; }
 
         public RESTRN_QUEUE_HAVE_RESERVE_FUN_Output()
         {
 
         }
 
-        public RESTRN_QUEUE_HAVE_RESERVE_FUN_Output(bool isSuccessFull, RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_OnFail failOutput, RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_OnSuccess successOutput)
+        public RESTRN_QUEUE_HAVE_RESERVE_FUN_Output(bool isSuccessFull, List<ServerMessage> messages, List<RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_Data> data)
         {
             IsSuccessFull = isSuccessFull;
-            FailOutput = failOutput;
-            SuccessOutput = successOutput;
+            Messages = messages;
+            Data = data;
         }
     }
 
-    public class RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_OnFail
-    {
-        public List<ServerMessage> RESTRN_QUEUE_HAVE_RESERVE_FUN { get; set; }
-    }
 
     public class RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_OnSuccess
     {
-        public List<RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_Data> RESTRN_QUEUE_HAVE_RESERVE_FUN { get; set; }
+        public string RESTRN_QUEUE_HAVE_RESERVE_FUN { get; set; }
     }
     #endregion
 

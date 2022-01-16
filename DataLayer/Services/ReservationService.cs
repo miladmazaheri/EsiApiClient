@@ -87,5 +87,20 @@ namespace DataLayer.Services
             var date = DateTime.Now.AddDays(-1 * days);
             await _context.Reservations.Where(x => x.DateTime_SentToWebService < date).DeleteAsync();
         }
+
+        public async Task<Reservation> FindReservationByCouponIdAsync(string reciverCouponId,string date)
+        {
+            var data =  await _context.Reservations.FirstOrDefaultAsync(x => x.Reciver_Coupon_Id == reciverCouponId);
+            if (data != null)
+            {
+                data.Status = ReservationStatusEnum.USED.ToString();
+                data.Date_Use = date;
+                data.Time_Use = DateTime.Now.TimeOfDay.ToString("hhmmss");
+                _context.Reservations.Update(data);
+                await _context.SaveChangesAsync();
+            }
+
+            return data;
+        }
     }
 }

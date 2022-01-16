@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -161,9 +162,24 @@ namespace IPAClient.Windows
                 {
                     if (res.IsSuccessFull)
                     {
-                        //TODO Save Online Reserve
-                        PlaySound(true);
-                        return;
+                        var onlineReserve = res.Data?.FirstOrDefault();
+                        if (onlineReserve != null)
+                        {
+                            var offlineReserve = await _reservationService.FindReservationByCouponIdAsync(onlineReserve.Reciver_Coupon_Id, DateTime.Now.Date.ToServerDateFormat());
+                            if (offlineReserve != null)
+                            {
+                                await OfflineReserveSuccessOperation(offlineReserve);
+                                return;
+                            }
+                            else
+                            {
+                                //TODO InsertOnlineReserveAsync And Update Labels By RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_Data
+                                //await _reservationService.InsertOnlineReserveAsync()
+                                //PlaySound(true);
+                                //return;
+                            }
+                        }
+
                     };
 
                     var message = "رزرو آنلاین یافت نشد";
@@ -180,10 +196,7 @@ namespace IPAClient.Windows
 
                 if (offlineReserve != null)
                 {
-                    PlaySound(true);
-                    UpdateLabels(offlineReserve);
-                    _monitorDto.AddToQueue(offlineReserve);
-                    await SetRemainFoods();
+                    await OfflineReserveSuccessOperation(offlineReserve);
                 }
                 else
                 {
@@ -195,6 +208,14 @@ namespace IPAClient.Windows
             }
 
             await SendMonitorData(_monitorDto.ToJson());
+        }
+
+        private async Task OfflineReserveSuccessOperation(Reservation reservation)
+        {
+            PlaySound(true);
+            UpdateLabels(reservation);
+            _monitorDto.AddToQueue(reservation);
+            await SetRemainFoods();
         }
 
         private void ClearLabels()
