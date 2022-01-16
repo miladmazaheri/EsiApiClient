@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DataLayer.Entities;
 using Microsoft.EntityFrameworkCore;
+using Z.EntityFramework.Plus;
 
 namespace DataLayer.Services
 {
@@ -59,11 +60,32 @@ namespace DataLayer.Services
             if (reservationExist == null) await _context.Reservations.AddAsync(reservation);
         }
 
-        public async Task<List<Reservation>> GetDeliveredReservesToSendAsync()
+        public async Task<List<(Guid Id, string Reciver_Coupon_Id, string Status, string Date_Use, string Time_Use)>> GetDeliveredReservesToSendAsync()
         {
-            return await _context.Reservations
+            return (await _context.Reservations.AsNoTracking()
                 .Where(x => !string.IsNullOrWhiteSpace(x.Status) && !x.DateTime_SentToWebService.HasValue)
-                .ToListAsync();
+                .Select(x => new { x.Id, x.Reciver_Coupon_Id, x.Status, x.Date_Use, x.Time_Use })
+                .Skip(0).Take(100)
+                .ToListAsync()).Select(x => (x.Id, x.Reciver_Coupon_Id, x.Status, x.Date_Use, x.Time_Use)).ToList();
+        }
+
+        public async Task SetSentToWebServiceDateTimeAsync(IEnumerable<Guid> ids)
+        {
+            foreach (var id in ids)
+            {
+                var reserve = _context.Reservations.FirstOrDefault(x => x.Id == id);
+                if (reserve != null)
+                {
+                    reserve.DateTime_SentToWebService = DateTime.Now;
+                }
+            }
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteOldReservationAsync(int days)
+        {
+            var date = DateTime.Now.AddDays(-1 * days);
+            await _context.Reservations.Where(x => x.DateTime_SentToWebService < date).DeleteAsync();
         }
     }
 }

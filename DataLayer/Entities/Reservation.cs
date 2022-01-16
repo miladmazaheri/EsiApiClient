@@ -42,7 +42,6 @@ namespace DataLayer.Entities
         public string Date_Use { get; set; }
         public string Time_Use { get; set; }
         public DateTime? DateTime_SentToWebService { get; set; }
-
         public ICollection<Food> Foods { get; set; }
     }
 

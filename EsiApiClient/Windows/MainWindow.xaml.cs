@@ -208,6 +208,8 @@ namespace IPAClient.Windows
                                 lblAppFoodName0.Content = lblAppFoodNum0.Content =
                                     lblAppFoodName1.Content = lblAppFoodNum1.Content =
                                         lblAppFoodName2.Content = lblAppFoodNum2.Content =
+                                        lblAppFoodName3.Content = lblAppFoodNum3.Content =
+                                        lblAppFoodName4.Content = lblAppFoodNum4.Content =
                                             string.Empty;
                 lblFoodName.Text = string.Empty;
                 brdFood.Visibility = Visibility.Collapsed;
@@ -339,6 +341,7 @@ namespace IPAClient.Windows
                 try
                 {
                     await GetAllMealsReservationsFromServer();
+                    await _reservationService.DeleteOldReservationAsync(2);
                     SetBackGroundImage("16");
                 }
                 catch (Exception ex)
@@ -735,10 +738,11 @@ namespace IPAClient.Windows
             }
         }
 
-        private async void SendDeliveredReservationsToServer()
+        private async Task SendDeliveredReservationsToServer()
         {
             var reservesToSend = await _reservationService.GetDeliveredReservesToSendAsync();
             if (reservesToSend is not { Count: > 0 }) return;
+
             var syncResult = await ApiClient.MainInfo_Synchronize_Data_Fun(new MainInfo_Synchronize_Data_Fun_Input(reservesToSend
                 .Select(x => new MainInfo_Synchronize_Data_Fun_Input_Data(App.AppConfig.Device_Cod, x.Reciver_Coupon_Id, x.Status, x.Date_Use, x.Time_Use)).ToList()));
 
@@ -746,6 +750,12 @@ namespace IPAClient.Windows
             {
                 App.AddLog(new Exception(syncResult.message));
             }
+            else
+            {
+                await _reservationService.SetSentToWebServiceDateTimeAsync(reservesToSend.Select(x => x.Id));
+            }
+
+            await SendDeliveredReservationsToServer();
         }
 
         private async Task SetRemainFoods()
@@ -828,7 +838,7 @@ namespace IPAClient.Windows
                 }
 
                 var appFoods = reservation.Foods.Where(x => !x.IsMain).ToList();
-                for (var i = 0; i < 3; i++)
+                for (var i = 0; i < 5; i++)
                 {
                     var appFood = appFoods.Skip(i).Take(1).FirstOrDefault();
                     if (appFood == null) break;
