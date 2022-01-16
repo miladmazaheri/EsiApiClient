@@ -7,6 +7,22 @@ namespace EpsilonService
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("Press i for install or u for unistall service: ");
+            var key = Console.ReadKey();
+            if (key.KeyChar == 'u')
+            {
+                try
+                {
+                   SelfInstaller.UninstallMe();
+                   Console.WriteLine("\n\npress any key to exit...");
+                   Console.ReadKey();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+                return;
+            }
             bool _IsInstalled = false;
             bool serviceStarting = false;
             string SERVICE_NAME = "EpsilonBackgroundService";
