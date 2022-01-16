@@ -169,7 +169,7 @@ namespace ApiWrapper
         {
             try
             {
-                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/Restrn_Queue_Have_Reserve_Fun", new StringContent(JsonSerializer.Serialize(input), Encoding.UTF8, "application/json"));
+                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/Restrn_Queue_Have_Reserve_Fun", new StringContent(input.ToJsonString(), Encoding.UTF8, "application/json"));
                 var resAsString = await response.Content.ReadAsStringAsync();
                 try
                 {

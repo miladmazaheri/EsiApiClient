@@ -256,7 +256,7 @@ namespace ApiWrapper.Dto
             var itemsStr = Items.Select(x =>
 
                 "{\\\"Device_Cod\\\":\\\"" + x.Device_Cod + "\\\"," +
-                " \\\"*Reciver_Coupon_Id*\\\":\\\"" + x.Reciver_Coupon_Id + "\\\"," +
+                " \\\"Receiver_Coupun_Id\\\":\\\"" + x.Reciver_Coupon_Id + "\\\"," +
                 " \\\"Status\\\":\\\"" + x.Status + "\\\"," +
                 " \\\"Date_Use\\\":\\\"" + x.Date_Use + "\\\"," +
                 " \\\"Time_Use\\\":\\\"" + x.Time_Use + "\\\"}");
@@ -291,7 +291,12 @@ namespace ApiWrapper.Dto
         }
         public string ToJsonString()
         {
-            return "{\"JSON_CHARACTER\": \"[{\"DEVICE_COD\":\"" + Device_Cod + "\", \"Num_Prsn\":\"" + Num_Prsn + "\"}]\" }";
+            var itemsStr =
+
+                "{\\\"DEVICE_COD\\\":\\\"" + Device_Cod + "\\\"," +
+                " \\\"Num_Prsn\\\":\\\"" + Num_Prsn + "\\\"}";
+
+            return "{\"JSON_CHARACTER\": \"[" + itemsStr + "]\" }";
         }
     }
 
