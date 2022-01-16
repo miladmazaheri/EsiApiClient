@@ -156,13 +156,18 @@ namespace IPAClient.Windows
         {
             if (App.AppConfig.CheckOnline)
             {
-                var res = await ApiClient.Restrn_Queue_Have_Reserve_Fun(new RESTRN_QUEUE_HAVE_RESERVE_FUN_Input_Data
-                { Device_Cod = App.AppConfig.Device_Cod, Num_Prsn = personnelNumber });
+                var res = await ApiClient.Restrn_Queue_Have_Reserve_Fun(new RESTRN_QUEUE_HAVE_RESERVE_FUN_Input_Data { Device_Cod = App.AppConfig.Device_Cod, Num_Prsn = personnelNumber });
                 if (res != null)
                 {
-                    if (res.IsSuccessFull) return;
+                    if (res.IsSuccessFull)
+                    {
+                        //TODO Save Online Reserve
+                        PlaySound(true);
+                        return;
+                    };
 
                     var message = "رزرو آنلاین یافت نشد";
+                    PlaySound(false);
                     ShowError(message);
                     _monitorDto.AddMessageToQueue(personnelNumber, message);
                     return;
@@ -175,12 +180,14 @@ namespace IPAClient.Windows
 
                 if (offlineReserve != null)
                 {
+                    PlaySound(true);
                     UpdateLabels(offlineReserve);
                     _monitorDto.AddToQueue(offlineReserve);
                     await SetRemainFoods();
                 }
                 else
                 {
+                    PlaySound(false);
                     var message = "رزرو یافت نشد";
                     ShowError(message);
                     _monitorDto.AddMessageToQueue(personnelNumber, message);
@@ -698,7 +705,7 @@ namespace IPAClient.Windows
         private async Task SetCurrentMeal()
         {
             var activeMeal = App.MainInfo.Meals.FirstOrDefault(x => x.IsCurrentMeal);
-            var activeMealCode = activeMeal?.Cod_Data;
+            var activeMealCode = activeMeal?.Cod_Data ?? (App.AppConfig.CheckMealTime ? null : "22");
             if (App.CurrentMealCode != activeMealCode)
             {
                 App.CurrentMealCode = activeMealCode;
@@ -757,7 +764,6 @@ namespace IPAClient.Windows
             brd.BorderBrush = new SolidColorBrush(isSuccess ? Color.FromRgb(0, 255, 0) : Color.FromRgb(255, 0, 0));
             brd.Visibility = Visibility.Visible;
 
-            PlaySound(isSuccess);
 
             _borderTimer.Start();
         }
