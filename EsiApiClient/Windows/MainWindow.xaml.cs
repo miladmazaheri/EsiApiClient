@@ -76,10 +76,14 @@ namespace IPAClient.Windows
                 var wndKeyPad = new wndKeyPad();
                 wndKeyPad.ShowDialog();
                 if (!string.IsNullOrWhiteSpace(wndKeyPad.PersonnelNumber))
+                {
+                    ShowBorder(brdKeyPad,true);
                     await CheckReservation(wndKeyPad.PersonnelNumber);
+                }
             }
             else
             {
+                ShowBorder(brdKeyPad, false);
                 ShowError("خارج از وعده");
                 _monitorDto.AddMessageToQueue("", "خارج از وعده");
             }
@@ -728,8 +732,8 @@ namespace IPAClient.Windows
 
         private async Task SetCurrentMeal()
         {
-            var activeMeal = App.MainInfo.Meals.FirstOrDefault(x => x.IsCurrentMeal);
-            var activeMealCode = activeMeal?.Cod_Data ?? (App.AppConfig.CheckMealTime ? null : "22");
+            var activeMeal = App.MainInfo?.Meals?.FirstOrDefault(x => x.IsCurrentMeal);
+            var activeMealCode = activeMeal?.Cod_Data ?? ((App.AppConfig?.CheckMealTime ?? false) ? null : "22");
             if (App.CurrentMealCode != activeMealCode)
             {
                 App.CurrentMealCode = activeMealCode;

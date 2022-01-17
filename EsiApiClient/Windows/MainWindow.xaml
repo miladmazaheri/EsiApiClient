@@ -18,8 +18,9 @@
         <Label   x:Name="lblVade" Content="ناهار" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="18" FontWeight="ExtraBold" Margin="668,317,544,346"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
         <Label   x:Name="lblShift" Content="صبح" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="18" FontWeight="ExtraBold" Margin="992,377,222,288"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
         <Label   x:Name="lblShiftCompany" Content="ایپا" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="18" FontWeight="ExtraBold" Margin="668,376,478,287"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-        <Border  x:Name="brdRfId" BorderBrush="LawnGreen" Margin="1007,440,116,129" BorderThickness="3" CornerRadius="8" Visibility="Collapsed"/>
-        <Border  x:Name="brdFingerPrint" BorderBrush="Red" Margin="838,440,287,129" BorderThickness="3" CornerRadius="8" Visibility="Collapsed"/>
+        <Border  x:Name="brdRfId" BorderBrush="LawnGreen" Margin="1007,434,116,129" BorderThickness="3" CornerRadius="8" Visibility="Collapsed"/>
+        <Border  x:Name="brdFingerPrint" BorderBrush="Red" Margin="838,434,287,129" BorderThickness="3" CornerRadius="8" Visibility="Collapsed"/>
+        <Border  x:Name="brdKeyPad" BorderBrush="Red" Margin="664,434,461,129" BorderThickness="3" CornerRadius="8" Visibility="Collapsed"/>
         <Label x:Name="btnKeyPad" Content="" HorizontalAlignment="Left" Margin="668,434,0,0" VerticalAlignment="Top" Width="151" Height="141" MouseDown="BtnKeyPad_OnMouseDown"/>
         <Label   x:Name="lblError" Content="" Foreground="red" FontFamily="{StaticResource Vazir}" FontSize="28" FontWeight="ExtraBold" Margin="112,482,731,147"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
 
