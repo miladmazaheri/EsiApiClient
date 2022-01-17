@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DataLayer.Migrations
 {
-    public partial class V2021_11_05_2024 : Migration
+    public partial class V2022_01_15_1102 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -44,46 +44,32 @@ namespace DataLayer.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Reservations_Appetizer_Dessert",
+                name: "Foods",
                 columns: table => new
                 {
-                    ReservationId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Id = table.Column<int>(type: "INTEGER", nullable: false),
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
                     Des_Food = table.Column<string>(type: "TEXT", nullable: true),
                     Num_Amount = table.Column<string>(type: "TEXT", nullable: true),
-                    Typ_Serv_Unit = table.Column<string>(type: "TEXT", nullable: true)
+                    Typ_Serv_Unit = table.Column<string>(type: "TEXT", nullable: true),
+                    IsMain = table.Column<bool>(type: "INTEGER", nullable: false),
+                    ReservationId = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Reservations_Appetizer_Dessert", x => new { x.ReservationId, x.Id });
+                    table.PrimaryKey("PK_Foods", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Reservations_Appetizer_Dessert_Reservations_ReservationId",
+                        name: "FK_Foods_Reservations_ReservationId",
                         column: x => x.ReservationId,
                         principalTable: "Reservations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "Reservations_Main_Course",
-                columns: table => new
-                {
-                    ReservationId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Id = table.Column<int>(type: "INTEGER", nullable: false),
-                    Des_Food = table.Column<string>(type: "TEXT", nullable: true),
-                    Num_Amount = table.Column<string>(type: "TEXT", nullable: true),
-                    Typ_Serv_Unit = table.Column<string>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Reservations_Main_Course", x => new { x.ReservationId, x.Id });
-                    table.ForeignKey(
-                        name: "FK_Reservations_Main_Course_Reservations_ReservationId",
-                        column: x => x.ReservationId,
-                        principalTable: "Reservations",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+            migrationBuilder.CreateIndex(
+                name: "IX_Foods_ReservationId",
+                table: "Foods",
+                column: "ReservationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reservations_Date_Cod_Meal_Reciver_Coupon_Id_Num_Ide",
@@ -94,10 +80,7 @@ namespace DataLayer.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Reservations_Appetizer_Dessert");
-
-            migrationBuilder.DropTable(
-                name: "Reservations_Main_Course");
+                name: "Foods");
 
             migrationBuilder.DropTable(
                 name: "Reservations");

@@ -1,12 +1,9 @@
-﻿using ApiWrapper.Dto;
-using DataLayer.Entities;
+﻿using DataLayer.Entities;
 using IPAClient.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace IPAClient.Models
 {
@@ -53,15 +50,29 @@ namespace IPAClient.Models
             Shift = reservation.Employee_Shift_Name;
             Company = reservation.Des_Contract_Order;
 
-            MainFoods = reservation.Main_Course;
-            SubsidiaryFoods = reservation.Appetizer_Dessert;
+            MainFoods = reservation.Foods.Where(x => x.IsMain).ToList();
+            SubsidiaryFoods = reservation.Foods.Where(x => !x.IsMain).ToList();
+            if (SubsidiaryFoods.Count > 3)
+            {
+                var overItems = SubsidiaryFoods.Skip(2).Take(SubsidiaryFoods.Count - 2).ToList();
+                overItems.ForEach(o =>
+                {
+                    SubsidiaryFoods.Remove(o);
+                });
+
+                SubsidiaryFoods.Add(new Food
+                {
+                    Des_Food = overItems.Select(x => x.Des_Food).Aggregate((a, b) => a + "-" + b),
+                    Num_Amount = "1"
+                });
+            }
         }
-        public PersonnelFoodDto(string noReservePersonnelCode)
+        public PersonnelFoodDto(string noReservePersonnelCode, string message)
         {
             PersonnelNumber = noReservePersonnelCode;
             MainFoods = new List<Food>(){new Food()
             {
-                Des_Food = "رزرو یافت نشد",
+                Des_Food = message,
             }};
         }
 
@@ -99,17 +110,18 @@ namespace IPAClient.Models
             PersonnelFoods.Add(new PersonnelFoodDto(reservation));
         }
 
-        public void AddNoReserveToQueue(string personnelCode)
+        public void AddMessageToQueue(string personnelCode, string message)
         {
             if (PersonnelFoods.Count == 5)
             {
                 PersonnelFoods.Remove(PersonnelFoods[0]);
             }
-            PersonnelFoods.Add(new PersonnelFoodDto(personnelCode));
+            PersonnelFoods.Add(new PersonnelFoodDto(personnelCode, message));
         }
         public string ToJson()
         {
-            return JsonSerializer.Serialize(this, options: new JsonSerializerOptions() { WriteIndented = false }).Replace("\r\n", " ") + "\n";
+            var options = new JsonSerializerOptions() { WriteIndented = false };//, ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve };
+            return JsonSerializer.Serialize(this, options).Replace("\r\n", " ") + "\n";
         }
 
         public void InsertOrUpdateRemainFood(params RemainFoodModel[] remainFoods)
@@ -132,6 +144,12 @@ namespace IPAClient.Models
         public void SetCommand(string command)
         {
             Command = command;
+        }
+
+        public void Clear()
+        {
+            RemainFoods = new List<RemainFoodModel>();
+            PersonnelFoods = new List<PersonnelFoodDto>();
         }
     }
 }

@@ -9,14 +9,42 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(EsiDbContext))]
-    [Migration("20211105165420_V2021_11_05_2024")]
-    partial class V2021_11_05_2024
+    [Migration("20220116071112_V2022_01_16_1040")]
+    partial class V2022_01_16_1040
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "5.0.11");
+
+            modelBuilder.Entity("DataLayer.Entities.Food", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Des_Food")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsMain")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Num_Amount")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ReservationId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Typ_Serv_Unit")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReservationId");
+
+                    b.ToTable("Foods");
+                });
 
             modelBuilder.Entity("DataLayer.Entities.Reservation", b =>
                 {
@@ -43,6 +71,9 @@ namespace DataLayer.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Date")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DateTime_SentToWebService")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Date_Use")
@@ -106,63 +137,20 @@ namespace DataLayer.Migrations
                     b.ToTable("Reservations");
                 });
 
+            modelBuilder.Entity("DataLayer.Entities.Food", b =>
+                {
+                    b.HasOne("DataLayer.Entities.Reservation", "Reservation")
+                        .WithMany("Foods")
+                        .HasForeignKey("ReservationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Reservation");
+                });
+
             modelBuilder.Entity("DataLayer.Entities.Reservation", b =>
                 {
-                    b.OwnsMany("DataLayer.Entities.Food", "Appetizer_Dessert", b1 =>
-                        {
-                            b1.Property<Guid>("ReservationId")
-                                .HasColumnType("TEXT");
-
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("INTEGER");
-
-                            b1.Property<string>("Des_Food")
-                                .HasColumnType("TEXT");
-
-                            b1.Property<string>("Num_Amount")
-                                .HasColumnType("TEXT");
-
-                            b1.Property<string>("Typ_Serv_Unit")
-                                .HasColumnType("TEXT");
-
-                            b1.HasKey("ReservationId", "Id");
-
-                            b1.ToTable("Reservations_Appetizer_Dessert");
-
-                            b1.WithOwner()
-                                .HasForeignKey("ReservationId");
-                        });
-
-                    b.OwnsMany("DataLayer.Entities.Food", "Main_Course", b1 =>
-                        {
-                            b1.Property<Guid>("ReservationId")
-                                .HasColumnType("TEXT");
-
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("INTEGER");
-
-                            b1.Property<string>("Des_Food")
-                                .HasColumnType("TEXT");
-
-                            b1.Property<string>("Num_Amount")
-                                .HasColumnType("TEXT");
-
-                            b1.Property<string>("Typ_Serv_Unit")
-                                .HasColumnType("TEXT");
-
-                            b1.HasKey("ReservationId", "Id");
-
-                            b1.ToTable("Reservations_Main_Course");
-
-                            b1.WithOwner()
-                                .HasForeignKey("ReservationId");
-                        });
-
-                    b.Navigation("Appetizer_Dessert");
-
-                    b.Navigation("Main_Course");
+                    b.Navigation("Foods");
                 });
 #pragma warning restore 612, 618
         }

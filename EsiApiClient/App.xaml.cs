@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -10,7 +8,6 @@ using System.Windows.Threading;
 using ApiWrapper;
 using ApiWrapper.Dto;
 using DataLayer;
-using DataLayer.Entities;
 using IPAClient.Models;
 using IPAClient.Windows;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +25,7 @@ namespace IPAClient
     /// </summary>
     public partial class App : Application
     {
+        public static bool IsActive { get; set; }
         public static string CurrentMealCode { get; set; }
         private static ConfigModel _appConfig;
 

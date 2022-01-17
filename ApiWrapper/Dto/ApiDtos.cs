@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ApiWrapper.Dto
 {
@@ -61,8 +62,8 @@ namespace ApiWrapper.Dto
         public string Cod_Data { get; set; }
         public string Des_Data { get; set; }
 
-        public TimeSpan? StartTime  { get; set; }
-        public TimeSpan? EndTime  { get; set; }
+        public TimeSpan? StartTime { get; set; }
+        public TimeSpan? EndTime { get; set; }
 
         public bool IsCurrentMeal => StartTime.HasValue && EndTime.HasValue && DateTime.Now.TimeOfDay >= StartTime && DateTime.Now.TimeOfDay <= EndTime;
     }
@@ -70,7 +71,7 @@ namespace ApiWrapper.Dto
     public class Device
     {
         public string Device_Category { get; set; }
-        public int Device_Id { get; set; }
+        public string Device_Id { get; set; }
         public string Des_Device { get; set; }
         public string Cod_Device { get; set; }
     }
@@ -167,23 +168,42 @@ namespace ApiWrapper.Dto
         public string Cod_Resturant { get; set; }
         public string Cod_Coupon { get; set; }
 
-        public List<Course> Main_Course { get; set; }
-        public List<Course> Appetizer_Dessert { get; set; }
+        public List<MainCourse> Main_Course { get; set; }
+        public List<AppetizerCourse> Appetizer_Dessert { get; set; }
 
     }
 
-    public class Course
+    public class MainCourse
+    {
+        public string Des_Food { get; set; }
+        public int Num_Amount { get; set; }
+        public string Typ_Serv_Unit { get; set; }
+
+        public MainCourse()
+        {
+
+        }
+
+        public MainCourse(string desFood, int numAmount, string typServUnit)
+        {
+            Des_Food = desFood;
+            Num_Amount = numAmount;
+            Typ_Serv_Unit = typServUnit;
+        }
+    }
+
+    public class AppetizerCourse
     {
         public string Des_Food { get; set; }
         public string Num_Amount { get; set; }
         public string Typ_Serv_Unit { get; set; }
 
-        public Course()
+        public AppetizerCourse()
         {
 
         }
 
-        public Course(string desFood, string numAmount, string typServUnit)
+        public AppetizerCourse(string desFood, string numAmount, string typServUnit)
         {
             Des_Food = desFood;
             Num_Amount = numAmount;
@@ -217,14 +237,37 @@ namespace ApiWrapper.Dto
         }
     }
 
-    public class MainInfo_Synchronize_Data_Fun_Input : BaseInput<MainInfo_Synchronize_Data_Fun_Input_Data>
+    public class MainInfo_Synchronize_Data_Fun_Input
     {
+        public List<MainInfo_Synchronize_Data_Fun_Input_Data> Items { get; set; }
 
+        public MainInfo_Synchronize_Data_Fun_Input()
+        {
+
+        }
+
+        public MainInfo_Synchronize_Data_Fun_Input(List<MainInfo_Synchronize_Data_Fun_Input_Data> items)
+        {
+            Items = items;
+        }
+
+        public string ToJsonString()
+        {
+            var itemsStr = Items.Select(x =>
+
+                "{\\\"Device_Cod\\\":\\\"" + x.Device_Cod + "\\\"," +
+                " \\\"Receiver_Coupun_Id\\\":\\\"" + x.Reciver_Coupon_Id + "\\\"," +
+                " \\\"Status\\\":\\\"" + x.Status + "\\\"," +
+                " \\\"Date_Use\\\":\\\"" + x.Date_Use + "\\\"," +
+                " \\\"Time_Use\\\":\\\"" + x.Time_Use + "\\\"}");
+
+            return "{\"JSON_CHARACTER\": \"[" + itemsStr.Aggregate((a, b) => a + "," + b) + "]\" }";
+        }
     }
 
     public class MainInfo_Synchronize_Data_Fun_Output
     {
-        public ServerMessage MainInfo_Synchronize_Data_Fun { get; set; }
+        public string MAININFO_SYNCHRONIZE_DATA_FUN { get; set; }
     }
 
     #endregion
@@ -248,7 +291,12 @@ namespace ApiWrapper.Dto
         }
         public string ToJsonString()
         {
-            return "{\"JSON_CHARACTER\": \"[{\"DEVICE_COD\":\"" + Device_Cod + "\", \"Num_Prsn\":\"" + Num_Prsn + "\"}]\" }";
+            var itemsStr =
+
+                "{\\\"DEVICE_COD\\\":\\\"" + Device_Cod + "\\\"," +
+                " \\\"Num_Prsn\\\":\\\"" + Num_Prsn + "\\\"}";
+
+            return "{\"JSON_CHARACTER\": \"[" + itemsStr + "]\" }";
         }
     }
 
@@ -269,30 +317,26 @@ namespace ApiWrapper.Dto
     public class RESTRN_QUEUE_HAVE_RESERVE_FUN_Output
     {
         public bool IsSuccessFull { get; set; }
-        public RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_OnFail FailOutput { get; set; }
-        public RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_OnSuccess SuccessOutput { get; set; }
+        public List<ServerMessage> Messages { get; set; }
+        public List<RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_Data> Data { get; set; }
 
         public RESTRN_QUEUE_HAVE_RESERVE_FUN_Output()
         {
 
         }
 
-        public RESTRN_QUEUE_HAVE_RESERVE_FUN_Output(bool isSuccessFull, RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_OnFail failOutput, RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_OnSuccess successOutput)
+        public RESTRN_QUEUE_HAVE_RESERVE_FUN_Output(bool isSuccessFull, List<ServerMessage> messages, List<RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_Data> data)
         {
             IsSuccessFull = isSuccessFull;
-            FailOutput = failOutput;
-            SuccessOutput = successOutput;
+            Messages = messages;
+            Data = data;
         }
     }
 
-    public class RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_OnFail
-    {
-        public List<ServerMessage> RESTRN_QUEUE_HAVE_RESERVE_FUN { get; set; }
-    }
 
     public class RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_OnSuccess
     {
-        public List<RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_Data> RESTRN_QUEUE_HAVE_RESERVE_FUN { get; set; }
+        public string RESTRN_QUEUE_HAVE_RESERVE_FUN { get; set; }
     }
     #endregion
 

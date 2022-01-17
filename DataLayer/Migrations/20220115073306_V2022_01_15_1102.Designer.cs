@@ -3,14 +3,16 @@ using System;
 using DataLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(EsiDbContext))]
-    partial class EsiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220115073306_V2022_01_15_1102")]
+    partial class V2022_01_15_1102
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -69,9 +71,6 @@ namespace DataLayer.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Date")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("DateTime_SentToWebService")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Date_Use")
