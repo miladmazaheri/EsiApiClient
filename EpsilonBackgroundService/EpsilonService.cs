@@ -45,6 +45,7 @@ namespace EpsilonService
         /// <param name="message"></param>
         private void WriteLog(string message)
         {
+            //TODO : Control Logging By Some Setting
             try
             {
                 string logServicePath = CurrentDirectory + "EpsilonLog.log"; // وضعیت در یک فایل تکست به اسم "اپسیلون سرویس لوگ" ذخیره می شود

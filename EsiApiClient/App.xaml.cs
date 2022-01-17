@@ -29,7 +29,21 @@ namespace IPAClient
     public partial class App : Application
     {
         public static string CurrentMealCode { get; set; }
-        public static ConfigModel AppConfig { get; set; }
+        private static ConfigModel _appConfig;
+
+        public static ConfigModel AppConfig
+        {
+            get
+            {
+                return _appConfig;
+            }
+            set
+            {
+                _appConfig = value;
+                ConfigureApiClient();
+            }
+        }
+
         public static MainInfo_Send_Lookup_Data_Fun MainInfo { get; set; }
         public static string ConfigFilePath => Directory.GetCurrentDirectory() + @"\config.json";
         public static string FingerPrintConfigFilePath => Directory.GetCurrentDirectory() + @"\fingerPrintConfig.json";
@@ -85,7 +99,6 @@ namespace IPAClient
             ManageUnhandledExceptions();
             SetStartup();
             await CreateDateBase();
-            ConfigureApiClient();
         }
 
         private async Task CreateDateBase()
@@ -94,9 +107,9 @@ namespace IPAClient
             await context.Database.MigrateAsync();
         }
 
-        private void ConfigureApiClient()
+        public static void ConfigureApiClient()
         {
-            if (AppConfig.Logging)
+            if (AppConfig?.Logging == true)
                 ApiClient.SetLogger(Logger);
         }
         private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
@@ -139,7 +152,7 @@ namespace IPAClient
 
         public static void AddLog(Exception ex)
         {
-            if (AppConfig.Logging)
+            if (AppConfig?.Logging == true)
                 Logger.LogError(ex, "");
         }
     }
