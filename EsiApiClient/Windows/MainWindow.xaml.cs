@@ -52,6 +52,7 @@ namespace IPAClient.Windows
         {
             brdFingerPrint.Visibility = Visibility.Collapsed;
             brdRfId.Visibility = Visibility.Collapsed;
+            brdKeyPad.Visibility = Visibility.Collapsed;
             lblError.Content = string.Empty;
             brdNoReserve.Visibility = Visibility.Collapsed;
             lblNumber.Content = string.Empty;
@@ -77,7 +78,7 @@ namespace IPAClient.Windows
                 wndKeyPad.ShowDialog();
                 if (!string.IsNullOrWhiteSpace(wndKeyPad.PersonnelNumber))
                 {
-                    ShowBorder(brdKeyPad,true);
+                    ShowBorder(brdKeyPad, true);
                     await CheckReservation(wndKeyPad.PersonnelNumber);
                 }
             }
@@ -217,10 +218,19 @@ namespace IPAClient.Windows
 
         private async Task OfflineReserveSuccessOperation(Reservation reservation)
         {
-            PlaySound(true);
-            UpdateLabels(reservation);
-            _monitorDto.AddToQueue(reservation);
-            await SetRemainFoods();
+            if (string.IsNullOrWhiteSpace(reservation.Status))
+            {
+                PlaySound(true);
+                UpdateLabels(reservation);
+                _monitorDto.AddToQueue(reservation);
+                await SetRemainFoods();
+            }
+            else
+            {
+                var message = "تحویل داده شده است " + reservation.Time_Use.ToFriendlyTimeFormat();
+                ShowError(message);
+                _monitorDto.AddMessageToQueue(reservation.Num_Ide, message);
+            }
         }
 
         private void ClearLabels()

@@ -24,7 +24,7 @@ namespace DataLayer.Services
                   x.Num_Ide == personnelNumber
                   && x.Cod_Meal == currentMealCode
                   && x.Dat_Day_Mepdy == date
-                  && string.IsNullOrWhiteSpace(x.Status)
+                  //&& string.IsNullOrWhiteSpace(x.Status)
             );
             if (reservationExist != null)
             {

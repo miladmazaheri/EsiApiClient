@@ -49,6 +49,12 @@ namespace IPAClient.Tools
             return $"{pDt.Year:0000}{pDt.Month:00}{pDt.Day:00}";
         }
 
+        public static string ToFriendlyTimeFormat(this string time)
+        {
+            if (string.IsNullOrWhiteSpace(time) || time.Length < 6) return string.Empty;
+            return time.Insert(2, ":").Insert(5, ":");
+        }
+
         public static TimeSpan? ToTimeSpan(this string val)
         {
             if (string.IsNullOrWhiteSpace(val) || val.Length != 4 || val.Any(x => !char.IsDigit(x)))
@@ -62,7 +68,7 @@ namespace IPAClient.Tools
         {
             return dt.Date.AddDays(1) == DateTime.Now.Date;
         }
-        public static bool IsMinutePassed(this DateTime dt,int minute)
+        public static bool IsMinutePassed(this DateTime dt, int minute)
         {
             return dt.AddMinutes(minute) < DateTime.Now;
         }
@@ -77,7 +83,7 @@ namespace IPAClient.Tools
         public static string CurrentPersinaFullDate()
         {
             var now = DateTime.Now;
-            return  now.ToPersianDateTextify();
+            return now.ToPersianDateTextify();
         }
 
         public static string ToNormalJsonString(this string input)
