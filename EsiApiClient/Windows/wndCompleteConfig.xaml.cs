@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -27,7 +28,7 @@ namespace IPAClient.Windows
 
         }
 
-        private async void SendRequest()
+        private bool SendRequest()
         {
             var isSuccess = false;
             try
@@ -49,6 +50,7 @@ namespace IPAClient.Windows
             }
             catch (Exception)
             {
+                return false;
                 // ignored
             }
 
@@ -56,19 +58,13 @@ namespace IPAClient.Windows
             if (isSuccess)
             {
                 _configModel.IsConfirmed = true;
-                await File.WriteAllTextAsync(App.ConfigFilePath, JsonSerializer.Serialize(_configModel));
+                 File.WriteAllText(App.ConfigFilePath, JsonSerializer.Serialize(_configModel));
             }
-            _ = new Timer(Callback, isSuccess, 3000, int.MaxValue);
+
+            return isSuccess;
         }
 
-        private void Callback(object state)
-        {
-            Dispatcher.Invoke(() =>
-            {
-                DialogResult = (bool)state;
-                Close();
-            });
-        }
+    
 
         private void SetBackGroundImage(bool isSuccessful)
         {
@@ -91,7 +87,20 @@ namespace IPAClient.Windows
 
         private void WndCompleteConfig_OnLoaded(object sender, RoutedEventArgs e)
         {
-            Task.Factory.StartNew(SendRequest);
+            BackgroundWorker bw = new BackgroundWorker();
+
+            bw.DoWork += (_, args) =>
+            {
+                args.Result = SendRequest();
+                Thread.Sleep(3000);
+            };
+
+            bw.RunWorkerCompleted += (_, args) =>
+            {
+                DialogResult = (bool)(args.Result ?? false);
+            };
+
+            bw.RunWorkerAsync(); 
         }
     }
 }
