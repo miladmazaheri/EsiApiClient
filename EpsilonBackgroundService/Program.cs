@@ -20,6 +20,8 @@ namespace EpsilonService
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
+                    Console.WriteLine("\n\npress any key to exit...");
+                    Console.ReadKey();
                 }
                 return;
             }
