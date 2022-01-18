@@ -83,9 +83,10 @@ namespace IPAClient.Windows
             }
             else
             {
-                ShowBorder(brdKeyPad, false);
-                ShowError("خارج از وعده");
-                _monitorDto.AddMessageToQueue("", "خارج از وعده");
+                var message = "خارج از وعده";
+                ShowBorder(brdNoReserve, false);
+                ShowError(message);
+                _monitorDto.AddMessageToQueue("", message);
             }
         }
 
@@ -268,9 +269,10 @@ namespace IPAClient.Windows
                     }
                     else
                     {
-                        ShowError("خارج از وعده");
-                        ShowBorder(brdRfId, false);
-                        _monitorDto.AddMessageToQueue("", "خارج از وعده");
+                        var message = "خارج از وعده";
+                        ShowError(message);
+                        ShowBorder(brdNoReserve, false);
+                        _monitorDto.AddMessageToQueue("", message);
                     }
                     //await CheckReservation("919633");
                 }
@@ -667,9 +669,10 @@ namespace IPAClient.Windows
                 }
                 else
                 {
-                    ShowError("خارج از وعده");
-                    ShowBorder(brdRfId, false);
-                    _monitorDto.AddMessageToQueue("", "خارج از وعده");
+                    var message = "خارج از وعده";
+                    ShowError(message);
+                    ShowBorder(brdNoReserve, false);
+                    _monitorDto.AddMessageToQueue("", message);
                 }
             }, DispatcherPriority.Normal);
 

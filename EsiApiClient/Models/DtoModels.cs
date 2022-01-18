@@ -49,27 +49,28 @@ namespace IPAClient.Models
             Meal = reservation.Des_Nam_Meal;
             Shift = reservation.Employee_Shift_Name;
             Company = reservation.Des_Contract_Order;
-
+            DeliveryTime = DateTime.Now.TimeOfDay;
             MainFoods = reservation.Foods.Where(x => x.IsMain).ToList();
             SubsidiaryFoods = reservation.Foods.Where(x => !x.IsMain).ToList();
-            if (SubsidiaryFoods.Count > 3)
-            {
-                var overItems = SubsidiaryFoods.Skip(2).Take(SubsidiaryFoods.Count - 2).ToList();
-                overItems.ForEach(o =>
-                {
-                    SubsidiaryFoods.Remove(o);
-                });
+            //if (SubsidiaryFoods.Count > 3)
+            //{
+            //    var overItems = SubsidiaryFoods.Skip(2).Take(SubsidiaryFoods.Count - 2).ToList();
+            //    overItems.ForEach(o =>
+            //    {
+            //        SubsidiaryFoods.Remove(o);
+            //    });
 
-                SubsidiaryFoods.Add(new Food
-                {
-                    Des_Food = overItems.Select(x => x.Des_Food).Aggregate((a, b) => a + "-" + b),
-                    Num_Amount = "1"
-                });
-            }
+            //    SubsidiaryFoods.Add(new Food
+            //    {
+            //        Des_Food = overItems.Select(x => x.Des_Food).Aggregate((a, b) => a + "-" + b),
+            //        Num_Amount = "1"
+            //    });
+            //}
         }
         public PersonnelFoodDto(string noReservePersonnelCode, string message)
         {
             PersonnelNumber = noReservePersonnelCode;
+            DeliveryTime = DateTime.Now.TimeOfDay;
             MainFoods = new List<Food>(){new Food()
             {
                 Des_Food = message,
