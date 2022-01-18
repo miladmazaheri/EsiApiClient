@@ -66,6 +66,7 @@ namespace IPAClient.Windows
             Dispatcher.Invoke(() =>
             {
                 DialogResult = (bool)state;
+                Close();
             });
         }
 
