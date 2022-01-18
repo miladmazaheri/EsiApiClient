@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DataLayer.Dtos;
 using DataLayer.Entities;
 using Microsoft.EntityFrameworkCore;
 using Z.EntityFramework.Plus;
@@ -24,7 +25,7 @@ namespace DataLayer.Services
                   x.Num_Ide == personnelNumber
                   && x.Cod_Meal == currentMealCode
                   && x.Dat_Day_Mepdy == date
-                  //&& string.IsNullOrWhiteSpace(x.Status)
+            //&& string.IsNullOrWhiteSpace(x.Status)
             );
             if (reservationExist != null)
             {
@@ -88,9 +89,9 @@ namespace DataLayer.Services
             await _context.Reservations.Where(x => x.DateTime_SentToWebService < date).DeleteAsync();
         }
 
-        public async Task<Reservation> FindReservationByCouponIdAsync(string reciverCouponId,string date)
+        public async Task<Reservation> FindReservationByCouponIdAsync(string reciverCouponId, string date)
         {
-            var data =  await _context.Reservations.FirstOrDefaultAsync(x => x.Reciver_Coupon_Id == reciverCouponId);
+            var data = await _context.Reservations.FirstOrDefaultAsync(x => x.Reciver_Coupon_Id == reciverCouponId);
             if (data != null)
             {
                 data.Status = ReservationStatusEnum.USED.ToString();
@@ -101,6 +102,19 @@ namespace DataLayer.Services
             }
 
             return data;
+        }
+
+        public async Task<List<ReportDto>> GetReportAsync()
+        {
+            return await _context.Reservations.OrderByDescending(x=>x.Dat_Day_Mepdy).GroupBy(x => new { x.Dat_Day_Mepdy, x.Des_Nam_Meal })
+                .Select(x => new ReportDto()
+                {
+                    Date = x.Key.Dat_Day_Mepdy,
+                    Meal = x.Key.Des_Nam_Meal,
+                    ReserveCount = x.Count(),
+                    DeliveredCount = x.Count(c => c.Status != null),
+                    SentCount = x.Count(c => c.DateTime_SentToWebService.HasValue)
+                }).ToListAsync();
         }
     }
 }

@@ -809,11 +809,12 @@ namespace IPAClient.Windows
 
         private void ShowBorder(Border brd, bool isSuccess)
         {
-            brd.BorderBrush = new SolidColorBrush(isSuccess ? Color.FromRgb(0, 255, 0) : Color.FromRgb(255, 0, 0));
-            brd.Visibility = Visibility.Visible;
-
-
-            _borderTimer.Start();
+            Dispatcher.Invoke(() =>
+            {
+                brd.BorderBrush = new SolidColorBrush(isSuccess ? Color.FromRgb(0, 255, 0) : Color.FromRgb(255, 0, 0));
+                brd.Visibility = Visibility.Visible;
+                _borderTimer.Start();
+            }, DispatcherPriority.Normal);
         }
 
         private async Task ShowConfirmConfigAsync(ConfigModel configModel)
