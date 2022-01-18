@@ -83,12 +83,7 @@ namespace DataLayer.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteOldReservationAsync(int days)
-        {
-            var date = DateTime.Now.AddDays(-1 * days);
-            await _context.Reservations.Where(x => x.DateTime_SentToWebService < date).DeleteAsync();
-        }
-
+       
         public async Task<Reservation> FindReservationByCouponIdAsync(string reciverCouponId, string date)
         {
             var data = await _context.Reservations.FirstOrDefaultAsync(x => x.Reciver_Coupon_Id == reciverCouponId);
@@ -116,5 +111,16 @@ namespace DataLayer.Services
                     SentCount = x.Count(c => c.DateTime_SentToWebService.HasValue)
                 }).ToListAsync();
         }
+
+        public async Task DeleteAllSendAsync()
+        {
+            await _context.Reservations.Where(x => x.DateTime_SentToWebService.HasValue).DeleteAsync();
+        }
+        public async Task DeleteAllSendByDayAsync(int days)
+        {
+            var date = DateTime.Now.AddDays(-1 * days);
+            await _context.Reservations.Where(x => x.DateTime_SentToWebService < date).DeleteAsync();
+        }
+
     }
 }

@@ -378,7 +378,7 @@ namespace IPAClient.Windows
                 try
                 {
                     await GetAllMealsReservationsFromServer();
-                    await _reservationService.DeleteOldReservationAsync(2);
+                    await _reservationService.DeleteAllSendByDayAsync(2);
                     SetBackGroundImage("16");
                 }
                 catch (Exception ex)
@@ -529,7 +529,7 @@ namespace IPAClient.Windows
             //InitilizeRecheckTimer();
         }
 
-        private Reservation MapToReservation(MainInfo_Send_Offline_Data_Fun_Output_Data input, string mealCode)
+        public static Reservation MapToReservation(MainInfo_Send_Offline_Data_Fun_Output_Data input, string mealCode)
         {
             var res = new Reservation
             {

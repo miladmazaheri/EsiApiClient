@@ -25,6 +25,7 @@ namespace IPAClient.Windows
         private void btnNumberClick(object sender, MouseButtonEventArgs e)
         {
             var currentTxt = lblInput.Content.ToString();
+            if (currentTxt ==null || currentTxt.Length >= 9) return;
             currentTxt += ((Label)sender).Tag.ToString();
             lblInput.Content = currentTxt;
         }

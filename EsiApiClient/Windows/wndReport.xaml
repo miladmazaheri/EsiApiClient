@@ -5,12 +5,29 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:IPAClient.Windows"
         mc:Ignorable="d"
-        Title="wndReport" Style="{StaticResource AppWindow}" Width="1280" Height="720" Loaded="WndReport_OnLoaded" >
+        Title="wndReport" Style="{StaticResource AppWindow}" Width="1280" Height="720" Loaded="WndReport_OnLoaded" FlowDirection="RightToLeft" >
     <Grid>
         <StackPanel>
-            <DataGrid Name="grdReport" Height="500" IsReadOnly="True" FontFamily="{StaticResource Vazir}" FontSize="18"/>
-            <StackPanel Height="100"></StackPanel>
-            <StackPanel Height="105"></StackPanel>
+            <DataGrid Name="grdReport" Height="500" IsReadOnly="True" FontFamily="{StaticResource Vazir}" FontSize="18" AutoGenerateColumns="False"
+                       AlternatingRowBackground="LightYellow">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="تاریخ" Binding="{Binding Date}" Width="*"/>
+                    <DataGridTextColumn Header="وعده" Binding="{Binding Meal}" Width="*"/>
+                    <DataGridTextColumn Header="تعداد رزرو" Binding="{Binding ReserveCount}" Width="*"/>
+                    <DataGridTextColumn Header="تعداد رزرو تحویل داده شده" Binding="{Binding DeliveredCount}" Width="2*"/>
+                    <DataGridTextColumn Header="تعداد رزرو ارسال شده به سرور" Binding="{Binding SentCount}" Width="2*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <StackPanel Height="67" Orientation="Horizontal"  Margin="10" HorizontalAlignment="Left">
+                <Button x:Name="btnRefresh" Content="تهیه گزارش" Height="46" Width="149" Margin="10" Click="btnRefresh_Click" FontFamily="{StaticResource Vazir}" FontSize="15"/>
+                <Button x:Name="btnSend" Content="ارسال رزرو های تحویل داده شده" Height="46" Width="239" Margin="10" Click="btnSend_Click" FontFamily="{StaticResource Vazir}" FontSize="15"/>
+                <Button x:Name="btnReceive" Content="دریافت رزرو های آفلاین" Height="46" Width="189" Margin="10" Click="btnReceive_Click" FontFamily="{StaticResource Vazir}" FontSize="15"/>
+                <Button x:Name="btnDelete" Content="پاک سازی رزرو های ارسال شده" Height="46" Width="236" Margin="10" Click="btnDelete_Click" FontFamily="{StaticResource Vazir}" FontSize="15"/>
+                <Button x:Name="btnClose" Content="خروج" Height="46" Width="149" Margin="10" Click="btnClose_Click" FontFamily="{StaticResource Vazir}" FontSize="15"/>
+            </StackPanel>
+            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10">
+                <Label x:Name="lblMessage" FontFamily="{StaticResource Vazir}" FontSize="20" Content="" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"></Label>
+            </StackPanel>
         </StackPanel>
-     </Grid>
+    </Grid>
 </Window>
