@@ -46,20 +46,20 @@ namespace EpsilonService
         private void WriteLog(string message)
         {
             //TODO : Control Logging By Some Setting
-            try
-            {
-                string logServicePath = CurrentDirectory + "EpsilonLog.log"; // وضعیت در یک فایل تکست به اسم "اپسیلون سرویس لوگ" ذخیره می شود
-                if (!File.Exists(logServicePath))
-                {
-                    File.Create(logServicePath);
+            //try
+            //{
+            //    string logServicePath = CurrentDirectory + "EpsilonLog.log"; // وضعیت در یک فایل تکست به اسم "اپسیلون سرویس لوگ" ذخیره می شود
+            //    if (!File.Exists(logServicePath))
+            //    {
+            //        File.Create(logServicePath);
 
-                }
-                using (StreamWriter writer = new StreamWriter(logServicePath, true))
-                {
-                    writer.WriteLine(message);
-                }
-            }
-            catch { }
+            //    }
+            //    using (StreamWriter writer = new StreamWriter(logServicePath, true))
+            //    {
+            //        writer.WriteLine(message);
+            //    }
+            //}
+            //catch { }
         }
 
         private void timer_tick(object sender, ElapsedEventArgs e)
