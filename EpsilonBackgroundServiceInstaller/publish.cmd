@@ -1,0 +1,1 @@
+dotnet publish -r win10-arm64 -c Release --self-contained false -p:Publishtrimed=false

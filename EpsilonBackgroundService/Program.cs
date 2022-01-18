@@ -7,23 +7,26 @@ namespace EpsilonService
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Press i for install or u for unistall service: ");
-            var key = Console.ReadKey();
-            if (key.KeyChar == 'u')
+            if (args != null && args.Length > 0)
             {
-                try
+                Console.WriteLine("Press i for install or u for unistall service: ");
+                var key = Console.ReadKey();
+                if (key.KeyChar == 'u')
                 {
-                   SelfInstaller.UninstallMe();
-                   Console.WriteLine("\n\npress any key to exit...");
-                   Console.ReadKey();
+                    try
+                    {
+                        SelfInstaller.UninstallMe();
+                        Console.WriteLine("\n\npress any key to exit...");
+                        Console.ReadKey();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                        Console.WriteLine("\n\npress any key to exit...");
+                        Console.ReadKey();
+                    }
+                    return;
                 }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    Console.WriteLine("\n\npress any key to exit...");
-                    Console.ReadKey();
-                }
-                return;
             }
             bool _IsInstalled = false;
             bool serviceStarting = false;
