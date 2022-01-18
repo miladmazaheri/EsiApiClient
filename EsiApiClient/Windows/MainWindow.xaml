@@ -70,5 +70,6 @@
 
         <Button x:Name="btnClose" Content="X" HorizontalAlignment="Left" VerticalAlignment="Top" Height="20" Width="19" Click="BtnClose_OnClick" Background="Transparent" Foreground="White"/>
         <Button x:Name="btnInfo" Content="i"  HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="20" Width="19" Click="btnInfo_Click" Margin="1261,0,0,684" Background="Transparent" Foreground="White"/>
+        <Button x:Name="btnReport" Content="R"  HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="20" Width="19" Click="BtnReport_OnClick" Margin="1242,0,0,684" Background="Transparent" Foreground="White"/>
     </Grid>
 </Window>

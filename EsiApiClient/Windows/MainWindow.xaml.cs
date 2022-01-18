@@ -929,5 +929,10 @@ namespace IPAClient.Windows
                 MessageBox.Show("Can Not Use Config File\n" + exception.Message);
             }
         }
+
+        private void BtnReport_OnClick(object sender, RoutedEventArgs e)
+        {
+            new wndReport().ShowDialog();
+        }
     }
 }
