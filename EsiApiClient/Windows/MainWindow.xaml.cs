@@ -507,25 +507,30 @@ namespace IPAClient.Windows
 
         private async void MainTimerOnTick(object sender, EventArgs e)
         {
-            // در هر روز همه ی اطلاعات بروز میشود
-            if (App.LastFullUpdateTime == null || App.LastFullUpdateTime.Value.IsNextDay())
-                await GetConfigFromServerAsync();
-            //هر App.AppConfig.GetFromServerIntervalMinutes دقیقه اطلاعات رزرو وعده فعلی بروز میشود
-            else if (App.LastMealUpdateTime == null || App.LastMealUpdateTime.Value.IsMinutePassed(App.AppConfig.GetFromServerIntervalMinutes))
-                await UpdateCurrentMealReservationFromServer();
+            await Dispatcher.Invoke(async () =>
+            {
+                if (!IsActive) return;
+                // در هر روز همه ی اطلاعات بروز میشود
+                if (App.LastFullUpdateTime == null || App.LastFullUpdateTime.Value.IsNextDay())
+                    await GetConfigFromServerAsync();
+                //هر App.AppConfig.GetFromServerIntervalMinutes دقیقه اطلاعات رزرو وعده فعلی بروز میشود
+                else if (App.LastMealUpdateTime == null ||
+                         App.LastMealUpdateTime.Value.IsMinutePassed(App.AppConfig.GetFromServerIntervalMinutes))
+                    await UpdateCurrentMealReservationFromServer();
 
-            await SetCurrentMeal();
-            UpdateDateLabel();
+                await SetCurrentMeal();
+                UpdateDateLabel();
 
-            await SendMonitorData(_monitorDto.ToJson());
+                await SendMonitorData(_monitorDto.ToJson());
+            });
         }
 
         private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
+            _monitorDto = new MonitorDto();
             await CheckConfigStatusAndInitUtilitiesAsync();
             //در زمان هایی که برنامه مشغول کار دیگری نیست اجرا میشود
             //ComponentDispatcher.ThreadIdle += new EventHandler(CheckTimeForAutoUpdate);
-            _monitorDto = new MonitorDto();
             //InitilizeRecheckTimer();
         }
 
