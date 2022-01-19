@@ -30,7 +30,7 @@ namespace DataLayer.Services
             if (reservationExist != null)
             {
                 var time = DateTime.Now.TimeOfDay.ToString("hhmmss");
-                await _context.Reservations.Where(x => x.Id == reservationExist.Id).UpdateAsync(x => new Reservation()
+                await _context.Reservations.Where(x => x.Id == reservationExist.Id && x.Status == null).UpdateAsync(x => new Reservation()
                 {
                     Status = ReservationStatusEnum.USED.ToString(),
                     Date_Use = date,
