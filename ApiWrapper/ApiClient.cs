@@ -142,7 +142,7 @@ namespace ApiWrapper
                 {
                     var res1 = JsonSerializer.Deserialize<RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_OnSuccess>(resAsString);
                     if (res1 == null || string.IsNullOrWhiteSpace(res1.RESTRN_QUEUE_HAVE_RESERVE_FUN)) return new RESTRN_QUEUE_HAVE_RESERVE_FUN_Output(false, null, null);
-                    var data =  JsonSerializer.Deserialize<List<RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_Data>>(res1.RESTRN_QUEUE_HAVE_RESERVE_FUN);
+                    var data = JsonSerializer.Deserialize<List<RESTRN_QUEUE_HAVE_RESERVE_FUN_Output_Data>>(res1.RESTRN_QUEUE_HAVE_RESERVE_FUN);
                     return new RESTRN_QUEUE_HAVE_RESERVE_FUN_Output(true, null, data);
                 }
                 else
@@ -204,6 +204,18 @@ namespace ApiWrapper
         public static string ToNormalJsonString(this string input)
         {
             return input?.Replace("\\n", string.Empty).Replace("\n", string.Empty).Replace("\\r\\n", string.Empty).Replace("\r\n", string.Empty);
+        }
+
+        public static async Task<DateTime?> GetServerDateTime()
+        {
+            var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/MainInfo_Send_Lookup_Data_Fun", new StringContent("{\"JSON_CHARACTER\":\"[]\"}", Encoding.UTF8, "application/json"));
+            if (!response.Headers.TryGetValues("Date", out var dateValues)) return null;
+            var dateStr = dateValues.First();
+            if (DateTime.TryParse(dateStr, out var date))
+            {
+                return date;
+            }
+            return null;
         }
     }
 }

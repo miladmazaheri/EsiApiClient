@@ -29,13 +29,14 @@ namespace DataLayer.Services
             );
             if (reservationExist != null)
             {
-                reservationExist.Status = ReservationStatusEnum.USED.ToString();
-                reservationExist.Date_Use = date;
-                reservationExist.Time_Use = DateTime.Now.TimeOfDay.ToString("hhmmss");
-                _context.Reservations.Update(reservationExist);
-                await _context.SaveChangesAsync();
+                var time = DateTime.Now.TimeOfDay.ToString("hhmmss");
+                await _context.Reservations.Where(x => x.Id == reservationExist.Id).UpdateAsync(x => new Reservation()
+                {
+                    Status = ReservationStatusEnum.USED.ToString(),
+                    Date_Use = date,
+                    Time_Use = time
+                });
             }
-
             return reservationExist;
         }
 
@@ -70,6 +71,11 @@ namespace DataLayer.Services
                 .ToListAsync()).Select(x => (x.Id, x.Reciver_Coupon_Id, x.Status, x.Date_Use, x.Time_Use)).ToList();
         }
 
+        public async Task<bool> HasAnyNotSentToServer()
+        {
+            return await _context.Reservations.AnyAsync(x => !string.IsNullOrWhiteSpace(x.Status) && !x.DateTime_SentToWebService.HasValue);
+        }
+
         public async Task SetSentToWebServiceDateTimeAsync(IEnumerable<Guid> ids)
         {
             foreach (var id in ids)
@@ -83,7 +89,7 @@ namespace DataLayer.Services
             await _context.SaveChangesAsync();
         }
 
-       
+
         public async Task<Reservation> FindReservationByCouponIdAsync(string reciverCouponId, string date)
         {
             var data = await _context.Reservations.FirstOrDefaultAsync(x => x.Reciver_Coupon_Id == reciverCouponId);
@@ -101,7 +107,7 @@ namespace DataLayer.Services
 
         public async Task<List<ReportDto>> GetReportAsync()
         {
-            return await _context.Reservations.OrderByDescending(x=>x.Dat_Day_Mepdy).GroupBy(x => new { x.Dat_Day_Mepdy, x.Des_Nam_Meal })
+            return await _context.Reservations.OrderByDescending(x => x.Dat_Day_Mepdy).GroupBy(x => new { x.Dat_Day_Mepdy, x.Des_Nam_Meal })
                 .Select(x => new ReportDto()
                 {
                     Date = x.Key.Dat_Day_Mepdy,

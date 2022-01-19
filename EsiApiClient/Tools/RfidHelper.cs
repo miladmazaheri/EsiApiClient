@@ -8,11 +8,11 @@ namespace IPAClient.Tools
 {
     public class RfidHelper : IDisposable
     {
-        private readonly Func<uint, bool, bool, string, Task<bool>> _dataReceivedAction;
+        private readonly Action<uint, bool, bool, string> _dataReceivedAction;
         private readonly SerialPort _serialPort1;
         private volatile bool _isFree = true;
         public bool IsConnected => _serialPort1?.IsOpen ?? false;
-        public RfidHelper(int dataBits = 8, Parity parity = Parity.None, StopBits stopBits = StopBits.One, int baudRate = 19200, string portName = "COM4", Func<uint, bool, bool, string, Task<bool>> dataReceivedAction = null)
+        public RfidHelper(int dataBits = 8, Parity parity = Parity.None, StopBits stopBits = StopBits.One, int baudRate = 19200, string portName = "COM4", Action<uint, bool, bool, string> dataReceivedAction = null)
         {
             _dataReceivedAction = dataReceivedAction;
             _serialPort1 = new SerialPort
@@ -27,32 +27,28 @@ namespace IPAClient.Tools
             _serialPort1.Open();
         }
 
-        private async void SerialPort1_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        public void SetIsBusy(bool isBusy)
         {
-            try
+            _isFree = !isBusy;
+        }
+
+        private void SerialPort1_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            if (_isFree)
             {
-                if (_isFree)
+                var txt = string.Empty;
+                do
                 {
-                    _isFree = false;
-                    var txt = string.Empty;
-                    do
-                    {
-                        txt += _serialPort1.ReadLine();
-                    } while (_serialPort1.BytesToRead != 0);
+                    txt += _serialPort1.ReadLine();
+                } while (_serialPort1.BytesToRead != 0);
 
-                    if (string.IsNullOrWhiteSpace(txt))
-                    {
-                        _isFree = true;
-                        return;
-                    };
+                if (string.IsNullOrWhiteSpace(txt))
+                {
+                    return;
+                };
 
-                    var parsedData = ParsDate(txt);
-                    _isFree = (_dataReceivedAction == null || await _dataReceivedAction.Invoke(parsedData.number, parsedData.isActive, parsedData.isExp, parsedData.expDate));
-                }
-            }
-            catch (Exception)
-            {
-                _isFree = true;
+                var parsedData = ParsDate(txt);
+                _dataReceivedAction.Invoke(parsedData.number, parsedData.isActive, parsedData.isExp, parsedData.expDate);
             }
         }
 

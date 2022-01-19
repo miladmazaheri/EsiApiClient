@@ -227,6 +227,7 @@ namespace IPAClient.Windows
             }
             else
             {
+                PlaySound(false);
                 var message = "تحویل داده شده است " + reservation.Time_Use.ToFriendlyTimeFormat();
                 ShowError(message);
                 _monitorDto.AddMessageToQueue(reservation.Num_Ide, message);
@@ -355,7 +356,6 @@ namespace IPAClient.Windows
                         SetBackGroundImage("10");
                         await File.WriteAllTextAsync(App.MainInfoFilePath, JsonSerializer.Serialize(mainInfo));
                         App.MainInfo = mainInfo;
-                        SystemTimeHelper.SetSystemTime(mainInfo.ServerDateTime);
                         UpdateDateLabel();
                     }
                 }
@@ -365,6 +365,13 @@ namespace IPAClient.Windows
                     SetBackGroundImage("11");
                     //_recheckTimer.Start();
                     return;
+                }
+
+                //تنظیم ساعت سیستم بر اساس ساعت سرور
+                var serverDateTime = await ApiClient.GetServerDateTime();
+                if (serverDateTime.HasValue)
+                {
+                    SystemTimeHelper.SetSystemTime(serverDateTime.Value);
                 }
 
                 //دریافت اطلاعات هویتی پرسنل
@@ -647,11 +654,12 @@ namespace IPAClient.Windows
             });
         }
 
-        private async Task<bool> RfIdDataReceivedAction(uint personnelNumber, bool isActive, bool isExp, string expDate)
+        private async void RfIdDataReceivedAction(uint personnelNumber, bool isActive, bool isExp, string expDate)
         {
             ClearLabels();
             await Dispatcher.Invoke(async () =>
             {
+                _rfIdHelper.SetIsBusy(true);
                 if (App.IsActive || !App.AppConfig.CheckMealTime)
                 {
                     var pNumStr = personnelNumber.ToString();
@@ -689,9 +697,8 @@ namespace IPAClient.Windows
                     ShowBorder(brdNoReserve, false);
                     _monitorDto.AddMessageToQueue("", message);
                 }
+                _rfIdHelper.SetIsBusy(false);
             }, DispatcherPriority.Normal);
-
-            return true;
         }
 
         private async Task SendMonitorData(string dataStr)
@@ -759,11 +766,6 @@ namespace IPAClient.Windows
                 {
                     App.IsActive = false;
                     _monitorDto?.Clear();
-#pragma warning disable CS4014
-                    //DO NOT NEED await 
-                    //بعد از اتمام زمان هر وعده اطلاعات تحویل غذا را به وب سرویس ارسال میکند
-                    Task.Factory.StartNew(SendDeliveredReservationsToServer);
-#pragma warning restore CS4014
                 }
                 else
                 {
@@ -771,6 +773,16 @@ namespace IPAClient.Windows
                     await SetRemainFoods();
                 }
             }
+
+            if (!App.IsActive)
+            {
+#pragma warning disable CS4014
+                //DO NOT NEED await 
+                //بعد از اتمام زمان هر وعده اطلاعات تحویل غذا را به وب سرویس ارسال میکند
+                Task.Factory.StartNew(SendDeliveredReservationsToServer);
+#pragma warning restore CS4014
+            }
+
 
             if (_monitorDto != null)
             {
@@ -783,6 +795,8 @@ namespace IPAClient.Windows
 
         private async Task SendDeliveredReservationsToServer()
         {
+            if (!await _reservationService.HasAnyNotSentToServer()) return;
+
             var reservesToSend = await _reservationService.GetDeliveredReservesToSendAsync();
             if (reservesToSend is not { Count: > 0 }) return;
 
