@@ -1,5 +1,6 @@
 ﻿using System;
 using System.CodeDom;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -158,6 +159,25 @@ namespace IPAClient.Windows
                         await InitFingerPrintListener();
                     if (App.AppConfig.HasRfId)
                         await InitRfIdListener();
+
+                    if (App.AppConfig.IsDemo)
+                    {
+                        App.MainInfo = new MainInfo_Send_Lookup_Data_Fun
+                        {
+
+                            Meals = new List<Meal>()
+                            {
+                                new ()
+                                {
+                                    Cod_Data = "22",
+                                    Des_Data = "ناهار",
+                                    StartTime = DateTime.Now.AddHours(-1).TimeOfDay,
+                                    EndTime = DateTime.Now.AddHours(3).TimeOfDay
+                                }
+                            }
+                        };
+                    }
+
                     InitAndStartMainTimer();
                 }
             }
