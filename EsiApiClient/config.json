@@ -11,8 +11,8 @@
   "CheckOnline": false,
   "IsConfirmed": true,
   "IsDemo": false,
-  "Logging": true,
+  "Logging": false,
   "CheckMealTime": true,
   "GetFromServerIntervalMinutes": 30,
-  "HasExtraMonitors" : false
+  "HasExtraMonitors": true
 }
