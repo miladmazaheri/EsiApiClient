@@ -68,8 +68,8 @@
         </Border>
         <Border x:Name="brdNoReserve" BorderBrush="Red" CornerRadius="10" BorderThickness="4" Margin="93,65,708,62" Visibility="Collapsed" />
 
-        <Button x:Name="btnClose" Content="X" HorizontalAlignment="Left" VerticalAlignment="Top" Height="20" Width="19" Click="BtnClose_OnClick" Background="Transparent" Foreground="White" Margin="0,9,0,0"/>
-        <Button x:Name="btnInfo" Content="i"  HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="20" Width="19" Click="btnInfo_Click" Margin="1261,0,0,684" Background="Transparent" Foreground="White"/>
-        <Button x:Name="btnReport" Content="R"  HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="20" Width="19" Click="BtnReport_OnClick" Margin="1242,0,0,684" Background="Transparent" Foreground="White"/>
+        <Button x:Name="btnClose" Content="X" HorizontalAlignment="Left" VerticalAlignment="Top" Height="20" Width="19" Click="BtnClose_OnClick" Background="Transparent" Foreground="White" Margin="1257,9,0,0"/>
+        <Button x:Name="btnInfo" Content="i"  HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="20" Width="19" Click="btnInfo_Click" Margin="1230,0,0,675" Background="Transparent" Foreground="White"/>
+        <Button x:Name="btnReport" Content="R"  HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="20" Width="19" Click="BtnReport_OnClick" Margin="1204,0,0,675" Background="Transparent" Foreground="White"/>
     </Grid>
 </Window>
