@@ -33,6 +33,7 @@ namespace IPAClient.Windows
         private FingerPrintHelper _fingerPrintHelper;
         private DispatcherTimer _labelTimer;
         private DispatcherTimer _mainTimer;
+        private DispatcherTimer _timeTimer;
         private MonitorDto _monitorDto;
         private MonitorHelper _monitorHelper;
         private RfidHelper _rfIdHelper;
@@ -45,6 +46,7 @@ namespace IPAClient.Windows
             _reservationService = new ReservationService();
             InitBorderTimer();
             InitLabelTimer();
+            InitAndStartTimeTimer();
             ClearLabels();
         }
 
@@ -152,8 +154,10 @@ namespace IPAClient.Windows
                         SetBackGroundImage("21");
 
                     ClearLabels();
-                    await InitFingerPrintListener();
-                    await InitRfIdListener();
+                    if (App.AppConfig.HasFingerPrint)
+                        await InitFingerPrintListener();
+                    if (App.AppConfig.HasRfId)
+                        await InitRfIdListener();
                     InitAndStartMainTimer();
                 }
             }
@@ -205,7 +209,7 @@ namespace IPAClient.Windows
                 }
                 else
                 {
-                    
+
                     var message = "رزرو یافت نشد";
                     ShowError(message);
                     PlaySound(false);
@@ -410,6 +414,13 @@ namespace IPAClient.Windows
             _mainTimer.Interval = new TimeSpan(0, 1, 0);
             _mainTimer.Start();
         }
+        private void InitAndStartTimeTimer()
+        {
+            _timeTimer = new DispatcherTimer();
+            _timeTimer.Tick += TimeTimerOnTick;
+            _timeTimer.Interval = new TimeSpan(0, 1, 0);
+            _timeTimer.Start();
+        }
 
         private void InitBorderTimer()
         {
@@ -526,10 +537,13 @@ namespace IPAClient.Windows
                     await UpdateCurrentMealReservationFromServer();
 
                 await SetCurrentMeal();
-                UpdateDateLabel();
 
                 await SendMonitorData(_monitorDto.ToJson());
             });
+        }
+        private void TimeTimerOnTick(object sender, EventArgs e)
+        {
+            Dispatcher.Invoke(UpdateDateLabel);
         }
 
         private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
@@ -681,7 +695,7 @@ namespace IPAClient.Windows
 
                             if (isExp)
                             {
-                                
+
                                 var message = "کارت منقضی شده است " + expDate;
                                 ShowError(message);
                                 ShowBorder(brdRfId, false);

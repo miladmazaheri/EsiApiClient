@@ -17,6 +17,8 @@
         public bool Logging { get; set; }
         public bool CheckMealTime { get; set; }
         public bool HasExtraMonitors { get; set; }
+        public bool HasRfId { get; set; }
+        public bool HasFingerPrint { get; set; }
         
         public int GetFromServerIntervalMinutes { get; set; }
 
