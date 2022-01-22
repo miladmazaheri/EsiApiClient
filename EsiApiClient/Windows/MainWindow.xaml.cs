@@ -189,8 +189,8 @@ namespace IPAClient.Windows
                     };
 
                     var message = "رزرو آنلاین یافت نشد";
-                    PlaySound(false);
                     ShowError(message);
+                    PlaySound(false);
                     _monitorDto.AddMessageToQueue(personnelNumber, message);
                     return;
                 }
@@ -205,9 +205,10 @@ namespace IPAClient.Windows
                 }
                 else
                 {
-                    PlaySound(false);
+                    
                     var message = "رزرو یافت نشد";
                     ShowError(message);
+                    PlaySound(false);
                     _monitorDto.AddMessageToQueue(personnelNumber, message);
                 }
             }
@@ -219,16 +220,16 @@ namespace IPAClient.Windows
         {
             if (string.IsNullOrWhiteSpace(reservation.Status))
             {
-                PlaySound(true);
                 UpdateLabels(reservation);
+                PlaySound(true);
                 _monitorDto.AddToQueue(reservation);
                 await SetRemainFoods();
             }
             else
             {
-                PlaySound(false);
                 var message = "تحویل داده شده است " + reservation.Time_Use.ToFriendlyTimeFormat();
                 ShowError(message);
+                PlaySound(false);
                 _monitorDto.AddMessageToQueue(reservation.Num_Ide, message);
             }
         }
@@ -670,9 +671,9 @@ namespace IPAClient.Windows
                         {
                             if (!isActive)
                             {
-                                PlaySound(false);
                                 ShowError("کارت غیر فعال است");
                                 ShowBorder(brdRfId, false);
+                                PlaySound(false);
                                 _monitorDto.AddMessageToQueue(pNumStr, "کارت غیر فعال است");
                                 await SendMonitorData(_monitorDto.ToJson());
                                 return;
@@ -680,10 +681,11 @@ namespace IPAClient.Windows
 
                             if (isExp)
                             {
-                                PlaySound(false);
+                                
                                 var message = "کارت منقضی شده است " + expDate;
                                 ShowError(message);
                                 ShowBorder(brdRfId, false);
+                                PlaySound(false);
                                 _monitorDto.AddMessageToQueue(pNumStr, message);
                                 await SendMonitorData(_monitorDto.ToJson());
                                 return;
