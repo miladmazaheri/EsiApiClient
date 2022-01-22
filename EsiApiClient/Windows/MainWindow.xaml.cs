@@ -670,6 +670,7 @@ namespace IPAClient.Windows
                         {
                             if (!isActive)
                             {
+                                PlaySound(false);
                                 ShowError("کارت غیر فعال است");
                                 ShowBorder(brdRfId, false);
                                 _monitorDto.AddMessageToQueue(pNumStr, "کارت غیر فعال است");
@@ -679,6 +680,7 @@ namespace IPAClient.Windows
 
                             if (isExp)
                             {
+                                PlaySound(false);
                                 var message = "کارت منقضی شده است " + expDate;
                                 ShowError(message);
                                 ShowBorder(brdRfId, false);
@@ -712,7 +714,7 @@ namespace IPAClient.Windows
 
         private async Task SendMonitorData(string dataStr)
         {
-            if (string.IsNullOrWhiteSpace(dataStr)) return;
+            if (!App.AppConfig.HasExtraMonitors || string.IsNullOrWhiteSpace(dataStr)) return;
             try
             {
                 if (_monitorHelper == null)

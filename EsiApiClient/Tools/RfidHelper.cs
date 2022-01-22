@@ -2,6 +2,7 @@
 using System.IO.Ports;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 using DNTPersianUtils.Core;
 
 namespace IPAClient.Tools
@@ -11,6 +12,8 @@ namespace IPAClient.Tools
         private readonly Action<uint, bool, bool, string> _dataReceivedAction;
         private readonly SerialPort _serialPort1;
         private volatile bool _isFree = true;
+        private volatile bool _isFreeByTimer = true;
+        private readonly DispatcherTimer _mainTimer;
         public bool IsConnected => _serialPort1?.IsOpen ?? false;
         public RfidHelper(int dataBits = 8, Parity parity = Parity.None, StopBits stopBits = StopBits.One, int baudRate = 19200, string portName = "COM4", Action<uint, bool, bool, string> dataReceivedAction = null)
         {
@@ -25,6 +28,10 @@ namespace IPAClient.Tools
             };
             _serialPort1.DataReceived += SerialPort1_DataReceived;
             _serialPort1.Open();
+
+            _mainTimer = new DispatcherTimer();
+            _mainTimer.Tick += MainTimerOnTick;
+            _mainTimer.Interval = new TimeSpan(0, 0, 3);
         }
 
         public void SetIsBusy(bool isBusy)
@@ -34,6 +41,11 @@ namespace IPAClient.Tools
 
         private void SerialPort1_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
+            if (!_isFreeByTimer) return;
+
+            _isFreeByTimer = false;
+            _mainTimer.Start();
+
             if (_isFree)
             {
                 var txt = string.Empty;
@@ -88,6 +100,13 @@ namespace IPAClient.Tools
         public void Dispose()
         {
             _serialPort1.Close();
+        }
+
+
+        private void MainTimerOnTick(object sender, EventArgs e)
+        {
+            _isFreeByTimer = true;
+            _mainTimer.Stop();
         }
     }
 }

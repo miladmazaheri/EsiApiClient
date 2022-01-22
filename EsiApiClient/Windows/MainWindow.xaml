@@ -24,7 +24,7 @@
         <Label x:Name="btnKeyPad" Content="" HorizontalAlignment="Left" Margin="668,434,0,0" VerticalAlignment="Top" Width="151" Height="141" MouseDown="BtnKeyPad_OnMouseDown"/>
         <Label   x:Name="lblError" Content="" Foreground="red" FontFamily="{StaticResource Vazir}" FontSize="28" FontWeight="ExtraBold" Margin="112,482,731,147"  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
 
-        <Border x:Name="brdFood" BorderBrush="Green" CornerRadius="10" BorderThickness="2,2,2,2" Margin="93,65,708,62" Visibility="Visible">
+        <Border x:Name="brdFood" BorderBrush="LawnGreen" CornerRadius="10" BorderThickness="4" Margin="93,65,708,62" Visibility="Visible">
             <Border.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                     <GradientStop Color="#191a2b" Offset="0.25" />

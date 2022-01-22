@@ -13,5 +13,6 @@
   "IsDemo": false,
   "Logging": true,
   "CheckMealTime": true,
-  "GetFromServerIntervalMinutes": 30
+  "GetFromServerIntervalMinutes": 30,
+  "HasExtraMonitors" : false
 }

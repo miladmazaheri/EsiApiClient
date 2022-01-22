@@ -11,17 +11,17 @@ namespace DataLayer.Services
 {
     public class ReservationService
     {
-        private readonly EsiDbContext _context;
+   
 
         public ReservationService()
         {
-            _context = new EsiDbContext();
-            _context.Database.Migrate();
+            new EsiDbContext().Database.Migrate();
         }
 
         public async Task<Reservation> FindReservationAsync(string personnelNumber, string currentMealCode, string date)
         {
-            var reservationExist = await _context.Reservations.Include(x => x.Foods).FirstOrDefaultAsync(x =>
+            var context = new EsiDbContext();
+            var reservationExist = await context.Reservations.Include(x => x.Foods).FirstOrDefaultAsync(x =>
                   x.Num_Ide == personnelNumber
                   && x.Cod_Meal == currentMealCode
                   && x.Dat_Day_Mepdy == date
@@ -30,7 +30,7 @@ namespace DataLayer.Services
             if (reservationExist != null)
             {
                 var time = DateTime.Now.TimeOfDay.ToString("hhmmss");
-                await _context.Reservations.Where(x => x.Id == reservationExist.Id && x.Status == null).UpdateAsync(x => new Reservation()
+                await context.Reservations.Where(x => x.Id == reservationExist.Id && x.Status == null).UpdateAsync(x => new Reservation()
                 {
                     Status = ReservationStatusEnum.USED.ToString(),
                     Date_Use = date,
@@ -42,7 +42,8 @@ namespace DataLayer.Services
 
         public async Task<List<(string Title, int Total, int Remain)>> GetMealFoodRemain(string date, string mealCode)
         {
-            var data = await _context.Reservations
+            var context = new EsiDbContext();
+            var data = await context.Reservations
                 .Where(x => x.Dat_Day_Mepdy == date && x.Cod_Meal == mealCode && x.Foods.Any())
                 .Select(x => new { Title = x.Foods.First(food => food.IsMain).Des_Food, x.Status }).ToListAsync();
             return data.GroupBy(x => x.Title)
@@ -51,20 +52,22 @@ namespace DataLayer.Services
 
         public async Task InsertAsync(List<Reservation> reservations)
         {
-            foreach (var reservation in reservations) await InsertIfNotExistAsync(reservation);
-            await _context.SaveChangesAsync();
+            var context = new EsiDbContext();
+            foreach (var reservation in reservations) await InsertIfNotExistAsync(reservation,context);
+            await context.SaveChangesAsync();
         }
 
-        private async Task InsertIfNotExistAsync(Reservation reservation)
+        private async Task InsertIfNotExistAsync(Reservation reservation, EsiDbContext context)
         {
-            var reservationExist = await _context.Reservations.FirstOrDefaultAsync(x =>
+            var reservationExist = await context.Reservations.FirstOrDefaultAsync(x =>
                 x.Reciver_Coupon_Id == reservation.Reciver_Coupon_Id && x.Num_Ide == reservation.Num_Ide);
-            if (reservationExist == null) await _context.Reservations.AddAsync(reservation);
+            if (reservationExist == null) await context.Reservations.AddAsync(reservation);
         }
 
         public async Task<List<(Guid Id, string Reciver_Coupon_Id, string Status, string Date_Use, string Time_Use)>> GetDeliveredReservesToSendAsync()
         {
-            return (await _context.Reservations.AsNoTracking()
+            var context = new EsiDbContext();
+            return (await context.Reservations.AsNoTracking()
                 .Where(x => !string.IsNullOrWhiteSpace(x.Status) && !x.DateTime_SentToWebService.HasValue)
                 .Select(x => new { x.Id, x.Reciver_Coupon_Id, x.Status, x.Date_Use, x.Time_Use })
                 .Skip(0).Take(100)
@@ -73,33 +76,36 @@ namespace DataLayer.Services
 
         public async Task<bool> HasAnyNotSentToServer()
         {
-            return await _context.Reservations.AnyAsync(x => !string.IsNullOrWhiteSpace(x.Status) && !x.DateTime_SentToWebService.HasValue);
+            var context = new EsiDbContext();
+            return await context.Reservations.AnyAsync(x => !string.IsNullOrWhiteSpace(x.Status) && !x.DateTime_SentToWebService.HasValue);
         }
 
         public async Task SetSentToWebServiceDateTimeAsync(IEnumerable<Guid> ids)
         {
+            var context = new EsiDbContext();
             foreach (var id in ids)
             {
-                var reserve = _context.Reservations.FirstOrDefault(x => x.Id == id);
+                var reserve = context.Reservations.FirstOrDefault(x => x.Id == id);
                 if (reserve != null)
                 {
                     reserve.DateTime_SentToWebService = DateTime.Now;
                 }
             }
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
 
 
         public async Task<Reservation> FindReservationByCouponIdAsync(string reciverCouponId, string date)
         {
-            var data = await _context.Reservations.FirstOrDefaultAsync(x => x.Reciver_Coupon_Id == reciverCouponId);
+            var context = new EsiDbContext();
+            var data = await context.Reservations.FirstOrDefaultAsync(x => x.Reciver_Coupon_Id == reciverCouponId);
             if (data != null)
             {
                 data.Status = ReservationStatusEnum.USED.ToString();
                 data.Date_Use = date;
                 data.Time_Use = DateTime.Now.TimeOfDay.ToString("hhmmss");
-                _context.Reservations.Update(data);
-                await _context.SaveChangesAsync();
+                context.Reservations.Update(data);
+                await context.SaveChangesAsync();
             }
 
             return data;
@@ -107,7 +113,8 @@ namespace DataLayer.Services
 
         public async Task<List<ReportDto>> GetReportAsync()
         {
-            return await _context.Reservations.OrderByDescending(x => x.Dat_Day_Mepdy).GroupBy(x => new { x.Dat_Day_Mepdy, x.Des_Nam_Meal })
+            var context = new EsiDbContext();
+            return await context.Reservations.OrderByDescending(x => x.Dat_Day_Mepdy).GroupBy(x => new { x.Dat_Day_Mepdy, x.Des_Nam_Meal })
                 .Select(x => new ReportDto()
                 {
                     Date = x.Key.Dat_Day_Mepdy,
@@ -120,12 +127,14 @@ namespace DataLayer.Services
 
         public async Task DeleteAllSendAsync()
         {
-            await _context.Reservations.Where(x => x.DateTime_SentToWebService.HasValue).DeleteAsync();
+            var context = new EsiDbContext();
+            await context.Reservations.Where(x => x.DateTime_SentToWebService.HasValue).DeleteAsync();
         }
         public async Task DeleteAllSendByDayAsync(int days)
         {
+            var context = new EsiDbContext();
             var date = DateTime.Now.AddDays(-1 * days);
-            await _context.Reservations.Where(x => x.DateTime_SentToWebService < date).DeleteAsync();
+            await context.Reservations.Where(x => x.DateTime_SentToWebService < date).DeleteAsync();
         }
 
     }

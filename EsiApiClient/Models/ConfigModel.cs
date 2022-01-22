@@ -16,6 +16,8 @@
         public bool IsDemo { get; set; }
         public bool Logging { get; set; }
         public bool CheckMealTime { get; set; }
+        public bool HasExtraMonitors { get; set; }
+        
         public int GetFromServerIntervalMinutes { get; set; }
 
         public bool IsValid()
