@@ -197,8 +197,7 @@ namespace IPAClient.Windows
             }
             else
             {
-                var offlineReserve = await _reservationService.FindReservationAsync(personnelNumber,
-                    App.CurrentMealCode, DateTime.Now.Date.ToServerDateFormat());
+                var offlineReserve = await _reservationService.FindReservationAsync(personnelNumber, App.CurrentMealCode, DateTime.Now.Date.ToServerDateFormat());
 
                 if (offlineReserve != null)
                 {
@@ -660,44 +659,54 @@ namespace IPAClient.Windows
             await Dispatcher.Invoke(async () =>
             {
                 _rfIdHelper.SetIsBusy(true);
-                if (App.IsActive || !App.AppConfig.CheckMealTime)
+                try
                 {
-                    var pNumStr = personnelNumber.ToString();
-                    lblNumber.Content = pNumStr;
-                    if (!IsActive) return;
-                    if (personnelNumber != 0)
+                    if (App.IsActive || !App.AppConfig.CheckMealTime)
                     {
-                        if (!isActive)
+                        var pNumStr = personnelNumber.ToString();
+                        lblNumber.Content = pNumStr;
+                        if (!IsActive) return;
+                        if (personnelNumber != 0)
                         {
-                            ShowError("کارت غیر فعال است");
-                            ShowBorder(brdRfId, false);
-                            _monitorDto.AddMessageToQueue(pNumStr, "کارت غیر فعال است");
-                            await SendMonitorData(_monitorDto.ToJson());
-                            return;
-                        }
+                            if (!isActive)
+                            {
+                                ShowError("کارت غیر فعال است");
+                                ShowBorder(brdRfId, false);
+                                _monitorDto.AddMessageToQueue(pNumStr, "کارت غیر فعال است");
+                                await SendMonitorData(_monitorDto.ToJson());
+                                return;
+                            }
 
-                        if (isExp)
-                        {
-                            var message = "کارت منقضی شده است " + expDate;
-                            ShowError(message);
-                            ShowBorder(brdRfId, false);
-                            _monitorDto.AddMessageToQueue(pNumStr, message);
-                            await SendMonitorData(_monitorDto.ToJson());
-                            return;
-                        }
+                            if (isExp)
+                            {
+                                var message = "کارت منقضی شده است " + expDate;
+                                ShowError(message);
+                                ShowBorder(brdRfId, false);
+                                _monitorDto.AddMessageToQueue(pNumStr, message);
+                                await SendMonitorData(_monitorDto.ToJson());
+                                return;
+                            }
 
-                        ShowBorder(brdRfId, true);
-                        await CheckReservation(pNumStr);
+                            ShowBorder(brdRfId, true);
+                            await CheckReservation(pNumStr);
+                        }
+                    }
+                    else
+                    {
+                        var message = "خارج از وعده";
+                        ShowError(message);
+                        ShowBorder(brdNoReserve, false);
+                        _monitorDto.AddMessageToQueue("", message);
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    var message = "خارج از وعده";
-                    ShowError(message);
-                    ShowBorder(brdNoReserve, false);
-                    _monitorDto.AddMessageToQueue("", message);
+                    App.AddLog(ex);
                 }
-                _rfIdHelper.SetIsBusy(false);
+                finally
+                {
+                    _rfIdHelper.SetIsBusy(false);
+                }
             }, DispatcherPriority.Normal);
         }
 

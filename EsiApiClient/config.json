@@ -10,8 +10,8 @@
   "WebServiceAuthToken": "Basic TkFNRk9PRHVzZXIxOjUxZjIzMDQxYWNkOGRmNzlkMWIxOGY2ZjE2ZWE4YzM2",
   "CheckOnline": false,
   "IsConfirmed": true,
-  "IsDemo": true,
-  "Logging": false,
+  "IsDemo": false,
+  "Logging": true,
   "CheckMealTime": true,
   "GetFromServerIntervalMinutes": 30
 }
