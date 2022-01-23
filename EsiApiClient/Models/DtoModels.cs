@@ -52,20 +52,31 @@ namespace IPAClient.Models
             DeliveryTime = DateTime.Now.TimeOfDay;
             MainFoods = reservation.Foods.Where(x => x.IsMain).ToList();
             SubsidiaryFoods = reservation.Foods.Where(x => !x.IsMain).ToList();
-            //if (SubsidiaryFoods.Count > 3)
-            //{
-            //    var overItems = SubsidiaryFoods.Skip(2).Take(SubsidiaryFoods.Count - 2).ToList();
-            //    overItems.ForEach(o =>
-            //    {
-            //        SubsidiaryFoods.Remove(o);
-            //    });
-
-            //    SubsidiaryFoods.Add(new Food
-            //    {
-            //        Des_Food = overItems.Select(x => x.Des_Food).Aggregate((a, b) => a + "-" + b),
-            //        Num_Amount = "1"
-            //    });
-            //}
+            if (MainFoods.Count < 1)
+            {
+                MainFoods.Add(new Food()
+                {
+                    Des_Food = string.Empty,
+                    IsMain = true,
+                    Num_Amount = string.Empty,
+                    Typ_Serv_Unit = string.Empty,
+                    Id = 0
+                });
+            }
+            if (SubsidiaryFoods.Count < 6)
+            {
+                for (var i = 0; i < (6 - SubsidiaryFoods.Count); i++)
+                {
+                    SubsidiaryFoods.Add(new Food()
+                    {
+                        Des_Food = string.Empty,
+                        IsMain = false,
+                        Num_Amount = string.Empty,
+                        Typ_Serv_Unit = string.Empty,
+                        Id = 0
+                    });
+                }
+            }
         }
         public PersonnelFoodDto(string noReservePersonnelCode, string message)
         {
