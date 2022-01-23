@@ -10,11 +10,11 @@
   "WebServiceAuthToken": "Basic TkFNRk9PRHVzZXIxOjUxZjIzMDQxYWNkOGRmNzlkMWIxOGY2ZjE2ZWE4YzM2",
   "CheckOnline": false,
   "IsConfirmed": true,
-  "IsDemo": true,
+  "IsDemo": false,
   "Logging": false,
-  "CheckMealTime": false,
+  "CheckMealTime": true,
   "GetFromServerIntervalMinutes": 30,
-  "HasExtraMonitors": false,
-  "HasRfId": false,
-  "HasFingerPrint": false
+  "HasExtraMonitors": true,
+  "HasRfId": true,
+  "HasFingerPrint": true
 }
