@@ -48,10 +48,10 @@
                 <Grid Margin="10" Height="354">
                     <Label    Content="غذای اصلی" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="11"  HorizontalContentAlignment="Right" Margin="366,12,15,315"/>
                     <Label   Content="تعداد" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="11"  HorizontalContentAlignment="Right" Margin="16,12,382,317"/>
-                    <TextBlock x:Name="lblFoodName"  Foreground="#FFFFF300" FontFamily="{StaticResource Vazir}" FontSize="25" FontWeight="ExtraBold"  TextWrapping="Wrap" Margin="78,43,15,227" TextAlignment="Right" >
+                    <TextBlock x:Name="lblFoodName"  Foreground="#FFFFF300" FontFamily="{StaticResource Vazir}" FontSize="30" FontWeight="ExtraBold"  TextWrapping="Wrap" Margin="78,28,15,229" TextAlignment="Right" >
                         چلو جوجه کباب
                     </TextBlock>
-                    <Label  x:Name="lblFoodNum"  Content="3" Foreground="#FFFFF300" FontFamily="{StaticResource Vazir}" FontSize="30" FontWeight="ExtraBold" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Margin="28,31,382,258"/>
+                    <Label  x:Name="lblFoodNum"  Content="3" Foreground="#FFFFF300" FontFamily="{StaticResource Vazir}" FontSize="30" FontWeight="ExtraBold" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Margin="28,27,382,262"/>
                     <Label    Content="دورچین" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="11"  HorizontalContentAlignment="Right" Margin="366,125,15,199"/>
                     <Label  x:Name="lblAppFoodName0"  Content="نوشابه مشکی" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="18" FontWeight="ExtraBold" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Margin="118,156,15,160"/>
                     <Label  x:Name="lblAppFoodNum0"  Content="2" Foreground="White" FontFamily="{StaticResource Vazir}" FontSize="18" FontWeight="ExtraBold" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Margin="28,156,382,160"/>
