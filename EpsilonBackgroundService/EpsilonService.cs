@@ -34,8 +34,8 @@ namespace EpsilonService
             WriteLog(msg + DateTime.Now);
             runServer();
             //timer = new Timer {Interval = 1000 * 60 * 5}; // تنظیم فاصله زمانی بمدت ‍‍‍‍‍‍‍5 دقیقه
-            timer = new Timer { Interval = 1000 * 15 }; // تنظیم فاصله زمانی بمدت ‍‍‍‍‍‍‍15 تانیه
-            timer.Elapsed += new ElapsedEventHandler(timer_tick);
+            timer = new Timer { Interval = 1000 * 60 * 5 }; // تنظیم فاصله زمانی بمدت ‍‍‍‍‍‍‍15 تانیه
+            timer.Elapsed += timer_tick;
             timer.Enabled = true;
         }
 

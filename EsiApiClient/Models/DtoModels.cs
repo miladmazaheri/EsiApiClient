@@ -10,17 +10,17 @@ namespace IPAClient.Models
     public class RemainFoodModel
     {
         public string Title { get; set; }
-        public int Remain { get; set; }
+        public int Delivered { get; set; }
         public int Total { get; set; }
 
         public RemainFoodModel()
         {
 
         }
-        public RemainFoodModel(string title, int remain, int total)
+        public RemainFoodModel(string title, int delivered, int total)
         {
             Title = title;
-            Remain = remain;
+            Delivered = delivered;
             Total = total;
         }
 
@@ -136,7 +136,8 @@ namespace IPAClient.Models
                 }
                 else
                 {
-                    item.Remain = food.Remain;
+                    item.Total = food.Total;
+                    item.Delivered = food.Delivered;
                 }
 
             }

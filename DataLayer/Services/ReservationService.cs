@@ -40,14 +40,14 @@ namespace DataLayer.Services
             return reservationExist;
         }
 
-        public async Task<List<(string Title, int Total, int Remain)>> GetMealFoodRemain(string date, string mealCode)
+        public async Task<List<(string Title, int Total, int Delivered)>> GetMealFoodRemain(string date, string mealCode)
         {
             var context = new EsiDbContext();
             var data = await context.Reservations
                 .Where(x => x.Dat_Day_Mepdy == date && x.Cod_Meal == mealCode && x.Foods.Any())
                 .Select(x => new { Title = x.Foods.First(food => food.IsMain).Des_Food, x.Status }).ToListAsync();
             return data.GroupBy(x => x.Title)
-                .Select(x => (x.Key, x.Count(), x.Count(w => string.IsNullOrWhiteSpace(w.Status)))).ToList();
+                .Select(x => (x.Key, x.Count(), x.Count(w => !string.IsNullOrWhiteSpace(w.Status)))).ToList();
         }
 
         public async Task InsertAsync(List<Reservation> reservations)

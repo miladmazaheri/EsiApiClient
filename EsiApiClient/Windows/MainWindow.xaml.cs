@@ -868,7 +868,7 @@ namespace IPAClient.Windows
             {
                 var remainFood =
               await _reservationService.GetMealFoodRemain(DateTime.Now.ToServerDateFormat(), App.CurrentMealCode);
-                _monitorDto.InsertOrUpdateRemainFood(remainFood.Select(x => new RemainFoodModel(x.Title, x.Remain, x.Total))
+                _monitorDto.InsertOrUpdateRemainFood(remainFood.Select(x => new RemainFoodModel(x.Title, x.Delivered, x.Total))
                     .ToArray());
             }
         }
