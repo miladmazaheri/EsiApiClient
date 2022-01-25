@@ -34,6 +34,7 @@ namespace IPAClient.Windows
         private async void WndReport_OnLoaded(object sender, RoutedEventArgs e)
         {
             await FillGrid();
+            lblDbPath.Content = "Database File Address: " + _reservationService.GetDbPath();
         }
 
 
@@ -140,7 +141,7 @@ namespace IPAClient.Windows
                 SetMessage("خطا در دریافت رزرو های آفلاین از سرور" + Environment.NewLine + e.Message);
                 App.AddLog(e);
             }
-            
+
         }
 
         private async Task DeleteAllSent()
@@ -156,7 +157,7 @@ namespace IPAClient.Windows
                 SetMessage("خطا در پاک سازی رزرو های ارسال شده به سرور از پایگاه داده" + Environment.NewLine + e.Message);
                 App.AddLog(e);
             }
-            
+
         }
 
         private async Task DeleteAll()
@@ -191,6 +192,6 @@ namespace IPAClient.Windows
             lblMessage.Content = string.Empty;
         }
 
-       
+
     }
 }

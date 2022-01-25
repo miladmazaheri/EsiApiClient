@@ -8,8 +8,9 @@
         Title="wndReport" Style="{StaticResource AppWindow}" Width="1280" Height="720" Loaded="WndReport_OnLoaded" FlowDirection="RightToLeft" >
     <Grid>
         <StackPanel>
+            <Label Name="lblDbPath" FontSize="15" HorizontalAlignment="Center" FlowDirection="LeftToRight">Database File Address:</Label>
             <DataGrid Name="grdReport" Height="500" IsReadOnly="True" FontFamily="{StaticResource Vazir}" FontSize="18" AutoGenerateColumns="False"
-                       AlternatingRowBackground="LightYellow">
+                      AlternatingRowBackground="LightYellow">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="تاریخ" Binding="{Binding Date}" Width="*"/>
                     <DataGridTextColumn Header="وعده" Binding="{Binding Meal}" Width="*"/>

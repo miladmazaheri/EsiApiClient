@@ -10,7 +10,7 @@ namespace DataLayer
 {
     public class EsiDbContext : DbContext
     {
-        public string DbPath { get; private set; }
+        public static string DbPath { get; private set; }
 
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<Food> Foods { get; set; }

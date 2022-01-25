@@ -11,7 +11,7 @@ namespace DataLayer.Services
 {
     public class ReservationService
     {
-   
+
 
         public ReservationService()
         {
@@ -53,7 +53,7 @@ namespace DataLayer.Services
         public async Task InsertAsync(List<Reservation> reservations)
         {
             var context = new EsiDbContext();
-            foreach (var reservation in reservations) await InsertIfNotExistAsync(reservation,context);
+            foreach (var reservation in reservations) await InsertIfNotExistAsync(reservation, context);
             await context.SaveChangesAsync();
         }
 
@@ -141,6 +141,11 @@ namespace DataLayer.Services
         {
             var context = new EsiDbContext();
             await context.Reservations.DeleteAsync();
+        }
+
+        public string GetDbPath()
+        {
+            return EsiDbContext.DbPath;
         }
     }
 }

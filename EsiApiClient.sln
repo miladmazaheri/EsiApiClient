@@ -19,7 +19,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EpsilonBackgroundService", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EpsilonRunnerService", "EpsilonRunnerService\EpsilonRunnerService.csproj", "{E9229783-BF9E-4679-94C8-1B6F62FCFE87}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EpsilonBackgroundServiceInstaller", "EpsilonBackgroundServiceInstaller\EpsilonBackgroundServiceInstaller.csproj", "{3452365C-9162-4560-9A43-976E16DCAAD9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EpsilonBackgroundServiceInstaller", "EpsilonBackgroundServiceInstaller\EpsilonBackgroundServiceInstaller.csproj", "{3452365C-9162-4560-9A43-976E16DCAAD9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{A57568A5-689D-4052-B3E6-6B178FB6A20A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{AC8F7ADF-FC2F-4D3A-B6A5-DA1DAC53F0BD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -66,6 +70,14 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8AE1BEBE-DC98-4510-8587-6E30A98D2392} = {AC8F7ADF-FC2F-4D3A-B6A5-DA1DAC53F0BD}
+		{D45928DD-8816-4A24-AB74-861EB4B20236} = {AC8F7ADF-FC2F-4D3A-B6A5-DA1DAC53F0BD}
+		{14ED8BDD-CE3E-4ED5-BA65-2FE0C7D5B275} = {A57568A5-689D-4052-B3E6-6B178FB6A20A}
+		{2FC67395-AA89-4DC7-91B6-330213EA8CB1} = {A57568A5-689D-4052-B3E6-6B178FB6A20A}
+		{E9229783-BF9E-4679-94C8-1B6F62FCFE87} = {A57568A5-689D-4052-B3E6-6B178FB6A20A}
+		{3452365C-9162-4560-9A43-976E16DCAAD9} = {A57568A5-689D-4052-B3E6-6B178FB6A20A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {30B1E91C-CAD9-47DC-8ADB-E79E9FE44781}

@@ -254,7 +254,7 @@ namespace IPAClient.Windows
                 var message = "تحویل داده شده است " + reservation.Time_Use.ToFriendlyTimeFormat();
                 ShowError(message);
                 PlaySound(false);
-                _monitorDto.AddMessageToQueue(reservation.Num_Ide, message);
+                _monitorDto.AddMessageToQueue(reservation.Num_Ide, message, reservation.First_Name_Ide + " " + reservation.Last_Name_Ide);
             }
         }
 

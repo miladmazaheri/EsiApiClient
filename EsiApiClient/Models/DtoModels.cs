@@ -78,15 +78,17 @@ namespace IPAClient.Models
                 }
             }
         }
-        public PersonnelFoodDto(string noReservePersonnelCode, string message)
+        public PersonnelFoodDto(string noReservePersonnelCode, string message, string personnelName)
         {
+            FullName = personnelName ?? string.Empty;
             PersonnelNumber = noReservePersonnelCode;
             DeliveryTime = DateTime.Now.TimeOfDay;
-            MainFoods = new List<Food>(){new Food()
+            MainFoods = new List<Food>(){new()
             {
                 Des_Food = message,
             }};
         }
+
 
     }
 
@@ -122,13 +124,13 @@ namespace IPAClient.Models
             PersonnelFoods.Add(new PersonnelFoodDto(reservation));
         }
 
-        public void AddMessageToQueue(string personnelCode, string message)
+        public void AddMessageToQueue(string personnelCode, string message, string personnelName = null)
         {
             if (PersonnelFoods.Count == 5)
             {
                 PersonnelFoods.Remove(PersonnelFoods[0]);
             }
-            PersonnelFoods.Add(new PersonnelFoodDto(personnelCode, message));
+            PersonnelFoods.Add(new PersonnelFoodDto(personnelCode, message, personnelName));
         }
         public string ToJson()
         {
