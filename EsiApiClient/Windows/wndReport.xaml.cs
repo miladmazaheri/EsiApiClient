@@ -62,6 +62,12 @@ namespace IPAClient.Windows
             await FillGrid();
         }
 
+        private async void BtnDeleteAll_OnClick(object sender, RoutedEventArgs e)
+        {
+            await DeleteAll();
+            await FillGrid();
+        }
+
         private void btnClose_Click(object sender, RoutedEventArgs e)
         {
             Close();
@@ -152,6 +158,22 @@ namespace IPAClient.Windows
             }
             
         }
+
+        private async Task DeleteAll()
+        {
+            SetMessage("در حال پاک سازی رزرو ها از پایگاه داده. لطفا منتظر بمانید");
+            try
+            {
+                await _reservationService.DeleteAllAsync();
+                SetMessage("رزرو ها از پایگاه داده پاک سازی شد");
+            }
+            catch (Exception e)
+            {
+                SetMessage("خطا در پاک سازی رزرو ها از پایگاه داده" + Environment.NewLine + e.Message);
+                App.AddLog(e);
+            }
+
+        }
         private async ValueTask FillGrid()
         {
             grdReport.ItemsSource = await _reservationService.GetReportAsync();
@@ -168,5 +190,7 @@ namespace IPAClient.Windows
         {
             lblMessage.Content = string.Empty;
         }
+
+       
     }
 }

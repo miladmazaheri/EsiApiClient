@@ -23,6 +23,7 @@
                 <Button x:Name="btnReceive" Content="دریافت رزرو های آفلاین" Height="46" Width="189" Margin="10" Click="btnReceive_Click" FontFamily="{StaticResource Vazir}" FontSize="15"/>
                 <Button x:Name="btnSend" Content="ارسال رزرو های تحویل داده شده" Height="46" Width="239" Margin="10" Click="btnSend_Click" FontFamily="{StaticResource Vazir}" FontSize="15"/>
                 <Button x:Name="btnDelete" Content="پاک سازی رزرو های ارسال شده" Height="46" Width="236" Margin="10" Click="btnDelete_Click" FontFamily="{StaticResource Vazir}" FontSize="15"/>
+                <Button x:Name="btnDeleteAll" Content="پاک سازی همه اطلاعات" Height="46" Width="178" Margin="10" Click="BtnDeleteAll_OnClick" FontFamily="{StaticResource Vazir}" FontSize="15"/>
                 <Button x:Name="btnClose" Content="خروج" Height="46" Width="149" Margin="10" Click="btnClose_Click" FontFamily="{StaticResource Vazir}" FontSize="15"/>
             </StackPanel>
             <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10">

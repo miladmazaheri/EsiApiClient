@@ -137,5 +137,10 @@ namespace DataLayer.Services
             await context.Reservations.Where(x => x.DateTime_SentToWebService < date).DeleteAsync();
         }
 
+        public async Task DeleteAllAsync()
+        {
+            var context = new EsiDbContext();
+            await context.Reservations.DeleteAsync();
+        }
     }
 }
