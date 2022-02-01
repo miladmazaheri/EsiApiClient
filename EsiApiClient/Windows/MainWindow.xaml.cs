@@ -609,29 +609,12 @@ namespace IPAClient.Windows
                 Reciver_Coupon_Id = input.Reciver_Coupon_Id
             };
 
-            foreach (var mainFood in input.Main_Course)
-                res.Foods.Add(
-                    new Food
-                    {
-                        IsMain = true,
-                        ReservationId = res.Id,
-
-                        Des_Food = mainFood.Des_Food,
-                        Num_Amount = mainFood.Num_Amount.ToString(),
-                        Typ_Serv_Unit = mainFood.Typ_Serv_Unit
-                    });
-
-            foreach (var appFood in input.Appetizer_Dessert)
-                res.Foods.Add(
-                    new Food
-                    {
-                        IsMain = false,
-                        ReservationId = res.Id,
-
-                        Des_Food = appFood.Des_Food,
-                        Num_Amount = appFood.Num_Amount,
-                        Typ_Serv_Unit = appFood.Typ_Serv_Unit
-                    });
+            var foods = input.Des_Food_Order_Mepdy?.Split("-").ToList();
+            if (foods is not null && foods.Count > 0)
+            {
+                res.MainFood = foods[0];
+                res.AppFoods = foods.Skip(1).DefaultIfEmpty("").Aggregate((a, b) => a + "-" + b);
+            }
 
             return res;
         }
@@ -930,11 +913,11 @@ namespace IPAClient.Windows
                 lblVade.Content = reservation.Des_Nam_Meal;
                 lblShift.Content = reservation.Employee_Shift_Name;
                 lblShiftCompany.Content = reservation.Des_Contract_Order;
-                var mainFood = reservation.Foods.FirstOrDefault(x => x.IsMain);
-                if (mainFood != null)
+                var mainFood = reservation.MainFood;
+                if (!string.IsNullOrWhiteSpace(mainFood))
                 {
-                    lblFoodName.Text = mainFood.Des_Food;
-                    lblFoodNum.Content = mainFood.Num_Amount;
+                    lblFoodName.Text = mainFood;
+                    lblFoodNum.Content = "1";
                 }
                 else
                 {
@@ -942,33 +925,36 @@ namespace IPAClient.Windows
                     lblFoodNum.Content = string.Empty;
                 }
 
-                var appFoods = reservation.Foods.Where(x => !x.IsMain).ToList();
-                for (var i = 0; i < 5; i++)
+                var appFoods = reservation.AppFoods?.Split("-");
+                if (appFoods is not null && appFoods.Length > 0)
                 {
-                    var appFood = appFoods.Skip(i).Take(1).FirstOrDefault();
-                    if (appFood == null) break;
-                    switch (i)
+                    for (var i = 0; i < 5; i++)
                     {
-                        case 0:
-                            lblAppFoodName0.Content = appFood.Des_Food;
-                            lblAppFoodNum0.Content = appFood.Num_Amount;
-                            break;
-                        case 1:
-                            lblAppFoodName1.Content = appFood.Des_Food;
-                            lblAppFoodNum1.Content = appFood.Num_Amount;
-                            break;
-                        case 2:
-                            lblAppFoodName2.Content = appFood.Des_Food;
-                            lblAppFoodNum2.Content = appFood.Num_Amount;
-                            break;
-                        case 3:
-                            lblAppFoodName3.Content = appFood.Des_Food;
-                            lblAppFoodNum3.Content = appFood.Num_Amount;
-                            break;
-                        case 4:
-                            lblAppFoodName4.Content = appFood.Des_Food;
-                            lblAppFoodNum4.Content = appFood.Num_Amount;
-                            break;
+                        var appFood = appFoods.Skip(i).Take(1).FirstOrDefault();
+                        if (appFood == null) break;
+                        switch (i)
+                        {
+                            case 0:
+                                lblAppFoodName0.Content = appFood;
+                                lblAppFoodNum0.Content = "1";
+                                break;
+                            case 1:
+                                lblAppFoodName1.Content = appFood;
+                                lblAppFoodNum1.Content = "1";
+                                break;
+                            case 2:
+                                lblAppFoodName2.Content = appFood;
+                                lblAppFoodNum2.Content = "1";
+                                break;
+                            case 3:
+                                lblAppFoodName3.Content = appFood;
+                                lblAppFoodNum3.Content = "1";
+                                break;
+                            case 4:
+                                lblAppFoodName4.Content = appFood;
+                                lblAppFoodNum4.Content = "1";
+                                break;
+                        }
                     }
                 }
 

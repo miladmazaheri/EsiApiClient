@@ -11,7 +11,6 @@ namespace DataLayer.Entities
     {
         public Reservation()
         {
-            Foods = new HashSet<Food>();
         }
         public Guid Id { get; set; }
         public string Date { get; set; }
@@ -42,19 +41,9 @@ namespace DataLayer.Entities
         public string Date_Use { get; set; }
         public string Time_Use { get; set; }
         public DateTime? DateTime_SentToWebService { get; set; }
-        public ICollection<Food> Foods { get; set; }
+        public string MainFood { get; set; }
+        public string AppFoods { get; set; }
     }
 
-    public class Food
-    {
-        public long Id { get; set; }
-        public string Des_Food { get; set; }
-        public string Num_Amount { get; set; }
-        public string Typ_Serv_Unit { get; set; }
-        public bool IsMain { get; set; }
-        [JsonIgnore]
-        public Guid ReservationId { get; set; }
-        [JsonIgnore]
-        public Reservation Reservation { get; set; }
-    }
+  
 }

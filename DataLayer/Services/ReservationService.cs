@@ -21,7 +21,7 @@ namespace DataLayer.Services
         public async Task<Reservation> FindReservationAsync(string personnelNumber, string currentMealCode, string date)
         {
             var context = new EsiDbContext();
-            var reservationExist = await context.Reservations.Include(x => x.Foods).FirstOrDefaultAsync(x =>
+            var reservationExist = await context.Reservations.FirstOrDefaultAsync(x =>
                   x.Num_Ide == personnelNumber
                   && x.Cod_Meal == currentMealCode
                   && x.Dat_Day_Mepdy == date
@@ -44,8 +44,8 @@ namespace DataLayer.Services
         {
             var context = new EsiDbContext();
             var data = await context.Reservations
-                .Where(x => x.Dat_Day_Mepdy == date && x.Cod_Meal == mealCode && x.Foods.Any())
-                .Select(x => new { Title = x.Foods.First(food => food.IsMain).Des_Food, x.Status }).ToListAsync();
+                .Where(x => x.Dat_Day_Mepdy == date && x.Cod_Meal == mealCode)
+                .Select(x => new { Title = x.MainFood, x.Status }).ToListAsync();
             return data.GroupBy(x => x.Title)
                 .Select(x => (x.Key, x.Count(), x.Count(w => !string.IsNullOrWhiteSpace(w.Status)))).ToList();
         }

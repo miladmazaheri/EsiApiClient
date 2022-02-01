@@ -50,8 +50,19 @@ namespace IPAClient.Models
             Shift = reservation.Employee_Shift_Name;
             Company = reservation.Des_Contract_Order;
             DeliveryTime = DateTime.Now.TimeOfDay;
-            MainFoods = reservation.Foods.Where(x => x.IsMain).ToList();
-            SubsidiaryFoods = reservation.Foods.Where(x => !x.IsMain).ToList();
+            MainFoods = new List<Food>();
+            SubsidiaryFoods = new List<Food>();
+
+            if (!string.IsNullOrWhiteSpace(reservation.MainFood))
+            {
+                MainFoods.Add(new Food
+                {
+                    Des_Food = reservation.MainFood,
+                    IsMain = true,
+                    Num_Amount = "1",
+                    Typ_Serv_Unit = string.Empty,
+                });
+            }
             if (MainFoods.Count < 1)
             {
                 MainFoods.Add(new Food()
@@ -60,9 +71,26 @@ namespace IPAClient.Models
                     IsMain = true,
                     Num_Amount = string.Empty,
                     Typ_Serv_Unit = string.Empty,
-                    Id = 0
                 });
             }
+
+            var appFoods = reservation.AppFoods?.Split("-");
+            if (appFoods is not null && appFoods.Length > 0)
+            {
+                for (var i = 0; i < 5; i++)
+                {
+                    var appFood = appFoods.Skip(i).Take(1).FirstOrDefault();
+                    if (appFood == null) break;
+                    SubsidiaryFoods.Add(new Food()
+                    {
+                        Des_Food = appFood,
+                        IsMain = false,
+                        Num_Amount = "1",
+                        Typ_Serv_Unit = string.Empty,
+                    });
+                }
+            }
+            
             if (SubsidiaryFoods.Count < 6)
             {
                 for (var i = 0; i < (6 - SubsidiaryFoods.Count); i++)
@@ -91,7 +119,15 @@ namespace IPAClient.Models
 
 
     }
+    public class Food
+    {
+        public long Id { get; set; }
+        public string Des_Food { get; set; }
+        public string Num_Amount { get; set; }
+        public string Typ_Serv_Unit { get; set; }
+        public bool IsMain { get; set; }
 
+    }
     public class MonitorDto
     {
         /// <summary>
@@ -166,5 +202,7 @@ namespace IPAClient.Models
             RemainFoods = new List<RemainFoodModel>();
             PersonnelFoods = new List<PersonnelFoodDto>();
         }
+
+        
     }
 }
