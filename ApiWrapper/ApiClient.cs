@@ -208,14 +208,22 @@ namespace ApiWrapper
 
         public static async Task<DateTime?> GetServerDateTime()
         {
-            var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/MainInfo_Send_Lookup_Data_Fun", new StringContent("{\"JSON_CHARACTER\":\"[]\"}", Encoding.UTF8, "application/json"));
-            if (!response.Headers.TryGetValues("Date", out var dateValues)) return null;
-            var dateStr = dateValues.First();
-            if (DateTime.TryParse(dateStr, out var date))
+            try
             {
-                return date;
+                var response = await httpClient.PostAsync($"{baseUrl}osb/namfood/restservices/MainInfo_Send_Lookup_Data_Fun", new StringContent("{\"JSON_CHARACTER\":\"[]\"}", Encoding.UTF8, "application/json"));
+                if (!response.Headers.TryGetValues("Date", out var dateValues)) return null;
+                var dateStr = dateValues.First();
+                if (DateTime.TryParse(dateStr, out var date))
+                {
+                    return date;
+                }
+                return null;
             }
-            return null;
+            catch (Exception ex)
+            {
+                AddLog(ex);
+                return null;
+            }
         }
     }
 }

@@ -147,8 +147,22 @@ namespace IPAClient.Windows
                     ApiClient.SetBaseUrl(string.IsNullOrWhiteSpace(configModel.WebServiceUrl)
                         ? "http://eis.msc.ir/"
                         : configModel.WebServiceUrl);
+
+                    await SetTimeFromServer();
+                    await SetCurrentMeal();
+                    await SendMonitorData(_monitorDto.ToJson());
+
                     if (!App.AppConfig.IsDemo)
-                        await GetConfigFromServerAsync();
+                    {
+                        try
+                        {
+                            await GetConfigFromServerAsync();
+                        }
+                        catch (Exception e)
+                        {
+                            App.AddLog(e);
+                        }
+                    }
                     //Commented Because Of Uknown Error That Says We Should Install .Net 4 !!!
                     //InitReConfigListener();
                     else
@@ -391,18 +405,11 @@ namespace IPAClient.Windows
                     return;
                 }
 
-                //تنظیم ساعت سیستم بر اساس ساعت سرور
-                var serverDateTime = await ApiClient.GetServerDateTime();
-                if (serverDateTime.HasValue)
-                {
-                    SystemTimeHelper.SetSystemTime(serverDateTime.Value);
-                }
 
                 //دریافت اطلاعات هویتی پرسنل
-                SetBackGroundImage("12");
+                //SetBackGroundImage("12");
                 //TODO Update Personnel Info
-                Thread.Sleep(2000);
-                SetBackGroundImage("13");
+                //SetBackGroundImage("13");
 
                 //دریافت رزرواسیون آفلاین
                 SetBackGroundImage("15");
@@ -425,6 +432,23 @@ namespace IPAClient.Windows
             App.LastMealUpdateTime = DateTime.Now;
             //تصویر پس زمینه آماده به کار
             SetBackGroundImage("21");
+        }
+
+        private async Task SetTimeFromServer()
+        {
+            //تنظیم ساعت سیستم بر اساس ساعت سرور
+            try
+            {
+                var serverDateTime = await ApiClient.GetServerDateTime();
+                if (serverDateTime.HasValue)
+                {
+                    SystemTimeHelper.SetSystemTime(serverDateTime.Value);
+                }
+            }
+            catch (Exception e)
+            {
+               App.AddLog(e);
+            }
         }
 
         private void InitAndStartMainTimer()
@@ -552,12 +576,10 @@ namespace IPAClient.Windows
                 if (App.LastFullUpdateTime == null || App.LastFullUpdateTime.Value.IsNextDay())
                     await GetConfigFromServerAsync();
                 //هر App.AppConfig.GetFromServerIntervalMinutes دقیقه اطلاعات رزرو وعده فعلی بروز میشود
-                else if (App.LastMealUpdateTime == null ||
-                         App.LastMealUpdateTime.Value.IsMinutePassed(App.AppConfig.GetFromServerIntervalMinutes))
+                else if (App.LastMealUpdateTime == null || App.LastMealUpdateTime.Value.IsMinutePassed(App.AppConfig.GetFromServerIntervalMinutes))
                     await UpdateCurrentMealReservationFromServer();
 
                 await SetCurrentMeal();
-
                 await SendMonitorData(_monitorDto.ToJson());
             });
         }
@@ -800,9 +822,11 @@ namespace IPAClient.Windows
                 else
                 {
                     App.IsActive = true;
-                    await SetRemainFoods();
                 }
             }
+
+            await SetRemainFoods();
+
 
             if (!App.IsActive)
             {
@@ -847,7 +871,7 @@ namespace IPAClient.Windows
 
         private async Task SetRemainFoods()
         {
-            if (_monitorDto is { })
+            if (_monitorDto is { } && !string.IsNullOrWhiteSpace(App.CurrentMealCode))
             {
                 var remainFood =
               await _reservationService.GetMealFoodRemain(DateTime.Now.ToServerDateFormat(), App.CurrentMealCode);
