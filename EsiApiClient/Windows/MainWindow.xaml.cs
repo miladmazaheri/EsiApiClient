@@ -166,35 +166,40 @@ namespace IPAClient.Windows
                     //Commented Because Of Uknown Error That Says We Should Install .Net 4 !!!
                     //InitReConfigListener();
                     else
+                    {
                         SetBackGroundImage("21");
+                        FillFakeMainInfo();
+                    }
 
                     ClearLabels();
+
                     if (App.AppConfig.HasFingerPrint)
                         await InitFingerPrintListener();
                     if (App.AppConfig.HasRfId)
                         await InitRfIdListener();
 
-                    if (App.AppConfig.IsDemo)
-                    {
-                        App.MainInfo = new MainInfo_Send_Lookup_Data_Fun
-                        {
-
-                            Meals = new List<Meal>()
-                            {
-                                new ()
-                                {
-                                    Cod_Data = "22",
-                                    Des_Data = "ناهار",
-                                    StartTime = DateTime.Now.AddHours(-1).TimeOfDay,
-                                    EndTime = DateTime.Now.AddHours(3).TimeOfDay
-                                }
-                            }
-                        };
-                    }
 
                     InitAndStartMainTimer();
                 }
             }
+        }
+
+        private void FillFakeMainInfo()
+        {
+            App.MainInfo = new MainInfo_Send_Lookup_Data_Fun
+            {
+
+                Meals = new List<Meal>()
+                {
+                    new ()
+                    {
+                        Cod_Data = "22",
+                        Des_Data = "ناهار",
+                        StartTime = DateTime.Now.AddHours(-1).TimeOfDay,
+                        EndTime = DateTime.Now.AddHours(3).TimeOfDay
+                    }
+                }
+            };
         }
 
         private async Task CheckReservation(string personnelNumber)
@@ -374,19 +379,21 @@ namespace IPAClient.Windows
                             var mainInfoContent = await File.ReadAllTextAsync(App.MainInfoFilePath);
                             try
                             {
-                                mainInfo = JsonSerializer.Deserialize<MainInfo_Send_Lookup_Data_Fun>(mainInfoContent);
+                                App.MainInfo = JsonSerializer.Deserialize<MainInfo_Send_Lookup_Data_Fun>(mainInfoContent); 
+
                             }
                             catch (Exception e)
                             {
                                 App.AddLog(e);
-                                throw;
+                                FillFakeMainInfo();
                             }
 
-                            App.MainInfo = mainInfo;
                         }
                         else
                         {
-                            throw new Exception("Main Info File Not Found");
+                            //throw new Exception("Main Info File Not Found");
+                            App.AddLog(new Exception("Main Info File Not Found"));
+                            FillFakeMainInfo();
                         }
                     }
                     else
@@ -394,17 +401,17 @@ namespace IPAClient.Windows
                         SetBackGroundImage("10");
                         await File.WriteAllTextAsync(App.MainInfoFilePath, JsonSerializer.Serialize(mainInfo));
                         App.MainInfo = mainInfo;
-                        UpdateDateLabel();
                     }
                 }
                 catch (Exception ex)
                 {
                     App.AddLog(ex);
                     SetBackGroundImage("11");
+                    FillFakeMainInfo();
                     //_recheckTimer.Start();
-                    return;
+                    //return;
                 }
-
+                UpdateDateLabel();
 
                 //دریافت اطلاعات هویتی پرسنل
                 //SetBackGroundImage("12");
@@ -424,7 +431,6 @@ namespace IPAClient.Windows
                     App.AddLog(ex);
                     SetBackGroundImage("17");
                     //_recheckTimer.Start();
-                    return;
                 }
             }
 
