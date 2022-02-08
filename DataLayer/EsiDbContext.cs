@@ -15,8 +15,7 @@ namespace DataLayer
         public DbSet<Reservation> Reservations { get; set; }
         public EsiDbContext()
         {
-            var folder = Environment.SpecialFolder.LocalApplicationData;
-            var path = Environment.GetFolderPath(folder);
+            var path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             DbPath = $"{path}{System.IO.Path.DirectorySeparatorChar}esi.db";
         }
 
