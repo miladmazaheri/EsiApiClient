@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,6 +17,7 @@ using ApiWrapper;
 using ApiWrapper.Dto;
 using DataLayer.Dtos;
 using DataLayer.Services;
+using IPAClient.Models;
 using IPAClient.Tools;
 
 namespace IPAClient.Windows
@@ -25,9 +28,11 @@ namespace IPAClient.Windows
     public partial class wndReport : Window
     {
         private readonly ReservationService _reservationService;
-        public wndReport()
+        public SerialBusHelper _serialBusHelper;
+        public wndReport(SerialBusHelper serialBusHelper)
         {
             InitializeComponent();
+            _serialBusHelper = serialBusHelper;
             _reservationService = new ReservationService();
         }
 
@@ -192,6 +197,45 @@ namespace IPAClient.Windows
             lblMessage.Content = string.Empty;
         }
 
+
+        private void BtnReset_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show("آیا از راه اندازی مجدد سیستم اطمینان دارید؟", "Restart System", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No, MessageBoxOptions.RightAlign | MessageBoxOptions.ServiceNotification) == MessageBoxResult.Yes)
+            {
+                SendCommandToSerialPort("10");
+                if (MessageBox.Show("دستور راه اندازی مجدد به زیر سیستم ها ارسال شد" + Environment.NewLine +
+                                    "پس از اطمینان  از اعمال دستور این پیام را تایید نمایید", "Restart System", MessageBoxButton.OKCancel,MessageBoxImage.Asterisk,MessageBoxResult.Cancel, MessageBoxOptions.RightAlign|MessageBoxOptions.ServiceNotification) == MessageBoxResult.OK)
+                {
+                    ShutdownHelper.Restart();
+                }
+            }
+        }
+
+        private void BtnShotDown_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show("آیا از خاموش شدن سیستم اطمینان دارید؟", "Restart System", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No, MessageBoxOptions.RightAlign | MessageBoxOptions.ServiceNotification) == MessageBoxResult.Yes)
+            {
+                SendCommandToSerialPort("20");
+                if (MessageBox.Show("دستور خاموش شدن به زیر سیستم ها ارسال شد" + Environment.NewLine +
+                                    "پس از اطمینان  از اعمال دستور این پیام را تایید نمایید", "Restart System", MessageBoxButton.OKCancel, MessageBoxImage.Asterisk, MessageBoxResult.Cancel, MessageBoxOptions.ServiceNotification) == MessageBoxResult.OK)
+                {
+                    ShutdownHelper.Restart();
+                }
+            }
+        }
+
+        private void SendCommandToSerialPort(string command)
+        {
+            if (!App.AppConfig.HasExtraMonitors || string.IsNullOrWhiteSpace(command) || _serialBusHelper == null) return;
+            try
+            {
+                _serialBusHelper.SendDate(command);
+            }
+            catch (Exception e)
+            {
+                App.AddLog(e);
+            }
+        }
 
     }
 }

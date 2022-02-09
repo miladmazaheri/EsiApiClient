@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace IPAClient.Tools
 {
-    public class MonitorHelper : IDisposable
+    public class SerialBusHelper : IDisposable
     {
         private readonly int _dataBits;
         private readonly Parity _parity;
@@ -17,7 +17,7 @@ namespace IPAClient.Tools
         private readonly Func<Task> _commandThree;
         private readonly Func<Task> _commandFour;
         private SerialPort _monitorSerialPort;
-        public MonitorHelper(int dataBits = 8, Parity parity = Parity.None, StopBits stopBits = StopBits.One, int baudRate = 115200, string portName = "COM4", Func<Task> commandOne = null, Func<Task> commandTwo = null, Func<Task> commandThree = null, Func<Task> commandFour = null)
+        public SerialBusHelper(int dataBits = 8, Parity parity = Parity.None, StopBits stopBits = StopBits.One, int baudRate = 115200, string portName = "COM4", Func<Task> commandOne = null, Func<Task> commandTwo = null, Func<Task> commandThree = null, Func<Task> commandFour = null)
         {
             _dataBits = dataBits;
             _parity = parity;

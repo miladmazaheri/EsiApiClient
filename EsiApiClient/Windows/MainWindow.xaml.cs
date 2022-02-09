@@ -36,7 +36,7 @@ namespace IPAClient.Windows
         private DispatcherTimer _mainTimer;
         private DispatcherTimer _timeTimer;
         private MonitorDto _monitorDto;
-        private MonitorHelper _monitorHelper;
+        private SerialBusHelper _serialBusHelper;
         private RfidHelper _rfIdHelper;
         private wndCommandOne _wndCommandOne;
         private wndCommandTwo _wndCommandTwo;
@@ -379,7 +379,7 @@ namespace IPAClient.Windows
                             var mainInfoContent = await File.ReadAllTextAsync(App.MainInfoFilePath);
                             try
                             {
-                                App.MainInfo = JsonSerializer.Deserialize<MainInfo_Send_Lookup_Data_Fun>(mainInfoContent); 
+                                App.MainInfo = JsonSerializer.Deserialize<MainInfo_Send_Lookup_Data_Fun>(mainInfoContent);
 
                             }
                             catch (Exception e)
@@ -453,7 +453,7 @@ namespace IPAClient.Windows
             }
             catch (Exception e)
             {
-               App.AddLog(e);
+                App.AddLog(e);
             }
         }
 
@@ -764,42 +764,48 @@ namespace IPAClient.Windows
             if (!App.AppConfig.HasExtraMonitors || string.IsNullOrWhiteSpace(dataStr)) return;
             try
             {
-                if (_monitorHelper == null)
+                if (_serialBusHelper == null)
                 {
-                    if (!File.Exists(App.MonitorConfigFilePath))
-                    {
-                        _monitorHelper = new MonitorHelper(commandOne: MonitorCommand1, commandTwo: MonitorCommand2);
-                    }
-                    else
-                    {
-                        var monitorConfigContent = await File.ReadAllTextAsync(App.MonitorConfigFilePath);
-                        SerialPortConfigModel monitorConfigModel = null;
-                        try
-                        {
-                            monitorConfigModel =
-                                JsonSerializer.Deserialize<SerialPortConfigModel>(monitorConfigContent);
-                        }
-                        catch (Exception e)
-                        {
-                            App.AddLog(e);
-                            _monitorHelper =
-                                new MonitorHelper(commandOne: MonitorCommand1, commandTwo: MonitorCommand2);
-                        }
-
-                        _monitorHelper = monitorConfigModel == null
-                            ? new MonitorHelper(commandOne: MonitorCommand1, commandTwo: MonitorCommand2)
-                            : new MonitorHelper(monitorConfigModel.DataBits, monitorConfigModel.Parity,
-                                monitorConfigModel.StopBits,
-                                monitorConfigModel.BaudRate, monitorConfigModel.PortName, MonitorCommand1,
-                                MonitorCommand2);
-                    }
+                    await InitSerialBusHelper();
                 }
-
-                _monitorHelper.SendDate(dataStr);
+                _serialBusHelper.SendDate(dataStr);
             }
             catch (Exception e)
             {
                 App.AddLog(e);
+            }
+        }
+
+        private async Task InitSerialBusHelper()
+        {
+            if (!App.AppConfig.HasExtraMonitors) return;
+
+            if (!File.Exists(App.MonitorConfigFilePath))
+            {
+                _serialBusHelper = new SerialBusHelper(commandOne: MonitorCommand1, commandTwo: MonitorCommand2);
+            }
+            else
+            {
+                var monitorConfigContent = await File.ReadAllTextAsync(App.MonitorConfigFilePath);
+                SerialPortConfigModel monitorConfigModel = null;
+                try
+                {
+                    monitorConfigModel =
+                        JsonSerializer.Deserialize<SerialPortConfigModel>(monitorConfigContent);
+                }
+                catch (Exception e)
+                {
+                    App.AddLog(e);
+                    _serialBusHelper =
+                        new SerialBusHelper(commandOne: MonitorCommand1, commandTwo: MonitorCommand2);
+                }
+
+                _serialBusHelper = monitorConfigModel == null
+                    ? new SerialBusHelper(commandOne: MonitorCommand1, commandTwo: MonitorCommand2)
+                    : new SerialBusHelper(monitorConfigModel.DataBits, monitorConfigModel.Parity,
+                        monitorConfigModel.StopBits,
+                        monitorConfigModel.BaudRate, monitorConfigModel.PortName, MonitorCommand1,
+                        MonitorCommand2);
             }
         }
 
@@ -1012,9 +1018,13 @@ namespace IPAClient.Windows
             }
         }
 
-        private void BtnReport_OnClick(object sender, RoutedEventArgs e)
+        private async void BtnReport_OnClick(object sender, RoutedEventArgs e)
         {
-            new wndReport().ShowDialog();
+            if (_serialBusHelper == null)
+            {
+                await InitSerialBusHelper();
+            }
+            new wndReport(_serialBusHelper).ShowDialog();
         }
     }
 }
