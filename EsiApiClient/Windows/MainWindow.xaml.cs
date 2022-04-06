@@ -651,20 +651,12 @@ namespace IPAClient.Windows
         {
             await Dispatcher.Invoke(async () =>
             {
-                if (_wndCommandOne == null)
-                {
-                    _monitorDto.SetCommand("1");
-                    await SendMonitorData(_monitorDto.ToJson());
-                    _wndCommandOne = new wndCommandOne();
-                    _wndCommandOne.Show();
-                }
-                else
-                {
-                    _monitorDto.SetCommand(string.Empty);
-                    await SendMonitorData(_monitorDto.ToJson());
-                    _wndCommandOne.Close();
-                    _wndCommandOne = null;
-                }
+                await wndReport.SendDeliveredReservationsToServer(_reservationService, sendMessageToSerialPortAction:
+                    async message =>
+                    {
+                        _monitorDto.AddMessageToQueue("پیام سیستم", message, "ارسال گزارش تحویل غذا");
+                        await SendMonitorData(_monitorDto.ToJson());
+                    });
             }, DispatcherPriority.Normal);
         }
 
@@ -686,6 +678,29 @@ namespace IPAClient.Windows
                     _wndCommandTwo.Close();
                     _wndCommandTwo = null;
                 }
+            }, DispatcherPriority.Normal);
+        }
+        private async Task MonitorCommand3()
+        {
+            await Dispatcher.Invoke(async () =>
+            {
+                //پیام خاموش شدن سیستم
+                _monitorDto.SetCommand("20");
+                await SendMonitorData(_monitorDto.ToJson());
+                ShutdownHelper.Shut();
+            }, DispatcherPriority.Normal);
+        }
+        private async Task MonitorCommand4()
+        {
+            await Dispatcher.Invoke(async () =>
+            {
+                await Dispatcher.Invoke(async () =>
+                {
+                    //پیام راه اندازی مجدد سیستم
+                    _monitorDto.SetCommand("10");
+                    await SendMonitorData(_monitorDto.ToJson());
+                    ShutdownHelper.Restart();
+                }, DispatcherPriority.Normal);
             }, DispatcherPriority.Normal);
         }
 
@@ -782,7 +797,7 @@ namespace IPAClient.Windows
 
             if (!File.Exists(App.MonitorConfigFilePath))
             {
-                _serialBusHelper = new SerialBusHelper(commandOne: MonitorCommand1, commandTwo: MonitorCommand2);
+                _serialBusHelper = new SerialBusHelper(commandOne: MonitorCommand1, commandTwo: MonitorCommand2, commandThree: MonitorCommand3, commandFour: MonitorCommand4);
             }
             else
             {
@@ -797,15 +812,15 @@ namespace IPAClient.Windows
                 {
                     App.AddLog(e);
                     _serialBusHelper =
-                        new SerialBusHelper(commandOne: MonitorCommand1, commandTwo: MonitorCommand2);
+                        new SerialBusHelper(commandOne: MonitorCommand1, commandTwo: MonitorCommand2, commandThree: MonitorCommand3, commandFour: MonitorCommand4);
                 }
 
                 _serialBusHelper = monitorConfigModel == null
-                    ? new SerialBusHelper(commandOne: MonitorCommand1, commandTwo: MonitorCommand2)
+                    ? new SerialBusHelper(commandOne: MonitorCommand1, commandTwo: MonitorCommand2, commandThree: MonitorCommand3, commandFour: MonitorCommand4)
                     : new SerialBusHelper(monitorConfigModel.DataBits, monitorConfigModel.Parity,
                         monitorConfigModel.StopBits,
                         monitorConfigModel.BaudRate, monitorConfigModel.PortName, MonitorCommand1,
-                        MonitorCommand2);
+                        MonitorCommand2, commandThree: MonitorCommand3, commandFour: MonitorCommand4);
             }
         }
 

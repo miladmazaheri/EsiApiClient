@@ -25,10 +25,10 @@
                 <Button x:Name="btnSend" Content="ارسال رزرو های تحویل داده شده" Height="46" Width="216" Margin="10" Click="btnSend_Click" FontFamily="{StaticResource Vazir}" FontSize="15"/>
                 <Button x:Name="btnDelete" Content="پاک سازی رزرو های ارسال شده" Height="46" Width="207" Margin="10" Click="btnDelete_Click" FontFamily="{StaticResource Vazir}" FontSize="15"/>
                 <Button x:Name="btnDeleteAll" Content="پاک سازی همه اطلاعات" Height="46" Width="159" Margin="10" Click="BtnDeleteAll_OnClick" FontFamily="{StaticResource Vazir}" FontSize="15"/>
-                <Button x:Name="btnReset" Content="Restart" Height="46" Width="73" Margin="10" Click="BtnReset_OnClick" FontFamily="{StaticResource Vazir}" FontSize="15"/>
-                <Button x:Name="btnShotDown" Content="Shotdown" Height="46" Width="82" Click="BtnShotDown_OnClick" Margin="10" FontFamily="{StaticResource Vazir}" FontSize="15"/>
+                <Button x:Name="btnReset" Content="راه اندازی مجدد" Height="46" Width="114" Margin="10" Click="BtnReset_OnClick" FontFamily="{StaticResource Vazir}" FontSize="15"/>
+                <Button x:Name="btnShutDown" Content="خاموش" Height="46" Width="76" Click="BtnShutDown_OnClick" Margin="10" FontFamily="{StaticResource Vazir}" FontSize="15"/>
                 
-                <Button x:Name="btnClose" Content="خروج" Height="46" Width="121" Margin="10" Click="btnClose_Click" FontFamily="{StaticResource Vazir}" FontSize="15"/>
+                <Button x:Name="btnClose" Content="خروج" Height="46" Width="85" Margin="10" Click="btnClose_Click" FontFamily="{StaticResource Vazir}" FontSize="15"/>
             </StackPanel>
             <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10">
                 <Label x:Name="lblMessage" FontFamily="{StaticResource Vazir}" FontSize="20" Content="" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"></Label>

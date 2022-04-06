@@ -17,6 +17,7 @@ using ApiWrapper;
 using ApiWrapper.Dto;
 using DataLayer.Dtos;
 using DataLayer.Services;
+using DNTPersianUtils.Core;
 using IPAClient.Models;
 using IPAClient.Tools;
 
@@ -52,7 +53,7 @@ namespace IPAClient.Windows
 
         private async void btnSend_Click(object sender, RoutedEventArgs e)
         {
-            await SendDeliveredReservationsToServer();
+            await SendDeliveredReservationsToServer(_reservationService, setMessageAction: SetMessage, sendMessageToSerialPortAction: SendMessageToSerialPort);
             await FillGrid();
         }
 
@@ -80,33 +81,46 @@ namespace IPAClient.Windows
         }
 
 
-        private async Task SendDeliveredReservationsToServer()
+        public static async Task SendDeliveredReservationsToServer(ReservationService reservationService, int deliveredTilNow = 0, Action<string> setMessageAction = null, Action<string> sendMessageToSerialPortAction = null)
         {
             try
             {
-                SetMessage("در حال ارسال رزرو های تحویل داده شده به سرور. لطفا منتظر بمانید");
-                var reservesToSend = await _reservationService.GetDeliveredReservesToSendAsync();
-                if (reservesToSend is not { Count: > 0 }) return;
+                setMessageAction?.Invoke("در حال ارسال رزرو های تحویل داده شده به سرور. لطفا منتظر بمانید");
+                var reservesToSend = await reservationService.GetDeliveredReservesToSendAsync();
+                if (reservesToSend is not { Count: > 0 })
+                {
+                    if (deliveredTilNow > 0)
+                    {
+                        var message = $"{deliveredTilNow} رزرو در {DateTime.Now.ToLongPersianDateTimeString()} به سرور ارسال شد";
+                        setMessageAction?.Invoke(message);
+                        sendMessageToSerialPortAction?.Invoke(message);
+                    }
+                    else
+                    {
+                        setMessageAction?.Invoke("هیچ رزروی برای تحویل وجود ندارد");
+                    }
+                    return;
+                }
 
                 var syncResult = await ApiClient.MainInfo_Synchronize_Data_Fun(new MainInfo_Synchronize_Data_Fun_Input(reservesToSend
                     .Select(x => new MainInfo_Synchronize_Data_Fun_Input_Data(App.AppConfig.Device_Cod, x.Reciver_Coupon_Id, x.Status, x.Date_Use, x.Time_Use)).ToList()));
 
                 if (!syncResult.isSuccessful)
                 {
-                    SetMessage("خطا در ارسال رزرو های تحویل داده شده به سرور" + Environment.NewLine + syncResult.message);
+                    setMessageAction?.Invoke("خطا در ارسال رزرو های تحویل داده شده به سرور" + Environment.NewLine + syncResult.message);
                     App.AddLog(new Exception(syncResult.message));
                     return;
                 }
-                else
-                {
-                    await _reservationService.SetSentToWebServiceDateTimeAsync(reservesToSend.Select(x => x.Id));
-                }
-                SetMessage("رزرو های تحویل داده شده به سرور ارسال شد");
-                await SendDeliveredReservationsToServer();
+
+                await reservationService.SetSentToWebServiceDateTimeAsync(reservesToSend.Select(x => x.Id));
+                setMessageAction?.Invoke("رزرو های تحویل داده شده به سرور ارسال شد");
+                deliveredTilNow += reservesToSend.Count;
+                await SendDeliveredReservationsToServer(reservationService, deliveredTilNow, setMessageAction, sendMessageToSerialPortAction);
+
             }
             catch (Exception e)
             {
-                SetMessage("خطا در ارسال رزرو های تحویل داده شده به سرور" + Environment.NewLine + e.Message);
+                setMessageAction?.Invoke("خطا در ارسال رزرو های تحویل داده شده به سرور" + Environment.NewLine + e.Message);
                 App.AddLog(e);
             }
         }
@@ -204,22 +218,22 @@ namespace IPAClient.Windows
             {
                 SendCommandToSerialPort("10");
                 if (MessageBox.Show("دستور راه اندازی مجدد به زیر سیستم ها ارسال شد" + Environment.NewLine +
-                                    "پس از اطمینان  از اعمال دستور این پیام را تایید نمایید", "Restart System", MessageBoxButton.OKCancel,MessageBoxImage.Asterisk,MessageBoxResult.Cancel, MessageBoxOptions.RightAlign|MessageBoxOptions.ServiceNotification) == MessageBoxResult.OK)
+                                    "پس از اطمینان  از اعمال دستور این پیام را تایید نمایید", "Restart System", MessageBoxButton.OKCancel, MessageBoxImage.Asterisk, MessageBoxResult.Cancel, MessageBoxOptions.RightAlign | MessageBoxOptions.ServiceNotification) == MessageBoxResult.OK)
                 {
                     ShutdownHelper.Restart();
                 }
             }
         }
 
-        private void BtnShotDown_OnClick(object sender, RoutedEventArgs e)
+        private void BtnShutDown_OnClick(object sender, RoutedEventArgs e)
         {
-            if (MessageBox.Show("آیا از خاموش شدن سیستم اطمینان دارید؟", "Restart System", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No, MessageBoxOptions.RightAlign | MessageBoxOptions.ServiceNotification) == MessageBoxResult.Yes)
+            if (MessageBox.Show("آیا از خاموش شدن سیستم اطمینان دارید؟", "ShutDown System", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No, MessageBoxOptions.RightAlign | MessageBoxOptions.ServiceNotification) == MessageBoxResult.Yes)
             {
                 SendCommandToSerialPort("20");
                 if (MessageBox.Show("دستور خاموش شدن به زیر سیستم ها ارسال شد" + Environment.NewLine +
-                                    "پس از اطمینان  از اعمال دستور این پیام را تایید نمایید", "Restart System", MessageBoxButton.OKCancel, MessageBoxImage.Asterisk, MessageBoxResult.Cancel, MessageBoxOptions.ServiceNotification) == MessageBoxResult.OK)
+                                    "پس از اطمینان  از اعمال دستور این پیام را تایید نمایید", "ShutDown System", MessageBoxButton.OKCancel, MessageBoxImage.Asterisk, MessageBoxResult.Cancel, MessageBoxOptions.ServiceNotification) == MessageBoxResult.OK)
                 {
-                    ShutdownHelper.Restart();
+                    ShutdownHelper.Shut();
                 }
             }
         }
@@ -229,7 +243,24 @@ namespace IPAClient.Windows
             if (!App.AppConfig.HasExtraMonitors || string.IsNullOrWhiteSpace(command) || _serialBusHelper == null) return;
             try
             {
-                _serialBusHelper.SendDate(command);
+                var dto = new MonitorDto();
+                dto.SetCommand(command);
+                _serialBusHelper.SendDate(dto.ToJson());
+            }
+            catch (Exception e)
+            {
+                App.AddLog(e);
+            }
+        }
+
+        private void SendMessageToSerialPort(string message)
+        {
+            if (!App.AppConfig.HasExtraMonitors || string.IsNullOrWhiteSpace(message) || _serialBusHelper == null) return;
+            try
+            {
+                var dto = new MonitorDto();
+                dto.AddMessageToQueue("پیام سیستم", message, "ارسال گزارش تحویل غذا");
+                _serialBusHelper.SendDate(dto.ToJson());
             }
             catch (Exception e)
             {

@@ -51,16 +51,16 @@ namespace IPAClient.Tools
             var command = _monitorSerialPort.ReadLine();
             switch (command)
             {
-                case "1"://دستور اتمام غذا
+                case "1"://دستور ارسال گزارش تحویل
                     await _commandOne?.Invoke();
                     break;
                 case "2"://در حال آماده سازی
                     await _commandTwo?.Invoke();
                     break;
-                case "3":
+                case "3":// خاموش
                     await _commandThree?.Invoke();
                     break;
-                case "4":
+                case "4"://راه اندازی مجدد
                     await _commandFour?.Invoke();
                     break;
             }
