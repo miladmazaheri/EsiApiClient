@@ -97,7 +97,9 @@ namespace IPAClient.Windows
                     }
                     else
                     {
-                        setMessageAction?.Invoke("هیچ رزروی برای تحویل وجود ندارد");
+                        var message = "هیچ رزروی برای تحویل وجود ندارد";
+                        setMessageAction?.Invoke(message);
+                        sendMessageToSerialPortAction?.Invoke(message);
                     }
                     return;
                 }
@@ -107,20 +109,23 @@ namespace IPAClient.Windows
 
                 if (!syncResult.isSuccessful)
                 {
-                    setMessageAction?.Invoke("خطا در ارسال رزرو های تحویل داده شده به سرور" + Environment.NewLine + syncResult.message);
+                    var message = "خطا در ارسال رزرو های تحویل داده شده به سرور" + Environment.NewLine + syncResult.message;
+                    setMessageAction?.Invoke(message);
+                    sendMessageToSerialPortAction?.Invoke(message);
                     App.AddLog(new Exception(syncResult.message));
                     return;
                 }
 
                 await reservationService.SetSentToWebServiceDateTimeAsync(reservesToSend.Select(x => x.Id));
-                setMessageAction?.Invoke("رزرو های تحویل داده شده به سرور ارسال شد");
                 deliveredTilNow += reservesToSend.Count;
                 await SendDeliveredReservationsToServer(reservationService, deliveredTilNow, setMessageAction, sendMessageToSerialPortAction);
 
             }
             catch (Exception e)
             {
-                setMessageAction?.Invoke("خطا در ارسال رزرو های تحویل داده شده به سرور" + Environment.NewLine + e.Message);
+                var message = "خطا در ارسال رزرو های تحویل داده شده به سرور" + Environment.NewLine + e.Message;
+                setMessageAction?.Invoke(message);
+                sendMessageToSerialPortAction?.Invoke(message);
                 App.AddLog(e);
             }
         }
